@@ -8,8 +8,6 @@ from app.views import *  # should use ..
 from flask_restful import Api
 
 main = Blueprint('main', __name__)
-
-
 api = Api(main)
 
 @main.route('/')
@@ -45,19 +43,6 @@ def logout():
 def restricted():
     return "You can only see this if you are logged in!", 200
 
-"""
-api.add_resource(team_res, "/api/v1/teams/<int:id>", )
-api.add_resource(team_match_res, "/api/v1/teams/<int:team_id>/match/<int:id>", )
-api.add_resource(match_res, "/api/v1/matches/<int:id>", )
-
-api.add_resource(PlayerMatchesQueryRes, "/api/v1/teams/<int:team_id>/match/<int:id>/players", )
-api.add_resource(MatchesQueryRes, "/api/v1/teams/<int:id>/matches", )
-
-api.add_resource(player_res, "/api/v1/players/<int:id>", )
-
-#api.add_resource(match_res, "/match/<int:match_id>", )
-
-"""
 
 api.add_resource(CreateListTeam, '/api/v1/teams/')
 api.add_resource(GetUpdateDeleteTeam, '/api/v1/teams/<int:team_id>')

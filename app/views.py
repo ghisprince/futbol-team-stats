@@ -1,11 +1,12 @@
 from flask_restful import Resource
 from flask import jsonify, make_response, request
 from sqlalchemy.exc import SQLAlchemyError
+from webargs.flaskparser import use_kwargs, parser, abort
 
-from .models import *
-from .schemas import *
+from app.models import *
+from app.schemas import *
 from marshmallow import ValidationError
-
+import webargs
 
 team_schema = TeamSchema(strict=True)
 player_schema = PlayerSchema(strict=True)
@@ -31,16 +32,25 @@ If a POST request did not include a Client-Generated ID and the
 requested resource has been created successfully, the server MUST 
 return a 201 Created status code"""
 
+# This error handler is necessary for usage with Flask-RESTful
+@parser.error_handler
+def handle_request_parsing_error(err):
+    """webargs error handler that uses Flask-RESTful's abort function to return
+    a JSON error response to the client.
+    """
+    abort(422, errors=err.messages)
+
 
 class CreateListResourceBase(Resource):
+
     def get(self):
         query = self.dbModel.query.all()
         return self.mm_schema.dump(query, many=True).data
 
     def post(self):
+        #import pdb;pdb.set_trace()
         raw_dict = request.get_json(force=True)
         try:
-            #import pdb;pdb.set_trace()
             self.mm_schema.validate(raw_dict)
             request_dict = raw_dict['data']['attributes']
             dbModelInst = self.dbModelInstFromDict(request_dict)
@@ -63,7 +73,6 @@ class CreateListResourceBase(Resource):
 
 class GetUpdateDeleteResourceBase(Resource):
     def get(self, id):
-        print("YEAH 1")
         query = self.dbModel.query.get_or_404(id)
         return self.mm_schema.dump(query).data
 
@@ -90,18 +99,54 @@ class GetUpdateDeleteResourceBase(Resource):
             resp.status_code = 401
             return resp
 
+'''
 class CreateListTeam(CreateListResourceBase):
     dbModel = Team
     mm_schema = team_schema
 
-    def dbModelInstFromDict(self, request_dict):
+    def InstanceFromDict(self, request_dict):
         return self.dbModel(request_dict['name'], )
+        #return get_or_create(db.session, self.mm_schema, name=request_dict['name'])
+'''
+
+class CreateListTeam(Resource):
+    @use_kwargs({'name': webargs.fields.Str(required=False)})
+    def get(self, name):
+        query = Team.query
+        if name:
+            query = query.filter_by(name=name)
+        return team_schema.dump(query.all(), many=True).data
+
+    def post(self):
+        import pdb;pdb.set_trace()
+        raw_dict = request.get_json(force=True)
+        try:
+            team_schema.validate(raw_dict)
+            request_dict = raw_dict['data']['attributes']
+            team = Team(request_dict['name'], )
+            team.add(team)
+            query = Team.query.get(team.id)
+            results = team_schema.dump(query).data
+            return results, 201
+
+        except ValidationError as err:
+            resp = jsonify({"error": err.messages})
+            resp.status_code = 403
+            return resp
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            resp = jsonify({"error": str(e)})
+            resp.status_code = 403
+            return resp
+
+
 
 class CreateListCampaign(CreateListResourceBase):
     dbModel = Campaign
     mm_schema = campaign_schema
 
-    def dbModelInstFromDict(self, request_dict):
+    def InstanceFromDict(self, request_dict):
         return self.dbModel(request_dict['name'], )
 
 
@@ -109,8 +154,8 @@ class CreateListMatch(CreateListResourceBase):
     dbModel = Match
     mm_schema = match_schema
 
-    def dbModelInstFromDict(self, request_dict):
-        # THIS IS ALL WRONG
+    def InstanceFromDict(self, request_dict):
+
         dbModelInst = self.dbModel(date_time=request_dict['date_time'].replace("+00:00",""),
                                    home_team=Team.query.get_or_404(request_dict['home_team']['data']['id']),
                                    away_team=Team.query.get_or_404(request_dict['away_team']['data']['id']),
@@ -123,7 +168,7 @@ class CreateListPlayer(CreateListResourceBase):
     dbModel = Player
     mm_schema = player_schema
 
-    def dbModelInstFromDict(self, request_dict):
+    def InstanceFromDict(self, request_dict):
         return self.dbModel(request_dict['name'], request_dict['number'],)
 
 
@@ -131,8 +176,7 @@ class CreateListPlayerMatch(CreateListResourceBase):
     dbModel = PlayerMatch
     mm_schema = playermatch_schema
 
-    def dbModelInstFromDict(self, request_dict):
-        import pdb;pdb.set_trace()
+    def InstanceFromDict(self, request_dict):
         player = db.session.query(Player).filter_by(id=request_dict['player']['data']['id']).one()
         match = db.session.query(Match).filter_by(id=request_dict['match']['data']['id']).one()
         team = db.session.query(Team).filter_by(id=request_dict['team']['data']['id']).one()
@@ -150,11 +194,6 @@ class CreateListPlayerMatch(CreateListResourceBase):
 
 ###########################################
 ###########################################
-###########################################
-###########################################
-
-
-
 
 
 class GetUpdateDeleteTeam(Resource):
@@ -240,7 +279,6 @@ class GetUpdateDeletePlayer(Resource):
         try:
             player_schema.validate(raw_dict)
             request_dict = raw_dict['data']['attributes']
-            import pdb;pdb.set_trace()
             for key, value in request_dict.items():
                 setattr(player, key, value)
 
@@ -315,144 +353,3 @@ class GetUpdateDeletePlayerMatch(Resource):
             resp = jsonify({"error": str(e)})
             resp.status_code = 401
             return resp
-
-
-
-
-
-
-
-
-
-
-
-'''
-class CreateListTeam(Resource):
-    def get(self):
-        query = Team.query.all()
-        return team_schema.dump(query, many=True).data
-
-    def post(self):
-        raw_dict = request.get_json(force=True)
-        try:
-            team_schema.validate(raw_dict)
-            request_dict = raw_dict['data']['attributes']
-            team = Team(request_dict['name'],)
-            team.add(team)
-            query = Team.query.get(team.id)
-            results = team_schema.dump(query).data
-            return results, 201
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 403
-            return resp
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 403
-            return resp
-
-class GetUpdateDeleteTeam(Resource):
-    def get(self, id):
-        query = Team.query.get_or_404(id)
-        return team_schema.dump(query).data
-
-    def patch(self, id):
-        team = Team.query.get_or_404(id)
-        raw_dict = request.get_json(force=True)
-        try:
-            team_schema.validate(raw_dict)
-            request_dict = raw_dict['data']['attributes']
-            for key, value in request_dict.items():
-                setattr(team, key, value)
-
-            team.update()
-            return self.get(id)
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 401
-            return resp
-
-
-class CreateListPlayer(Resource):
-    def get(self):
-        query = Player.query.all()
-        return player_schema.dump(query, many=True).data
-
-    def post(self):
-        raw_dict = request.get_json(force=True)
-        try:
-            player_schema.validate(raw_dict)
-            request_dict = raw_dict['data']['attributes']
-            player = Player(request_dict['name'],)
-            player.add(player)
-            query = Player.query.get(player.id)
-            results = player_schema.dump(query).data
-            return results, 201
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 403
-            return resp
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 403
-            return resp
-
-
-class GetUpdateDeletePlayer(Resource):
-    def get(self, id):
-        query = Player.query.get_or_404(id)
-        return player_schema.dump(query).data
-
-    def patch(self, id):
-        player = Player.query.get_or_404(id)
-        raw_dict = request.get_json(force=True)
-        try:
-            player_schema.validate(raw_dict)
-            request_dict = raw_dict['data']['attributes']
-            for key, value in request_dict.items():
-                setattr(player, key, value)
-
-            player.update()
-            return self.get(id)
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 401
-            return resp
-
-class CreateListPlayerMatch(Resource):
-    def get(self):
-        query = PlayerMatch.query.all()
-        return playermatch_schema.dump(query, many=True).data
-
-class CreateListMatch(Resource):
-    def get(self):
-        query = Match.query.all()
-        return match_schema.dump(query, many=True).data
-
-'''
-
-
-
-
-
-

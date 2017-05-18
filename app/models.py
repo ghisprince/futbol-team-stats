@@ -33,7 +33,8 @@ def get_or_create(session, model, **kwargs):
 # many to many relationship between User and Team
 association = db.Table('association',
                        db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                       db.Column('team_id', db.Integer, db.ForeignKey('team.id')))
+                       db.Column('team_id', db.Integer, db.ForeignKey('team.id'))
+                       )
 
 
 class User(db.Model, CRUD_MixIn, UserMixin):
@@ -80,8 +81,10 @@ class Team(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False, unique=True)
 
-    home_matches = db.relationship('Match', foreign_keys='Match.home_team_id', backref='home_team', lazy='dynamic')
-    away_matches = db.relationship('Match', foreign_keys='Match.away_team_id', backref='away_team', lazy='dynamic')
+    home_matches = db.relationship('Match', foreign_keys='Match.home_team_id',
+                                   backref='home_team', lazy='dynamic')
+    away_matches = db.relationship('Match', foreign_keys='Match.away_team_id',
+                                   backref='away_team', lazy='dynamic')
     player_matches = db.relationship("PlayerMatch", back_populates="team")
 
     def __init__(self, name=None):
@@ -93,8 +96,6 @@ class Team(db.Model, CRUD_MixIn):
     @property
     def matches(self):
         return self.home_matches.union(self.away_matches)
-
-
 
 
 class Campaign(db.Model, CRUD_MixIn):
@@ -109,8 +110,6 @@ class Campaign(db.Model, CRUD_MixIn):
         return "Campaign (name={})".format(self.name)
 
 
-
-
 class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     date_time = db.Column(db.DateTime(), nullable=False, unique=True)
@@ -119,10 +118,7 @@ class Match(db.Model, CRUD_MixIn):
     player_matches = db.relationship("PlayerMatch", back_populates="match")
 
     home_team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    #home_team = db.relationship("Team", back_populates="home_matches")
-
     away_team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    #away_team = db.relationship("Team", back_populates="away_matches")
 
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
     campaign = db.relationship("Campaign", back_populates="matches")
@@ -134,9 +130,8 @@ class Match(db.Model, CRUD_MixIn):
         self.campaign = campaign
 
     def __repr__(self):
-        return "Match (home_team={}, away_team={}, date_time={})".format(self.home_team,
-                                                                         self.away_team,
-                                                                         self.date_time)
+        return "Match (home_team={}, away_team={}, date_time={})".format(
+                                self.home_team, self.away_team, self.date_time)
 
 
 class Player(db.Model, CRUD_MixIn):
@@ -213,11 +208,11 @@ class Shot(db.Model, CRUD_MixIn):
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
                                 nullable=False)
-    player_match = db.relationship("PlayerMatch", back_populates="shots")
 
+    player_match = db.relationship("PlayerMatch", back_populates="shots")
     goal = db.relationship("Goal", uselist=False, back_populates="shot")
 
-    def __init__(self, player_match, x=None, y=None, on_goal=None, pk=None, goal=None):
+    def __init__(self, player_match, x=None, y=None, on_goal=None, pk=None):
         self.player_match = player_match
         self.x = x
         self.y = y
@@ -226,7 +221,7 @@ class Shot(db.Model, CRUD_MixIn):
 
     def __repr__(self):
         return "Shot (player={}, x={}, y={}, on_goal={}, pk={})".format(
-            self.player_match.player.name, self.x, self.y, self.on_goal, self.pk)
+           self.player_match.player.name, self.x, self.y, self.on_goal, self.pk)
 
 
 class Goal(db.Model, CRUD_MixIn):
@@ -234,7 +229,7 @@ class Goal(db.Model, CRUD_MixIn):
     time = db.Column(db.Integer(), nullable=True)
 
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
-                                nullable = False)
+                                nullable=False)
     player_match = db.relationship("PlayerMatch", back_populates="goals")
 
     # relationships
@@ -243,7 +238,7 @@ class Goal(db.Model, CRUD_MixIn):
 
     assist = db.relationship("Assist", back_populates="goal")
 
-    def __init__(self, player_match, shot, time=None, ):
+    def __init__(self, player_match, shot, time=None):
         self.time = time
         self.shot = shot
         self.player_match = player_match
@@ -256,7 +251,7 @@ class Goal(db.Model, CRUD_MixIn):
 class Assist(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
-                                nullable=False )
+                                nullable=False)
     player_match = db.relationship("PlayerMatch", back_populates="assists")
 
     # relationships
@@ -269,7 +264,7 @@ class Assist(db.Model, CRUD_MixIn):
 
     def __repr__(self):
         return "Assist (player={}, goal.player={})".format(
-            self.player_match.player.name, self.goal.player_match.player.name )
+            self.player_match.player.name, self.goal.player_match.player.name)
 
 
 class ShotAgainst(db.Model, CRUD_MixIn):
@@ -285,11 +280,10 @@ class ShotAgainst(db.Model, CRUD_MixIn):
                                 nullable=False)
     player_match = db.relationship("PlayerMatch", back_populates="shots_against")
 
-    def __init__(self, x=None, y=None, on_goal=None, saved=None, goal=None, pk=None, ):
+    def __init__(self, x=None, y=None, on_goal=None, scored=None, pk=None):
         self.x = x
         self.y = y
         self.on_goal = on_goal
-        self.saved = saved
-        self.goal = goal
+        self.scored = scored
         self.pk = pk
 
