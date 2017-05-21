@@ -81,7 +81,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "goal": true,
+            "saved": true,
             "pk": false,
             "keeper": "K"
         }
@@ -160,7 +160,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "goal": true,
+            "saved": true,
             "pk": false,
             "keeper": "K"
         },
@@ -168,7 +168,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "goal": false,
+            "saved": false,
             "pk": false,
             "keeper": "K"
         }

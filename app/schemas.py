@@ -55,6 +55,7 @@ class PlayerSchema(Schema):
     id = fields.String(dump_only=True)
     name = fields.String(validate=must_not_be_blank)
     number = fields.Integer()
+    team = fields.Nested('TeamSchema',)
 
     class Meta:
         strict = True

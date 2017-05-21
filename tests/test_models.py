@@ -53,6 +53,13 @@ class TestModels:
         player = Player("Lil' Messi", 10)
         assert player.number == 10
         assert player.name == "Lil' Messi"
+        assert player.team is None
+
+        team = Team("Barca")
+        player.team == team
+
+        player = Player("Lil' Ronaldhino", 11, team)
+        assert player.team.name == "Barca"
 
     def test_match(self, testapp):
         match = Match("2017-01-02T08:00:00",

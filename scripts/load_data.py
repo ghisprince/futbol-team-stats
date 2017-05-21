@@ -52,9 +52,10 @@ def load_match(match_data):
     print("Load PlayerMatch")
     for pm_data in match_data["player_match"]:
         print(" - player match : {}".format(pm_data["name"]))
-        playerMatch = PlayerMatch(player=get_or_create(db.session, Player, name=pm_data["name"]),
+        team = get_or_create(db.session, Team, name=pm_data["team"])
+        playerMatch = PlayerMatch(player=get_or_create(db.session, Player, name=pm_data["name"], team=team),
                                   match=match,
-                                  team=get_or_create(db.session, Team, name=pm_data["team"]),
+                                  team=team,
                                   started=pm_data["started"],
                                   minutes=pm_data["minutes"],
                                   subbed_due_to_injury=pm_data["subbed_due_to_injury"],
@@ -69,8 +70,6 @@ def load_match(match_data):
     print("Load Shots")
     for shot_data in match_data.get("shot", []):
         playerMatch = get_player_match_by_name(match, shot_data['player'])
-        if playerMatch is None:
-            import pdb;pdb.set_trace()
         shot = Shot(playerMatch,
                     x=shot_data['x'], y=shot_data['y'],
                     on_goal=shot_data['on_goal'], pk=shot_data['pk'])
@@ -91,7 +90,7 @@ def load_match(match_data):
     for shot_ag_data in match_data.get("shot_against", []):
         shotAgainst = ShotAgainst(x=shot_ag_data["x"], y=shot_ag_data["y"],
                                   on_goal=shot_ag_data["on_goal"],
-                                  goal=shot_ag_data["goal"],
+                                  saved=shot_ag_data["saved"],
                                   pk=shot_ag_data["pk"],
                                   )
         keeper = get_player_match_by_name(match, shot_ag_data['keeper'])
@@ -117,7 +116,11 @@ def pprint():
 
 #validate_player_match(milan_2017_04_22_match)
 
-d = json.load(open("data.json", "r"))
+
+
+
+d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "data.json"), "r"))
 for i in d:
     load_match(i)
 print("FIN")

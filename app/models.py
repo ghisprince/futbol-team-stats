@@ -85,6 +85,8 @@ class Team(db.Model, CRUD_MixIn):
                                    backref='home_team', lazy='dynamic')
     away_matches = db.relationship('Match', foreign_keys='Match.away_team_id',
                                    backref='away_team', lazy='dynamic')
+    players = db.relationship("Player", back_populates="team")
+
     player_matches = db.relationship("PlayerMatch", back_populates="team")
 
     def __init__(self, name=None):
@@ -142,13 +144,16 @@ class Player(db.Model, CRUD_MixIn):
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="player")
 
-    def __init__(self, name, number=None):
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
+    team = db.relationship("Team", back_populates="players")
+
+    def __init__(self, name, number=None, team=None):
         self.name = name
         self.number = number
+        self.team = team
 
     def __repr__(self):
         return "Player (number={}, name={})".format(self.number, self.name)
-
 
 
 
@@ -194,8 +199,6 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     def __repr__(self):
         return "PlayerMatch (player={}, started={}, minutes={})".format(
             self.player.name, self.started, self.minutes,)
-
-
 
 
 class Shot(db.Model, CRUD_MixIn):
@@ -272,7 +275,7 @@ class ShotAgainst(db.Model, CRUD_MixIn):
     x = db.Column(db.Integer(), )
     y = db.Column(db.Integer(), )
     on_goal = db.Column(db.Boolean(), default=False, nullable=False)
-    goal = db.Column(db.Boolean(), default=False, nullable=False)
+    saved = db.Column(db.Boolean(), default=False, nullable=False)
     pk = db.Column(db.Boolean(), default=False, nullable=False)
 
     # relationships
@@ -280,10 +283,10 @@ class ShotAgainst(db.Model, CRUD_MixIn):
                                 nullable=False)
     player_match = db.relationship("PlayerMatch", back_populates="shots_against")
 
-    def __init__(self, x=None, y=None, on_goal=None, scored=None, pk=None):
+    def __init__(self, x=None, y=None, on_goal=None, saved=None, pk=None):
         self.x = x
         self.y = y
         self.on_goal = on_goal
-        self.scored = scored
+        self.saved = saved
         self.pk = pk
 

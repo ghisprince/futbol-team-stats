@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, login_required
 from app.extensions import cache
 from app.forms import LoginForm
 from app.models import *
-from app.views import *  # should use ..
+from app.views import *
 from flask_restful import Api
 
 main = Blueprint('main', __name__)
@@ -44,8 +44,29 @@ def restricted():
     return "You can only see this if you are logged in!", 200
 
 
+api_v1_html = """
+<p>
+rest api version 1.0
+    <ul>
+    <li><a href="/api/v1/teams/">/api/v1/teams/</a></li>
+    <li><a href="/api/v1/players/">/api/v1/players/</a></li>
+    <li><a href="/api/v1/campaigns/">/api/v1/campaigns/</a></li>
+    <li><a href="/api/v1/matches/">/api/v1/matches/</a></li>
+    <li><a href="/api/v1/playermatches/">/api/v1/playermatches/</a></li>    
+    </ul>
+</p>
+
+"""
+
+@main.route("/api/v1")
+def api_v1():
+    return api_v1_html
+
+
 api.add_resource(CreateListTeam, '/api/v1/teams/')
 api.add_resource(GetUpdateDeleteTeam, '/api/v1/teams/<int:team_id>')
+api.add_resource(AddRemoveListTeamPlayer, '/api/v1/teams/<int:team_id>/players/')
+
 
 api.add_resource(CreateListPlayer, '/api/v1/players/')
 api.add_resource(GetUpdateDeletePlayer, '/api/v1/players/<int:player_id>')

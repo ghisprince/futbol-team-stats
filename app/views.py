@@ -32,28 +32,22 @@ If a POST request did not include a Client-Generated ID and the
 requested resource has been created successfully, the server MUST 
 return a 201 Created status code"""
 
-# This error handler is necessary for usage with Flask-RESTful
-@parser.error_handler
-def handle_request_parsing_error(err):
-    """webargs error handler that uses Flask-RESTful's abort function to return
-    a JSON error response to the client.
-    """
-    abort(422, errors=err.messages)
-
 
 class CreateListResourceBase(Resource):
 
-    def get(self):
-        query = self.dbModel.query.all()
-        return self.mm_schema.dump(query, many=True).data
+    @use_kwargs({'name': webargs.fields.Str(required=False)})
+    def get(self, name):
+        query = self.dbModel.query
+        if name:
+            query = query.filter_by(name=name)
+        return self.mm_schema.dump(query.all(), many=True).data
 
     def post(self):
-        #import pdb;pdb.set_trace()
         raw_dict = request.get_json(force=True)
         try:
             self.mm_schema.validate(raw_dict)
             request_dict = raw_dict['data']['attributes']
-            dbModelInst = self.dbModelInstFromDict(request_dict)
+            dbModelInst = self.InstanceFromDict(request_dict)
             dbModelInst.add(dbModelInst)
             query = self.dbModel.query.get(dbModelInst.id)
             results = self.mm_schema.dump(query).data
@@ -99,14 +93,22 @@ class GetUpdateDeleteResourceBase(Resource):
             resp.status_code = 401
             return resp
 
-'''
+
 class CreateListTeam(CreateListResourceBase):
     dbModel = Team
     mm_schema = team_schema
 
     def InstanceFromDict(self, request_dict):
         return self.dbModel(request_dict['name'], )
-        #return get_or_create(db.session, self.mm_schema, name=request_dict['name'])
+
+
+class AddRemoveListTeamPlayer(Resource):
+    def get(self, team_id):
+        query = Player.query.filter_by(team_id=team_id)
+        return player_schema.dump(query.all(), many=True).data
+
+
+
 '''
 
 class CreateListTeam(Resource):
@@ -118,7 +120,6 @@ class CreateListTeam(Resource):
         return team_schema.dump(query.all(), many=True).data
 
     def post(self):
-        import pdb;pdb.set_trace()
         raw_dict = request.get_json(force=True)
         try:
             team_schema.validate(raw_dict)
@@ -139,7 +140,7 @@ class CreateListTeam(Resource):
             resp = jsonify({"error": str(e)})
             resp.status_code = 403
             return resp
-
+'''
 
 
 class CreateListCampaign(CreateListResourceBase):
@@ -155,12 +156,12 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema = match_schema
 
     def InstanceFromDict(self, request_dict):
-
-        dbModelInst = self.dbModel(date_time=request_dict['date_time'].replace("+00:00",""),
-                                   home_team=Team.query.get_or_404(request_dict['home_team']['data']['id']),
-                                   away_team=Team.query.get_or_404(request_dict['away_team']['data']['id']),
-                                   campaign=Campaign.query.get_or_404(request_dict['campaign']['data']['id']),
-                                   )
+        dbModelInst = self.dbModel(
+            date_time=request_dict['date_time'].replace("+00:00",""),
+            home_team=Team.query.get_or_404(request_dict['home_team']['data']['id']),
+            away_team=Team.query.get_or_404(request_dict['away_team']['data']['id']),
+            campaign=Campaign.query.get_or_404(request_dict['campaign']['data']['id']),
+            )
         return dbModelInst
 
 
@@ -169,7 +170,15 @@ class CreateListPlayer(CreateListResourceBase):
     mm_schema = player_schema
 
     def InstanceFromDict(self, request_dict):
-        return self.dbModel(request_dict['name'], request_dict['number'],)
+        try:
+            team_id = request_dict['team']['data']['id']
+            team = db.session.query(Team).filter_by(id=team_id).one()
+        except KeyError:
+            team = None
+
+        return self.dbModel(name=request_dict['name'],
+                            number=request_dict.get('number', None),
+                            team=team)
 
 
 class CreateListPlayerMatch(CreateListResourceBase):
@@ -180,14 +189,15 @@ class CreateListPlayerMatch(CreateListResourceBase):
         player = db.session.query(Player).filter_by(id=request_dict['player']['data']['id']).one()
         match = db.session.query(Match).filter_by(id=request_dict['match']['data']['id']).one()
         team = db.session.query(Team).filter_by(id=request_dict['team']['data']['id']).one()
-        dbModelInst = self.dbModel(player=player, team=team, match=match,
-                                   started=request_dict['started'],
-                                   minutes=request_dict['minutes'],
-                                   subbed_due_to_injury=request_dict['subbed_due_to_injury'],
-                                   yellow_card=request_dict['yellow_card'],
-                                   red_card=request_dict['red_card'],
-                                   corner=request_dict['corner'],
-                                   )
+        dbModelInst = self.dbModel(
+                        player=player, team=team, match=match,
+                        started=request_dict['started'],
+                        minutes=request_dict['minutes'],
+                        subbed_due_to_injury=request_dict['subbed_due_to_injury'],
+                        yellow_card=request_dict['yellow_card'],
+                        red_card=request_dict['red_card'],
+                        corner=request_dict['corner'],
+                        )
 
         return dbModelInst
 
@@ -318,6 +328,19 @@ class GetUpdateDeleteCampaign(Resource):
             resp = jsonify({"error": err.messages})
             resp.status_code = 401
             return resp
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            resp = jsonify({"error": str(e)})
+            resp.status_code = 401
+            return resp
+    def delete(self, campaign_id):
+        campaign = Campaign.query.get_or_404(campaign_id)
+        try:
+            delete = campaign.delete(campaign)
+            response = make_response()
+            response.status_code = 204
+            return response
 
         except SQLAlchemyError as e:
             db.session.rollback()
