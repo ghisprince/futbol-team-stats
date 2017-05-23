@@ -4,8 +4,11 @@ from flask import Flask
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 
 from app import assets
-from app.models import db
 from app.controllers.main import main
+from app.shared import api
+from app.shared import db
+from app.shared import ma
+
 
 from app.extensions import (
     cache,
@@ -37,6 +40,8 @@ def create_app(object_name):
 
     # initialize SQLAlchemy
     db.init_app(app)
+    ma.init_app(app)
+    api.init_app(app)
 
     login_manager.init_app(app)
 
@@ -45,6 +50,7 @@ def create_app(object_name):
     assets_loader = PythonAssetsLoader(assets)
     for name, bundle in assets_loader.load_bundles().items():
         assets_env.register(name, bundle)
+
 
     # register our blueprints
     app.register_blueprint(main)

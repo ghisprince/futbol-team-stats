@@ -3,6 +3,7 @@
 
 import pytest
 from app.models import *
+import pdb
 
 create_user = False
 
@@ -29,7 +30,6 @@ class TestModels:
         assert admin.check_password('supersafepassword')
 
     def test_team(self, testapp):
-        """ """
         team = Team("Shark Tornado")
         assert team.name == "Shark Tornado"
         assert team.id is None
@@ -39,8 +39,6 @@ class TestModels:
         assert team.id is not None
 
     def test_get_or_create(self, testapp):
-        """ """
-
         assert Team.query.filter_by(name="Cabras").first() is None
 
         # make sure get or create works
@@ -49,7 +47,6 @@ class TestModels:
         assert team2.id == team.id
 
     def test_player(self, testapp):
-        """ """
         player = Player("Lil' Messi", 10)
         assert player.number == 10
         assert player.name == "Lil' Messi"
@@ -60,6 +57,13 @@ class TestModels:
 
         player = Player("Lil' Ronaldhino", 11, team)
         assert player.team.name == "Barca"
+
+    def test_campaign(self, testapp):
+        camp = Campaign("Spring 2017")
+        assert camp.name == "Spring 2017"
+
+        camp.result = "2nd place"
+        assert camp.result == "2nd place"
 
     def test_match(self, testapp):
         match = Match("2017-01-02T08:00:00",
@@ -102,10 +106,9 @@ class TestModels:
         shot2 = Shot(player_match2, 40, 10, on_goal=False)
         shot3 = Shot(player_match2, 10, 10, on_goal=True)
 
-        goal1 = Goal(player_match1, shot1)
+        goal1 = Goal(shot1)
         assist = Assist(player_match3, goal1)
-        goal2 = Goal(player_match2, shot3)
-
+        goal2 = Goal(shot3)
 
         # test
         assert player_match1.match.home_team.name == "Lil' Barca"
@@ -123,6 +126,7 @@ class TestModels:
         assert len(match.player_matches) == 3
         assert sorted([i.player.number for i in match.player_matches]) == [4, 7, 10]
 
+        # persist everything
         db.session.add(home_team)
         db.session.add(away_team)
         db.session.add(match)
@@ -136,6 +140,20 @@ class TestModels:
         db.session.add(assist)
 
         db.session.commit()
+
+        # now try some deletes
+        assert(len(Goal.query.all())) == 2
+        assert(len(Assist.query.all())) == 1
+        assert(len(Shot.query.all())) == 3
+
+        # delete teh shot that scored, and has an assist
+        shot = Shot.query.first()
+        shot.delete(shot)
+
+        assert(len(Goal.query.all())) == 1
+        assert(len(Assist.query.all())) == 0
+        assert(len(Shot.query.all())) == 2
+
 
     def test_goal(self, testapp):
         home_team = Team("Lil' Barca")
@@ -161,3 +179,22 @@ class TestModels:
 
         assert len(match.player_matches) == 2
         assert sorted([i.player.number for i in match.player_matches]) == [7, 10]
+
+    def test_assist(self, testapp):
+        home_team = Team("A Team")
+        away_team = Team("B Team")
+        match = Match("2017-11-12T08:00:00",
+                      home_team,
+                      away_team,)
+
+        player_match1 = PlayerMatch(Player("Player A", 10),
+                                    home_team, match, True, 60, True, 1, 0, 1)
+
+        player_match2 = PlayerMatch(Player("Player B", 7),
+                                    away_team, match, False, 60, False, 0, 1, 2)
+
+        shot = Shot(player_match1, 1, 1, True, False)
+        goal = Goal(shot, 89)
+        assist = Assist(player_match2, goal)
+        assert assist.goal.shot.player_match.player.name == "Player A"
+        assert assist.player_match.player.name == "Player B"

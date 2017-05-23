@@ -1,14 +1,14 @@
-from flask import Blueprint, render_template, flash, request, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
 from flask_login import login_user, logout_user, login_required
+
 
 from app.extensions import cache
 from app.forms import LoginForm
 from app.models import *
-from app.views import *
-from flask_restful import Api
+
+
 
 main = Blueprint('main', __name__)
-api = Api(main)
 
 @main.route('/')
 @cache.cached(timeout=1000)
@@ -63,22 +63,4 @@ def api_v1():
     return api_v1_html
 
 
-api.add_resource(CreateListTeam, '/api/v1/teams/')
-api.add_resource(GetUpdateDeleteTeam, '/api/v1/teams/<int:team_id>')
-api.add_resource(AddRemoveListTeamPlayer, '/api/v1/teams/<int:team_id>/players/')
-
-
-api.add_resource(CreateListPlayer, '/api/v1/players/')
-api.add_resource(GetUpdateDeletePlayer, '/api/v1/players/<int:player_id>')
-
-api.add_resource(CreateListMatch, '/api/v1/matches/')
-api.add_resource(GetUpdateDeleteMatch, '/api/v1/matches/<int:match_id>')
-
-#api.add_resource(CreateListTeamMatch, '/api/v1/teams/<int:team_id>/matches/')
-#api.add_resource(GetUpdateDeleteTeamMatch, '/api/v1/teams/<int:team_id>/matches/<int:match_id>')
-
-api.add_resource(CreateListCampaign, '/api/v1/campaigns/')
-api.add_resource(GetUpdateDeleteCampaign, '/api/v1/campaigns/<int:campaign_id>')
-
-api.add_resource(CreateListPlayerMatch, '/api/v1/playermatches/')
-api.add_resource(GetUpdateDeletePlayerMatch, '/api/v1/playermatches/<int:playermatch_id>')
+from app.api import *

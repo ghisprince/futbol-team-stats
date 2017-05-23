@@ -4,6 +4,7 @@ db_file = tempfile.NamedTemporaryFile()
 
 class Config(object):
     SECRET_KEY = 'REPLACE ME'
+    JSONIFY_PRETTYPRINT_REGULAR = True
 
 
 class ProdConfig(Config):

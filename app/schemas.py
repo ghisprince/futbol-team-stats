@@ -1,85 +1,182 @@
-from marshmallow_jsonapi import fields
-from marshmallow_jsonapi.flask import Schema
-from marshmallow import validate, ValidationError
+#from marshmallow_jsonapi import fields
+#from marshmallow_jsonapi.flask import Schema
+from marshmallow import validate, ValidationError, fields
+from flask_marshmallow.sqla import ModelSchema, HyperlinkRelated
+from app.shared import ma
+from app.shared import api
+from app.models import *
 
 
-# for schema objects
-not_blank = validate.Length(min=1, error='Field cannot be blank')
-
-# Custom validator
-def must_not_be_blank(data):
-    if not data:
-        raise ValidationError('Data not provided.')
-
-
-class TeamSchema(Schema):
-    id = fields.String(dump_only=True)
-    name = fields.String(validate=must_not_be_blank)
-
-    class Meta:
-        strict = True
-        type_ = "team"
-        self_view = "main.GetUpdateDeleteTeam".lower()
-        self_view_kwargs = {'team_id': "<id>"}
-        self_view_many = 'main.CreateListTeam'.lower()
-
-
-class CampaignSchema(Schema):
-    id = fields.String(dump_only=True)
-    name = fields.String(validate=must_not_be_blank)
+class TeamSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteTeam'.lower(), team_id="<id>"),
+         'collection': ma.URLFor('CreateListTeam'.lower(),),
+         'matches': ma.URLFor('AddRemoveListTeamMatch'.lower(), team_id="<id>"),
+         'players': ma.URLFor('AddRemoveListTeamPlayer'.lower(), team_id="<id>"),
+         })
 
     class Meta:
         strict = True
-        type_ = "campaign"
-        self_view = "main.GetUpdateDeleteCampaign".lower()
-        self_view_kwargs = {'campaign_id': "<id>"}
-        self_view_many = 'main.CreateListCampaign'.lower()
+        model = Team
+        sqla_session = db.session
 
 
-class MatchSchema(Schema):
-    id = fields.String(dump_only=True)
-    date_time = fields.DateTime(format='iso8601', validate=must_not_be_blank)
-    home_team = fields.Nested('TeamSchema', validate=must_not_be_blank)
-    away_team = fields.Nested('TeamSchema', validate=must_not_be_blank)
-    campaign = fields.Nested('CampaignSchema')
+class PlayerSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeletePlayer'.lower(), player_id="<id>"),
+         'collection': ma.URLFor('CreateListPlayer'.lower()),
+         'playermatches': ma.URLFor('AddRemoveListPlayerPlayerMatch'.lower(),
+                                player_id="<id>")
+        })
 
-    class Meta:
-        strict = True
-        type_ = "match"
-        self_view = "main.GetUpdateDeleteMatch".lower()
-        self_view_kwargs = {'match_id': "<id>"}
-        self_view_many = 'main.CreateListMatch'.lower()
+    player_matches = fields.Nested('PlayerMatchSchema',
+                                   many=True,
+                                   dump_only=True,
+                                   only=("_links", "id",))
 
-
-class PlayerSchema(Schema):
-    id = fields.String(dump_only=True)
-    name = fields.String(validate=must_not_be_blank)
-    number = fields.Integer()
-    team = fields.Nested('TeamSchema',)
+    team = fields.Nested('TeamSchema',
+                         dump_only=True,
+                         only=("_links", "id", "name"))
 
     class Meta:
         strict = True
-        type_ = "player"
-        self_view = "main.GetUpdateDeletePlayer".lower()
-        self_view_kwargs = {'player_id': "<id>"}
-        self_view_many = 'main.CreateListPlayer'.lower()
+        model = Player
+        sqla_session = db.session
 
 
-class PlayerMatchSchema(Schema):
-    id = fields.String(dump_only=True)
-    started = fields.Boolean()
-    minutes = fields.Integer(validate=must_not_be_blank)
-    subbed_due_to_injury = fields.Boolean()
-    yellow_card = fields.Integer()
-    red_card = fields.Integer()
-    corner = fields.Integer()
-    player = fields.Nested(PlayerSchema, only=('id',), validate=must_not_be_blank)
-    team = fields.Nested(TeamSchema, only=('id',), validate=must_not_be_blank)
-    match = fields.Nested(MatchSchema, only=('id',), validate=must_not_be_blank)
+class CampaignSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteCampaign'.lower(), campaign_id="<id>"),
+         'collection': ma.URLFor('CreateListCampaign'.lower())
+        })
+
+    matches = fields.Nested('MatchSchema',
+                            many=True,
+                            dump_only=True,
+                            only=("_links", "id", "date_time", "away_team", "home_team"))
 
     class Meta:
         strict = True
-        type_ = "playermatch"
-        self_view = "main.GetUpdateDeletePlayerMatch".lower()
-        self_view_kwargs = {'playermatch_id': "<id>"}
-        self_view_many = 'main.CreateListPlayerMatch'.lower()
+        model = Campaign
+        sqla_session = db.session
+
+
+class ShotSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteShot'.lower(), shot_id="<id>"),
+         'collection': ma.URLFor('CreateListShot'.lower())
+        })
+    goal = fields.Nested('GoalSchema',
+                            dump_only=True,
+                            only=("_links", "id", "time", ))
+
+    class Meta:
+        strict = True
+        model = Shot
+        sqla_session = db.session
+
+
+class AssistSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteAssist'.lower(), assist_id="<id>"),
+         'collection': ma.URLFor('CreateListAssist'.lower())
+        })
+
+    class Meta:
+        strict = True
+        model = Assist
+        sqla_session = db.session
+
+
+class GoalSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteGoal'.lower(), goal_id="<id>"),
+         'collection': ma.URLFor('CreateListGoal'.lower())
+        })
+
+    # comment out due to error at http://127.0.0.1:5000/api/v1/playermatches/
+    assist = fields.Nested('AssistSchema',
+                            dump_only=True,
+                            only=("_links", "id"))
+    class Meta:
+        strict = True
+        model = Goal
+        sqla_session = db.session
+
+
+class ShotAgainstSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteShotAgainst'.lower(),
+                           shotagainst_id="<id>"),
+         'collection': ma.URLFor('CreateListShotAgainst'.lower())
+        })
+
+    class Meta:
+        strict = True
+        model = ShotAgainst
+        sqla_session = db.session
+
+
+class PlayerMatchSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeletePlayerMatch'.lower(),
+                           playermatch_id="<id>"),
+         'collection': ma.URLFor('CreateListPlayerMatch'.lower()),
+         })
+
+
+    player = fields.Nested(PlayerSchema,
+                             dump_only=True,
+                             only=("_links", "id", "name", "number"))
+
+    team = fields.Nested(TeamSchema, dump_only=True,
+                         only=("_links", "id", "name"))
+
+    match = fields.Nested('MatchSchema', dump_only=True,
+                          only=("_links", "id", ))
+
+    shots = fields.Nested(ShotSchema, dump_only=True, many=True)
+    assists = fields.Nested(AssistSchema, dump_only=True, many=True)
+    goals = fields.Nested(GoalSchema, dump_only=True, many=True)
+    shots_against = fields.Nested(ShotAgainstSchema, dump_only=True, many=True)
+
+    class Meta:
+        strict = True
+        model = PlayerMatch
+        sqla_session = db.session
+
+
+class MatchSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), match_id="<id>"),
+         'collection': ma.URLFor('CreateListMatch'.lower()),
+         'playermatches': ma.URLFor('AddRemoveListMatchPlayerMatch'.lower(),
+                                    match_id="<id>"),
+         })
+
+    campaign = fields.Nested(CampaignSchema,
+                             dump_only=True,
+                             only=("_links", "id", "name"))
+
+    away_team = fields.Nested(TeamSchema, dump_only=True,
+                              only=("_links", "id", "name"))
+
+    home_team = fields.Nested(TeamSchema, dump_only=True,
+                              only=("_links", "id", "name"))
+
+
+    player_matches = fields.Nested(PlayerMatchSchema,
+                                   dump_only=True,
+                                   many=True,
+                                   only=("_links", "id",
+                                         "player", "minutes", "started",)
+                                         #"subbed_due_to_injury",
+                                         #"goals", "assists", "shots", "corner",
+                                         #"shots_against",
+                                         #"yellow_card", "red_card"
+                                         #)
+                                   )
+    class Meta:
+        strict = True
+        model = Match
+        sqla_session = db.session

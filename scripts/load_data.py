@@ -61,7 +61,7 @@ def load_match(match_data):
                                   subbed_due_to_injury=pm_data["subbed_due_to_injury"],
                                   yellow_card=pm_data["yellow_card"],
                                   red_card=pm_data["red_card"],
-                                  corner=pm_data["corner"],
+                                  corners=pm_data["corners"],
                                   )
 
         db.session.add(playerMatch)

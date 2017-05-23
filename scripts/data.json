@@ -13,7 +13,7 @@
             "subbed_due_to_injury": false,
             "yellow_card": 1,
             "red_card": 1,
-            "corner": 1
+            "corners": 1
         },
         {
             "team": "A Team",
@@ -23,7 +23,7 @@
             "subbed_due_to_injury": false,
             "yellow_card": 0,
             "red_card": 0,
-            "corner": 0
+            "corners": 0
         },
         {
             "team": "A Team",
@@ -33,7 +33,7 @@
             "subbed_due_to_injury": true,
             "yellow_card": 0,
             "red_card": 0,
-            "corner": 0
+            "corners": 0
         }
 
     ],
@@ -101,7 +101,7 @@
             "subbed_due_to_injury": false,
             "yellow_card": 2,
             "red_card": 2,
-            "corner": 2
+            "corners": 2
         },
         {
             "name": "B",
@@ -111,7 +111,7 @@
             "subbed_due_to_injury": false,
             "yellow_card": 0,
             "red_card": 0,
-            "corner": 0
+            "corners": 0
         },
         {
             "name": "K",
@@ -121,7 +121,7 @@
             "subbed_due_to_injury": false,
             "yellow_card": 0,
             "red_card": 0,
-            "corner": 0
+            "corners": 0
         }
 
     ],
