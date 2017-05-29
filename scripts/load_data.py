@@ -43,8 +43,10 @@ def load_match(match_data):
 
     print("Load Match")
     match = Match(date_time=match_data["date_time"],
-                  home_team=get_or_create(db.session, Team, name=match_data["home_team"]),
-                  away_team=get_or_create(db.session, Team, name=match_data["away_team"]),
+                  home_team=get_or_create(db.session, Team,
+                                          name=match_data["home_team"]),
+                  away_team=get_or_create(db.session, Team,
+                                          name=match_data["away_team"]),
                   campaign=campaign)
 
     db.session.add(match)
@@ -53,7 +55,9 @@ def load_match(match_data):
     for pm_data in match_data["player_match"]:
         print(" - player match : {}".format(pm_data["name"]))
         team = get_or_create(db.session, Team, name=pm_data["team"])
-        playerMatch = PlayerMatch(player=get_or_create(db.session, Player, name=pm_data["name"], team=team),
+        playerMatch = PlayerMatch(player=get_or_create(db.session, Player,
+                                                       name=pm_data["name"],
+                                                       team=team),
                                   match=match,
                                   team=team,
                                   started=pm_data["started"],
@@ -76,12 +80,13 @@ def load_match(match_data):
 
         #shot.player_match = playerMatch
         if shot_data['goal']:
-            goal = Goal(playerMatch, shot_data.get('time', None))
+            goal = Goal(shot_data.get('time', None))
 
             goal.player_match = playerMatch
             goal.shot = shot
             if shot_data['assist']:
-                assistPlayerMatch = get_player_match_by_name(match, shot_data['assist'])
+                assistPlayerMatch = get_player_match_by_name(match,
+                                                             shot_data['assist'])
                 assist = Assist(assistPlayerMatch, goal)
                 db.session.add(assist)
             db.session.add(goal)
@@ -112,10 +117,6 @@ def pprint():
     print("PM")
     for pm in db.session.query(PlayerMatch).all():
         print(pm)
-
-
-#validate_player_match(milan_2017_04_22_match)
-
 
 
 
