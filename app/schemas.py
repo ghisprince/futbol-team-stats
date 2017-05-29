@@ -1,7 +1,5 @@
-#from marshmallow_jsonapi import fields
-#from marshmallow_jsonapi.flask import Schema
-from marshmallow import validate, ValidationError, fields
-from flask_marshmallow.sqla import ModelSchema, HyperlinkRelated
+from marshmallow import fields
+from flask_marshmallow.sqla import ModelSchema
 from app.shared import ma
 from app.shared import api
 from app.models import *
@@ -53,7 +51,8 @@ class CampaignSchema(ModelSchema):
     matches = fields.Nested('MatchSchema',
                             many=True,
                             dump_only=True,
-                            only=("_links", "id", "date_time", "away_team", "home_team"))
+                            only=("_links", "id", "date_time", "away_team",
+                                  "home_team"))
 
     class Meta:
         strict = True
@@ -67,8 +66,8 @@ class ShotSchema(ModelSchema):
          'collection': ma.URLFor('CreateListShot'.lower())
         })
     goal = fields.Nested('GoalSchema',
-                            dump_only=True,
-                            only=("_links", "id", "time", ))
+                          dump_only=True,
+                          only=("_links", "id", "time", ))
 
     class Meta:
         strict = True
@@ -94,7 +93,6 @@ class GoalSchema(ModelSchema):
          'collection': ma.URLFor('CreateListGoal'.lower())
         })
 
-    # comment out due to error at http://127.0.0.1:5000/api/v1/playermatches/
     assist = fields.Nested('AssistSchema',
                             dump_only=True,
                             only=("_links", "id"))

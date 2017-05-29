@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -74,6 +73,7 @@ class User(db.Model, CRUD_MixIn, UserMixin):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
 
 # objects
 class Team(db.Model, CRUD_MixIn):
