@@ -41,7 +41,7 @@
             "y": 22,
             "on_goal": false,
             "pk": false,
-            "goal": false,
+            "scored": true,
             "assist": null
         },
         {
@@ -50,7 +50,7 @@
             "y": 33,
             "on_goal": false,
             "pk": false,
-            "goal": false,
+            "scored": true,
             "assist": null
         },
         {
@@ -59,7 +59,7 @@
             "y": 44,
             "on_goal": true,
             "pk": false,
-            "goal": true,
+            "scored": false,
             "assist": "Player Y"
         },
         {
@@ -68,7 +68,7 @@
             "y": 66,
             "on_goal": true,
             "pk": false,
-            "goal": true,
+            "scored": false,
             "assist": null
         }
 
@@ -78,7 +78,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "saved": true,
+            "scored": false,
             "pk": false,
             "keeper": "Player K"
         }
@@ -126,7 +126,7 @@
             "y": 51,
             "on_goal": false,
             "pk": false,
-            "goal": false,
+            "scored": true,
             "assist": null
         },
         {
@@ -135,7 +135,7 @@
             "y": 31,
             "on_goal": true,
             "pk": false,
-            "goal": false,
+            "scored": true,
             "assist": "Player X"
         },
         {
@@ -144,7 +144,7 @@
             "y": 11,
             "on_goal": true,
             "pk": false,
-            "goal": true,
+            "scored": false,
             "assist": null
         }
 
@@ -154,7 +154,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "saved": true,
+            "scored": false,
             "pk": false,
             "keeper": "Player K"
         },
@@ -162,7 +162,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "saved": false,
+            "scored": true,
             "pk": false,
             "keeper": "Player K"
         }

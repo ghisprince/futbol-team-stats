@@ -19,7 +19,6 @@ playermatch_schema = PlayerMatchSchema()
 shot_schema = ShotSchema()
 goal_schema = GoalSchema()
 assist_schema = AssistSchema()
-shotagainst_schema = ShotAgainstSchema()
 
 """http://jsonapi.org/format/#fetching
 A server MUST respond to a successful request to fetch an individual 
@@ -220,37 +219,15 @@ class CreateListShot(CreateListResourceBase):
                         x=request_dict['x'],
                         y=request_dict['y'],
                         on_goal=request_dict['on_goal'],
+                        scored=request_dict['scored'],
                         pk=request_dict['pk'],
+                        by_opponent=request_dict['by_opponent'],
+
                     )
 
         return modelInst
 
-#
-class CreateListShotAgainst(CreateListResourceBase):
-    ModelClass = ShotAgainst
-    mm_schema = shotagainst_schema
 
-    @use_kwargs({'playermatch_id': webargs.fields.Int(required=False)})
-    def get(self, playermatch_id):
-        query = self.ModelClass.query
-        if playermatch_id:
-            query = query.join(Player).filter(Player.id == playermatch_id)
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        player_match = db.session.query(PlayerMatch).filter_by(
-                        id=request_dict['player_match']['id']).one()
-        modelInst = self.ModelClass(
-                        player_match=player_match,
-                        x=request_dict['x'],
-                        y=request_dict['y'],
-                        on_goal=request_dict['on_goal'],
-                        pk=request_dict['pk'],
-        )
-
-        return modelInst
-
-#
 class CreateListGoal(CreateListResourceBase):
     ModelClass = Goal
     mm_schema = goal_schema
@@ -498,21 +475,6 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
 
     def delete(self, shot_id):
         return super().delete(shot_id)
-
-#
-class GetUpdateDeleteShotAgainst(GetUpdateDeleteResourceBase):
-    ModelClass = ShotAgainst
-    mm_schema = shotagainst_schema
-
-    def get(self, shotagainst_id):
-        query = Shot.query.get_or_404(shotagainst_id)
-        return match_schema.dump(query).data
-
-    def patch(self, shotagainst_id):
-        return super().patch(shotagainst_id)
-
-    def delete(self, shotagainst_id):
-        return super().delete(shotagainst_id)
 
 
 class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):

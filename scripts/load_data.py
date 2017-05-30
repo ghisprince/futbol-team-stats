@@ -74,9 +74,10 @@ def load_match(match_data):
         playerMatch = get_player_match_by_name(match, shot_data['player'])
         shot = Shot(playerMatch,
                     x=shot_data['x'], y=shot_data['y'],
-                    on_goal=shot_data['on_goal'], pk=shot_data['pk'])
+                    on_goal=shot_data['on_goal'], pk=shot_data['pk'],
+                    scored=shot_data['scored'], by_opponent=False, )
 
-        if shot_data['goal']:
+        if shot_data['scored']:
             goal = Goal(shot_data.get('time', None))
 
             goal.player_match = playerMatch
@@ -90,13 +91,14 @@ def load_match(match_data):
         db.session.add(shot)
 
     for shot_ag_data in match_data.get("shot_against", []):
-        shotAgainst = ShotAgainst(x=shot_ag_data["x"], y=shot_ag_data["y"],
-                                  on_goal=shot_ag_data["on_goal"],
-                                  saved=shot_ag_data["saved"],
-                                  pk=shot_ag_data["pk"],
-                                  )
         keeper = get_player_match_by_name(match, shot_ag_data['keeper'])
-        shotAgainst.player_match = keeper
+        shotAgainst = Shot(player_match=keeper,
+                           x=shot_ag_data["x"],
+                           y=shot_ag_data["y"],
+                           on_goal=shot_ag_data["on_goal"],
+                           scored=shot_ag_data["scored"],
+                           pk=shot_ag_data["pk"],
+                           by_opponent=True)
         db.session.add(shotAgainst)
 
     db.session.commit()

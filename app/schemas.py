@@ -121,19 +121,6 @@ class GoalSchema(ModelSchema):
         sqla_session = db.session
 
 
-class ShotAgainstSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteShotAgainst'.lower(),
-                           shotagainst_id="<id>"),
-         'collection': ma.URLFor('CreateListShotAgainst'.lower())
-        })
-
-    class Meta:
-        strict = True
-        model = ShotAgainst
-        sqla_session = db.session
-
-
 class PlayerMatchSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeletePlayerMatch'.lower(),
@@ -152,7 +139,6 @@ class PlayerMatchSchema(ModelSchema):
     shots = fields.Nested(ShotSchema, dump_only=True, many=True)
     assists = fields.Nested(AssistSchema, dump_only=True, many=True)
     goals = fields.Nested(GoalSchema, dump_only=True, many=True)
-    shots_against = fields.Nested(ShotAgainstSchema, dump_only=True, many=True)
 
     class Meta:
         strict = True
