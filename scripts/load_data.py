@@ -31,8 +31,8 @@ def load_match(match_data):
                                                       "%Y-%m-%dT%H:%M:%S")
 
     if db.session.query(Match).filter_by(date_time=match_data_date_time).first():
-        print("Already loaded {} vs '{}' on {}".format(match_data["home_team"],
-                                                       match_data["away_team"],
+        print("Already loaded {} vs '{}' on {}".format(match_data["team"],
+                                                       match_data["opponent"],
                                                        match_data["date_time"]))
         return
 
@@ -43,10 +43,10 @@ def load_match(match_data):
 
     print("Load Match")
     match = Match(date_time=match_data["date_time"],
-                  home_team=get_or_create(db.session, Team,
-                                          name=match_data["home_team"]),
-                  away_team=get_or_create(db.session, Team,
-                                          name=match_data["away_team"]),
+                  team=get_or_create(db.session, Team,
+                                     name=match_data["team"]),
+                  opponent=get_or_create(db.session, Opponent,
+                                         name=match_data["opponent"]),
                   campaign=campaign)
 
     db.session.add(match)
@@ -54,12 +54,11 @@ def load_match(match_data):
     print("Load PlayerMatch")
     for pm_data in match_data["player_match"]:
         print(" - player match : {}".format(pm_data["name"]))
-        team = get_or_create(db.session, Team, name=pm_data["team"])
+        team = get_or_create(db.session, Team, name=match_data["team"])
         playerMatch = PlayerMatch(player=get_or_create(db.session, Player,
                                                        name=pm_data["name"],
                                                        team=team),
                                   match=match,
-                                  team=team,
                                   started=pm_data["started"],
                                   minutes=pm_data["minutes"],
                                   subbed_due_to_injury=pm_data["subbed_due_to_injury"],
@@ -69,7 +68,6 @@ def load_match(match_data):
                                   )
 
         db.session.add(playerMatch)
-    #db.session.commit()
 
     print("Load Shots")
     for shot_data in match_data.get("shot", []):
@@ -78,7 +76,6 @@ def load_match(match_data):
                     x=shot_data['x'], y=shot_data['y'],
                     on_goal=shot_data['on_goal'], pk=shot_data['pk'])
 
-        #shot.player_match = playerMatch
         if shot_data['goal']:
             goal = Goal(shot_data.get('time', None))
 

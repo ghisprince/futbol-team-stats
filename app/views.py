@@ -14,6 +14,7 @@ team_schema = TeamSchema(only=("_links", "id", "name"))
 player_schema = PlayerSchema(only=("_links", "id", "name", "number", "team"))
 match_schema = MatchSchema()
 campaign_schema = CampaignSchema()
+opponent_schema = OpponentSchema()
 playermatch_schema = PlayerMatchSchema()
 shot_schema = ShotSchema()
 goal_schema = GoalSchema()
@@ -120,23 +121,35 @@ class CreateListCampaign(CreateListResourceBase):
         return self.ModelClass(request_dict['name'], )
 
 
+
+class CreateListOpponent(CreateListResourceBase):
+    ModelClass = Opponent
+    mm_schema = opponent_schema
+
+    @use_kwargs({'name': webargs.fields.Str(required=False)})
+    def get(self, name):
+        query = self.ModelClass.query
+        if name:
+            query = query.filter_by(name=name)
+        return self.mm_schema.dump(query.all(), many=True).data
+
+    def InstanceFromDict(self, request_dict):
+        return self.ModelClass(request_dict['name'], )
+
+
 class CreateListMatch(CreateListResourceBase):
     ModelClass = Match
     mm_schema = match_schema
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'team_id': webargs.fields.Int(required=False),
-                 'campaign_id': webargs.fields.Int(required=False),})
-    def get(self, team_id, opponent_id, campaign_id):
+                 'campaign_id': webargs.fields.Int(required=False),
+                 'at_home': webargs.fields.Bool(required=False),})
+    def get(self, team_id, opponent_id, campaign_id, at_home):
         query = self.ModelClass.query
 
         if opponent_id:
-            query = query.filter(or_(self.ModelClass.home_team_id == opponent_id,
-                                     self.ModelClass.away_team_id == opponent_id))
-
-        if team_id:
-            query = query.filter(or_(self.ModelClass.home_team_id == team_id,
-                                     self.ModelClass.away_team_id == team_id))
+            query = query.filter(self.ModelClass.opponent_id == opponent_id)
 
         if campaign_id:
             query = query.join(Campaign).filter(Campaign.id == campaign_id)
@@ -150,9 +163,10 @@ class CreateListMatch(CreateListResourceBase):
 
         modelInst = self.ModelClass(
             date_time=request_dict['date_time'].replace("+00:00", ""),
-            home_team=Team.query.get_or_404(request_dict['home_team']['id']),
-            away_team=Team.query.get_or_404(request_dict['away_team']['id']),
+            team=Team.query.get_or_404(request_dict['team']['id']),
+            opponent=Opponent.query.get_or_404(request_dict['opponent']['id']),
             campaign=campaign,
+            at_home=request_dict['at_home']
             )
         return modelInst
 
@@ -172,9 +186,9 @@ class CreateListPlayerMatch(CreateListResourceBase):
     def InstanceFromDict(self, request_dict):
         player = db.session.query(Player).filter_by(id=request_dict['player']['id']).one()
         match = db.session.query(Match).filter_by(id=request_dict['match']['id']).one()
-        team = db.session.query(Team).filter_by(id=request_dict['team']['id']).one()
         modelInst = self.ModelClass(
-                        player=player, team=team, match=match,
+                        player=player,
+                        match=match,
                         started=request_dict['started'],
                         minutes=request_dict['minutes'],
                         subbed_due_to_injury=request_dict['subbed_due_to_injury'],
@@ -200,13 +214,14 @@ class CreateListShot(CreateListResourceBase):
     def InstanceFromDict(self, request_dict):
         player_match = db.session.query(PlayerMatch).filter_by(
                         id=request_dict['player_match']['id']).one()
+
         modelInst = self.ModelClass(
                         player_match=player_match,
                         x=request_dict['x'],
                         y=request_dict['y'],
                         on_goal=request_dict['on_goal'],
                         pk=request_dict['pk'],
-        )
+                    )
 
         return modelInst
 
@@ -291,10 +306,7 @@ class AddRemoveListTeamMatch(GetResourceBase):
     mm_schema = match_schema
 
     def get(self, team_id):
-        query = self.ModelClass.query.filter(
-            or_(Match.home_team_id == team_id,
-                Match.away_team_id == team_id)
-        )
+        query = self.ModelClass.query.filter(Match.team_id == team_id)
         return self.mm_schema.dump(query.all(), many=True).data
 
 
@@ -424,6 +436,21 @@ class GetUpdateDeleteCampaign(GetUpdateDeleteResourceBase):
 
     def delete(self, campaign_id):
         return super().delete(campaign_id)
+
+
+class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
+    ModelClass = Opponent
+    mm_schema = opponent_schema
+
+    def get(self, opponent_id):
+        query = Opponent.query.get_or_404(opponent_id)
+        return opponent_schema.dump(query).data
+
+    def patch(self, opponent_id):
+        return super().patch(opponent_id)
+
+    def delete(self, opponent_id):
+        return super().delete(opponent_id)
 
 
 class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):

@@ -26,25 +26,25 @@ team_data = {"name": "A Team"}
 class TestViews:
     def _load_generic_match(self, testapp):
         match_data = {
-            "away_team": {"name": "B Team"},
+            "opponent": {"name": "B Team"},
             "campaign": None,
             "date_time": "2017-03-18T08:00:00",
-            "home_team": {"name": "A Team"},
+            "team": {"name": "A Team"},
+            "at_home": False,
         }
 
         code, resp = get_result(testapp.post('/api/v1/teams/',
-                          data=json.dumps(match_data['away_team']),
+                          data=json.dumps(match_data['team']),
                           content_type='application/json'))
-        away_team_id = resp['id']
+        team_id = resp['id']
 
-        code, resp = get_result(testapp.post('/api/v1/teams/',
-                          data=json.dumps(match_data['home_team']),
+        code, resp = get_result(testapp.post('/api/v1/opponents/',
+                          data=json.dumps(match_data['opponent']),
                           content_type='application/json'))
+        opponent_id = resp['id']
 
-        home_team_id = resp['id']
-
-        match_data['away_team']['id'] = away_team_id
-        match_data['home_team']['id'] = home_team_id
+        match_data['team']['id'] = team_id
+        match_data['opponent']['id'] = opponent_id
         code, resp = get_result(testapp.post('/api/v1/matches/',
                           data=json.dumps(match_data),
                           content_type='application/json'))
@@ -53,14 +53,12 @@ class TestViews:
 
     def _load_generic_playermatch(self, testapp):
         match = self._load_generic_match(testapp)
-        team = match['home_team']
+        team = match['team']
         _, player = get_result(testapp.post('/api/v1/players/',
-                               data=json.dumps({"name": "G",
-                                           "number": 11}),
+                               data=json.dumps({"name": "G", "number": 11}),
                                content_type='application/json'))
 
         playerMatch = {"player": player,
-                       "team": team,
                        "match": match,
                        "started": True,
                        "minutes": 90,
@@ -180,24 +178,25 @@ class TestViews:
 
     def test_match(self, testapp):
         match_data = {
-            "away_team": {"name": "B Team"},
+            "opponent": {"name": "B Team"},
             "campaign": {"name": "Alphabet League"},
             "date_time": "2017-01-18T08:00:00",
-            "home_team": {"name": "A Team"},
+            "team": {"name": "A Team"},
+            "at_home": True,
         }
 
-        code, resp = get_result(testapp.post('/api/v1/teams/',
-                          data=json.dumps(match_data['away_team']),
+        code, resp = get_result(testapp.post('/api/v1/opponents/',
+                          data=json.dumps(match_data['opponent']),
                           content_type='application/json'))
         assert code == 201
-        away_team_id = resp['id']
+        opponent_id = resp['id']
 
         code, resp = get_result(testapp.post('/api/v1/teams/',
-                          data=json.dumps(match_data['home_team']),
+                          data=json.dumps(match_data['team']),
                           content_type='application/json'))
 
         assert code == 201
-        home_team_id = resp['id']
+        team_id = resp['id']
 
         code, resp = get_result(testapp.post('/api/v1/campaigns/',
                                        data=json.dumps(match_data['campaign']),
@@ -205,19 +204,20 @@ class TestViews:
         assert code == 201
         campaign_id = resp['id']
 
-        match_data['away_team']['id'] = away_team_id
-        match_data['home_team']['id'] = home_team_id
+        match_data['team']['id'] = team_id
+        match_data['opponent']['id'] = opponent_id
         match_data['campaign']['id'] = campaign_id
+
 
         code, resp = get_result(testapp.post('/api/v1/matches/',
                           data=json.dumps(match_data),
                           content_type='application/json'))
         assert code == 201
 
-        assert resp['away_team']['id'] == 1
-        assert resp['home_team']['id'] == 2
-        assert resp['campaign']['id'] == 1
+        assert resp['opponent']['name'] == match_data['opponent']['name']
+        assert resp['campaign']['name'] == match_data['campaign']['name']
         assert resp['date_time'] == "2017-01-18T08:00:00+00:00"
+        assert resp['at_home'] == match_data['at_home']
 
         # Lastly create a match with null campaign (aka scrimmage, friendly)
         match_data['campaign'] = None
@@ -229,8 +229,6 @@ class TestViews:
         assert code == 201
 
         # then test
-        assert resp['away_team']['id'] == 1
-        assert resp['home_team']['id'] == 2
         assert resp['campaign'] is None
         assert resp['date_time'] == "2019-09-09T09:00:00+00:00"
 
@@ -420,7 +418,6 @@ class TestViews:
         player_match_1 = {
             'player': player_1,
             'match': match,
-            'team': team,
             'started': True,
             'minutes': 50,
             'subbed_due_to_injury': False,
@@ -446,7 +443,6 @@ class TestViews:
 
         assert pmatch['match']['id'] == match['id']
         assert pmatch['player']['name'] == player_1['name']
-        assert pmatch['team']['name'] == team['name']
         assert pmatch['match']['id'] == match['id']
 
         # POST again, but with diff values
@@ -457,7 +453,6 @@ class TestViews:
         player_match_2 = {
             'player': player_2,
             'match': match,
-            'team': team,
             'started': False,
             'minutes': 89,
             'subbed_due_to_injury': True,
@@ -483,7 +478,6 @@ class TestViews:
 
         assert pmatch['match']['id'] == match['id']
         assert pmatch['player']['name'] == player_2['name']
-        assert pmatch['team']['name'] == team['name']
         assert pmatch['match']['id'] == match['id']
 
         # quick test of patch
@@ -540,7 +534,6 @@ class TestViews:
                                content_type='application/json'))
 
         playerMatch_data = {"player": player,
-                             "team": pm['team'],
                              "match": pm['match'],
                              "started": True,
                              "minutes": 90,

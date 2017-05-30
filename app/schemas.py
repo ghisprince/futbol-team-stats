@@ -60,6 +60,25 @@ class CampaignSchema(ModelSchema):
         sqla_session = db.session
 
 
+#
+class OpponentSchema(ModelSchema):
+    _links = ma.Hyperlinks(
+        {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), opponent_id="<id>"),
+         'collection': ma.URLFor('CreateListOpponent'.lower())
+        })
+
+    matches = fields.Nested('MatchSchema',
+                            many=True,
+                            dump_only=True,
+                            only=("_links", "id", "date_time", "away_team",
+                                  "home_team"))
+
+    class Meta:
+        strict = True
+        model = Opponent
+        sqla_session = db.session
+
+
 class ShotSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteShot'.lower(), shot_id="<id>"),
@@ -127,9 +146,6 @@ class PlayerMatchSchema(ModelSchema):
                              dump_only=True,
                              only=("_links", "id", "name", "number"))
 
-    team = fields.Nested(TeamSchema, dump_only=True,
-                         only=("_links", "id", "name"))
-
     match = fields.Nested('MatchSchema', dump_only=True,
                           only=("_links", "id", ))
 
@@ -156,11 +172,11 @@ class MatchSchema(ModelSchema):
                              dump_only=True,
                              only=("_links", "id", "name"))
 
-    away_team = fields.Nested(TeamSchema, dump_only=True,
-                              only=("_links", "id", "name"))
+    opponent = fields.Nested(OpponentSchema, dump_only=True,
+                             only=("_links", "id", "name"))
 
-    home_team = fields.Nested(TeamSchema, dump_only=True,
-                              only=("_links", "id", "name"))
+    team = fields.Nested(TeamSchema, dump_only=True,
+                         only=("_links", "id", "name"))
 
 
     player_matches = fields.Nested(PlayerMatchSchema,

@@ -68,38 +68,38 @@ class TestModels:
     def test_match(self, testapp):
         match = Match("2017-01-02T08:00:00",
                       Team("Lil' Barca"),
-                      Team("Lil' Real Madrid"),)
-        assert match.home_team.name == "Lil' Barca"
-        assert match.away_team.name == "Lil' Real Madrid"
+                      Opponent("Lil' Real Madrid"),)
+        assert match.team.name == "Lil' Barca"
+        assert match.opponent.name == "Lil' Real Madrid"
         assert match.campaign is None
 
     def test_match_campaign(self, testapp):
         match = Match("2017-11-12T08:00:00",
                       Team("Lil' Barca"),
-                      Team("Lil' Real Madrid"),
+                      Opponent("Lil' Real Madrid"),
                       Campaign("Fall 2017"))
 
         assert match.campaign.name == "Fall 2017"
 
     def test_complete(self, testapp):
 
-        home_team = Team("Lil' Barca")
-        away_team = Team("Lil' Real Madrid")
+        team = Team("Lil' Barca")
+        opponent = Opponent("Lil' Real Madrid")
         match = Match("2017-11-12T08:00:00",
-                      home_team,
-                      away_team,
+                      team,
+                      opponent,
                       Campaign("Fall 2017"))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
-                                    home_team, match,
+                                    match,
                                     True, 60, True, 1, 0, 1)
 
         player_match2 = PlayerMatch(Player("Lil' Ronaldo", 7),
-                                    away_team, match,
+                                    match,
                                     False, 60, False, 0, 1, 2)
 
         player_match3 = PlayerMatch(Player("Lil' Rakitic", 4),
-                                    home_team, match,
+                                    match,
                                     False, 60, False,)
 
         shot1 = Shot(player_match1, 30, 30, on_goal=True)
@@ -111,14 +111,12 @@ class TestModels:
         goal2 = Goal(shot3)
 
         # test
-        assert player_match1.match.home_team.name == "Lil' Barca"
-        assert player_match1.match.away_team.name == "Lil' Real Madrid"
-        assert player_match1.team.name == "Lil' Barca"
+        assert player_match1.match.team.name == "Lil' Barca"
+        assert player_match1.match.opponent.name == "Lil' Real Madrid"
         assert player_match1.started
         assert player_match1.subbed_due_to_injury
         assert player_match1.yellow_card == 1
 
-        assert player_match2.team.name == "Lil' Real Madrid"
         assert not player_match2.started
         assert not player_match2.subbed_due_to_injury
         assert player_match2.red_card == 1
@@ -127,8 +125,8 @@ class TestModels:
         assert sorted([i.player.number for i in match.player_matches]) == [4, 7, 10]
 
         # persist everything
-        db.session.add(home_team)
-        db.session.add(away_team)
+        db.session.add(team)
+        db.session.add(opponent)
         db.session.add(match)
         db.session.add(player_match1)
         db.session.add(player_match2)
@@ -156,18 +154,18 @@ class TestModels:
 
 
     def test_goal(self, testapp):
-        home_team = Team("Lil' Barca")
-        away_team = Team("Lil' Real Madrid")
+        team = Team("Lil' Barca")
+        opponent = Opponent("Lil' Real Madrid")
         match = Match("2017-11-12T08:00:00",
-                      home_team,
-                      away_team,
+                      team,
+                      opponent,
                       Campaign("Fall 2017"))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
-                                    home_team, match, True, 60, True, 1, 0, 1)
+                                    match, True, 60, True, 1, 0, 1)
 
         player_match2 = PlayerMatch(Player("Lil' Ronaldo", 7),
-                                    away_team, match, False, 60, False, 0, 1, 2)
+                                    match, False, 60, False, 0, 1, 2)
 
         assert player_match1.started
         assert player_match1.subbed_due_to_injury
@@ -181,17 +179,17 @@ class TestModels:
         assert sorted([i.player.number for i in match.player_matches]) == [7, 10]
 
     def test_assist(self, testapp):
-        home_team = Team("A Team")
-        away_team = Team("B Team")
+        team = Team("A Team")
+        opponent = Opponent("B Team")
         match = Match("2017-11-12T08:00:00",
-                      home_team,
-                      away_team,)
+                      team,
+                      opponent,)
 
         player_match1 = PlayerMatch(Player("Player A", 10),
-                                    home_team, match, True, 60, True, 1, 0, 1)
+                                    match, True, 60, True, 1, 0, 1)
 
         player_match2 = PlayerMatch(Player("Player B", 7),
-                                    away_team, match, False, 60, False, 0, 1, 2)
+                                    match, False, 60, False, 0, 1, 2)
 
         shot = Shot(player_match1, 1, 1, True, False)
         goal = Goal(shot, 89)

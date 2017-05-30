@@ -1,12 +1,11 @@
 [
   {
-    "home_team": "A Team",
-    "away_team": "B Team",
+    "team": "A Team",
+    "opponent": "B Team",
     "date_time": "2017-01-01T08:00:00",
     "campaign": "Alphabet League",
     "player_match": [
         {
-            "team": "A Team",
             "name": "Player X",
             "started": true,
             "minutes": 60,
@@ -16,7 +15,6 @@
             "corners": 1
         },
         {
-            "team": "A Team",
             "name": "Player Y",
             "started": false,
             "minutes": 70,
@@ -26,7 +24,6 @@
             "corners": 0
         },
         {
-            "team": "A Team",
             "name": "Player K",
             "started": true,
             "minutes": 80,
@@ -88,14 +85,13 @@
     ]
  },
   {
-    "home_team": "A Team",
-    "away_team": "C Team",
+    "team": "A Team",
+    "opponent": "C Team",
     "date_time": "2017-02-02T08:00:00",
     "campaign": "Alphabet League",
     "player_match": [
         {
             "name": "Player X",
-            "team": "A Team",
             "started": true,
             "minutes": 62,
             "subbed_due_to_injury": false,
@@ -105,7 +101,6 @@
         },
         {
             "name": "Player Y",
-            "team": "A Team",
             "started": false,
             "minutes": 72,
             "subbed_due_to_injury": false,
@@ -115,7 +110,6 @@
         },
         {
             "name": "Player K",
-            "team": "A Team",
             "started": true,
             "minutes": 82,
             "subbed_due_to_injury": false,
