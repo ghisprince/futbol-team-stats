@@ -1,26 +1,26 @@
 # soccer-player-stats
 Web-site to collect and report soccer team and player's stats.
 
-###Statistics tracked
+### Statistics tracked
  * by team
-  * matches
-  * players
-  * campaigns (tournaments, seasons)
+   * matches
+   * players
+   * campaigns (tournaments, seasons)
  * by player
-  * started
-  * minutes played
-  * cards
-  * corners
-  * shots
-   * goals
-   * assists
-  * goal
-  * assist
+   * started
+   * minutes played
+   * cards
+   * corners
+   * shots
+    * goals
+    * assists
+   * goal
+   * assist
 
 
 ## Deploying
 To setup and run get repo, then do
-```python
+```cmd
 pip install -r requirements
 
 # loads toy data to play with
