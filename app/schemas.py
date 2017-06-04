@@ -23,8 +23,6 @@ class PlayerSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeletePlayer'.lower(), player_id="<id>"),
          'collection': ma.URLFor('CreateListPlayer'.lower()),
-         'playermatches': ma.URLFor('AddRemoveListPlayerPlayerMatch'.lower(),
-                                player_id="<id>")
         })
 
     player_matches = fields.Nested('PlayerMatchSchema',
@@ -51,8 +49,10 @@ class CampaignSchema(ModelSchema):
     matches = fields.Nested('MatchSchema',
                             many=True,
                             dump_only=True,
-                            only=("_links", "id", "date_time", "away_team",
-                                  "home_team"))
+                            only=("_links", "id", "date_time", "team",
+                                  "at_home", "result", "result_long"))
+
+    match_results = fields.String()
 
     class Meta:
         strict = True
@@ -70,8 +70,8 @@ class OpponentSchema(ModelSchema):
     matches = fields.Nested('MatchSchema',
                             many=True,
                             dump_only=True,
-                            only=("_links", "id", "date_time", "away_team",
-                                  "home_team"))
+                            only=("_links", "id", "date_time", "team_id",
+                                  "opponent_id", "result"))
 
     class Meta:
         strict = True
@@ -84,9 +84,13 @@ class ShotSchema(ModelSchema):
         {'self': ma.URLFor('GetUpdateDeleteShot'.lower(), shot_id="<id>"),
          'collection': ma.URLFor('CreateListShot'.lower())
         })
+
     goal = fields.Nested('GoalSchema',
                           dump_only=True,
                           only=("_links", "id", "time", ))
+
+    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
+                                 only=("_links", "id"))
 
     class Meta:
         strict = True
@@ -99,6 +103,9 @@ class AssistSchema(ModelSchema):
         {'self': ma.URLFor('GetUpdateDeleteAssist'.lower(), assist_id="<id>"),
          'collection': ma.URLFor('CreateListAssist'.lower())
         })
+
+    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
+                                 only=("_links", "id"))
 
     class Meta:
         strict = True
@@ -115,6 +122,14 @@ class GoalSchema(ModelSchema):
     assist = fields.Nested('AssistSchema',
                             dump_only=True,
                             only=("_links", "id"))
+
+    shot = fields.Nested('ShotSchema',
+                            dump_only=True,
+                            only=("_links", "id", ))
+
+    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
+                                 only=("_links", "id"))
+
     class Meta:
         strict = True
         model = Goal
@@ -128,7 +143,6 @@ class PlayerMatchSchema(ModelSchema):
          'collection': ma.URLFor('CreateListPlayerMatch'.lower()),
          })
 
-
     player = fields.Nested(PlayerSchema,
                              dump_only=True,
                              only=("_links", "id", "name", "number"))
@@ -140,6 +154,13 @@ class PlayerMatchSchema(ModelSchema):
     assists = fields.Nested(AssistSchema, dump_only=True, many=True)
     goals = fields.Nested(GoalSchema, dump_only=True, many=True)
 
+    # hybrid properties on model
+    num_shots = fields.Integer(dump_only=True)
+    num_shots_against = fields.Integer(dump_only=True)
+    num_goals = fields.Integer(dump_only=True)
+    num_goals_allowed = fields.Integer(dump_only=True)
+    num_assists = fields.Integer(dump_only=True)
+
     class Meta:
         strict = True
         model = PlayerMatch
@@ -150,8 +171,8 @@ class MatchSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), match_id="<id>"),
          'collection': ma.URLFor('CreateListMatch'.lower()),
-         'playermatches': ma.URLFor('AddRemoveListMatchPlayerMatch'.lower(),
-                                    match_id="<id>"),
+         #'playermatches': ma.URLFor('AddRemoveListMatchPlayerMatch'.lower(),
+         #                           match_id="<id>"),
          })
 
     campaign = fields.Nested(CampaignSchema,
@@ -169,13 +190,24 @@ class MatchSchema(ModelSchema):
                                    dump_only=True,
                                    many=True,
                                    only=("_links", "id",
-                                         "player", "minutes", "started",)
-                                         #"subbed_due_to_injury",
-                                         #"goals", "assists", "shots", "corner",
-                                         #"shots_against",
-                                         #"yellow_card", "red_card"
-                                         #)
+                                         "player", "minutes", "started",
+                                         "subbed_due_to_injury",
+                                         "yellow_card", "red_card",
+                                         "num_shots", "num_goals",
+                                         "num_assists",
+                                         "num_shots_against",
+                                         "num_goals_allowed",
+                                         )
                                    )
+
+    # add hybrid properties on model
+    result = fields.String(dump_only=True)
+    result_long = fields.String(dump_only=True)
+    num_shots = fields.Integer(dump_only=True)
+    num_shots_against = fields.Integer(dump_only=True)
+    num_goals = fields.Integer(dump_only=True)
+    num_goals_allowed = fields.Integer(dump_only=True)
+
     class Meta:
         strict = True
         model = Match

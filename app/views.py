@@ -39,11 +39,8 @@ requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
-class GetResourceBase(Resource):
-    pass
 
-
-class CreateListResourceBase(GetResourceBase):
+class CreateListResourceBase(Resource):
 
     def post(self):
         request_dict = request.get_json(force=True)
@@ -68,7 +65,6 @@ class CreateListResourceBase(GetResourceBase):
 
 
 # basic collection of roles
-
 class CreateListTeam(CreateListResourceBase):
     ModelClass = Team
     mm_schema = team_schema
@@ -120,7 +116,6 @@ class CreateListCampaign(CreateListResourceBase):
         return self.ModelClass(request_dict['name'], )
 
 
-
 class CreateListOpponent(CreateListResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
@@ -141,10 +136,9 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema = match_schema
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
-                 'team_id': webargs.fields.Int(required=False),
-                 'campaign_id': webargs.fields.Int(required=False),
-                 'at_home': webargs.fields.Bool(required=False),})
-    def get(self, team_id, opponent_id, campaign_id, at_home):
+                 'campaign_id': webargs.fields.Int(required=False)
+                 })
+    def get(self, opponent_id, campaign_id, ):
         query = self.ModelClass.query
 
         if opponent_id:
@@ -174,11 +168,16 @@ class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
 
-    @use_kwargs({'player_id': webargs.fields.Int(required=False)})
-    def get(self, player_id):
+    @use_kwargs({'player_id': webargs.fields.Int(required=False),
+                 'player': webargs.fields.Str(required=False)})
+    def get(self, player_id, player):
         query = self.ModelClass.query
         if player_id:
             query = query.join(Player).filter(Player.id == player_id)
+
+        if player:
+            query = query.join(Player).filter(Player.name == player)
+
         return self.mm_schema.dump(query.all(), many=True).data
 
 
@@ -203,11 +202,17 @@ class CreateListShot(CreateListResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
 
-    @use_kwargs({'playermatch_id': webargs.fields.Int(required=False)})
-    def get(self, playermatch_id):
+    @use_kwargs({'player_id': webargs.fields.Int(required=False),
+                 'match_id': webargs.fields.Int(required=False), })
+    def get(self, player_id, match_id):
         query = self.ModelClass.query
-        if playermatch_id:
-            query = query.join(Player).filter(Player.id == playermatch_id)
+        if player_id:
+            query = query.join(PlayerMatch).join(Player).filter(
+                                                Player.id == player_id)
+
+        if match_id:
+            query = query.filter(Match.id == match_id)
+
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -222,7 +227,6 @@ class CreateListShot(CreateListResourceBase):
                         scored=request_dict['scored'],
                         pk=request_dict['pk'],
                         by_opponent=request_dict['by_opponent'],
-
                     )
 
         return modelInst
@@ -232,11 +236,16 @@ class CreateListGoal(CreateListResourceBase):
     ModelClass = Goal
     mm_schema = goal_schema
 
-    @use_kwargs({'goal_id': webargs.fields.Int(required=False)})
-    def get(self, goal_id):
+    @use_kwargs({'player_id': webargs.fields.Int(required=False),
+                 'match_id': webargs.fields.Int(required=False), })
+    def get(self, player_id, match_id):
         query = self.ModelClass.query
-        if goal_id:
-            query = query.join(Player).filter(Player.id == goal_id)
+        if player_id:
+            query = query.join(Shot).join(PlayerMatch).join(Player).filter(
+                                                Player.id == player_id)
+
+        if match_id:
+            query = query.join(Shot).filter(Match.id == match_id)
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -254,8 +263,17 @@ class CreateListAssist(CreateListResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
 
-    def get(self):
+    @use_kwargs({'player_id': webargs.fields.Int(required=False),
+                 'match_id': webargs.fields.Int(required=False), })
+    def get(self, player_id, match_id):
         query = self.ModelClass.query
+        if player_id:
+            query = query.join(PlayerMatch).join(Player).filter(
+                                                Player.id == player_id)
+
+        if match_id:
+            query = query.filter(Match.id == match_id)
+
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -269,7 +287,7 @@ class CreateListAssist(CreateListResourceBase):
 
 
 # collections within relationships
-class AddRemoveListTeamPlayer(GetResourceBase):
+class AddRemoveListTeamPlayer(Resource):
     ModelClass = Player
     mm_schema = player_schema
 
@@ -278,7 +296,7 @@ class AddRemoveListTeamPlayer(GetResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
 
-class AddRemoveListTeamMatch(GetResourceBase):
+class AddRemoveListTeamMatch(Resource):
     ModelClass = Match
     mm_schema = match_schema
 
@@ -286,8 +304,8 @@ class AddRemoveListTeamMatch(GetResourceBase):
         query = self.ModelClass.query.filter(Match.team_id == team_id)
         return self.mm_schema.dump(query.all(), many=True).data
 
-
-class AddRemoveListPlayerPlayerMatch(GetResourceBase):
+'''
+class AddRemoveListPlayerPlayerMatch(Resource):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
 
@@ -296,14 +314,14 @@ class AddRemoveListPlayerPlayerMatch(GetResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
 
-class AddRemoveListMatchPlayerMatch(GetResourceBase):
+class AddRemoveListMatchPlayerMatch(Resource):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
 
     def get(self, match_id=None):
         query = self.ModelClass.query.join(Match).filter(Match.id == match_id)
         return self.mm_schema.dump(query.all(), many=True).data
-
+'''
 
 #
 class GetUpdateDeleteResourceBase(Resource):

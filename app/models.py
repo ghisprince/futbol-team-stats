@@ -1,6 +1,6 @@
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.shared import db
 import datetime
 
@@ -92,7 +92,7 @@ class Team(db.Model, CRUD_MixIn):
 
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False, unique=True)
+    name = db.Column(db.String(), nullable=False)
     matches = db.relationship("Match", back_populates="opponent")
 
     def __init__(self, name=None):
@@ -104,10 +104,17 @@ class Opponent(db.Model, CRUD_MixIn):
 
 class Campaign(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False, unique=True)
-    result = db.Column(db.String(), nullable=True, unique=False)
+    name = db.Column(db.String(), nullable=False)
+    result = db.Column(db.String(), nullable=True)
     matches = db.relationship("Match", back_populates="campaign")
     external_url = db.Column(db.String())
+
+    @hybrid_property
+    def match_results(self):
+        win = len([i for i in self.matches if (i.result == "win")])
+        loss = len([i for i in self.matches if (i.result == "loss")])
+        tie = len([i for i in self.matches if (i.result == "tie")])
+        return "{}-{}-{}".format(win, loss, tie)
 
     def __init__(self, name):
         self.name = name
@@ -119,19 +126,58 @@ class Campaign(db.Model, CRUD_MixIn):
 class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     date_time = db.Column(db.DateTime(), nullable=False)
-    at_home = db.Column(db.Boolean()) # at home, or away
+    at_home = db.Column(db.Boolean())  # False=away
 
     # relationships
-    player_matches = db.relationship("PlayerMatch", back_populates="match")
+    player_matches = db.relationship("PlayerMatch", back_populates="match",
+                                     cascade="all, delete-orphan")
 
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     team = db.relationship("Team", back_populates="matches")
 
     opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'))
-    opponent = db.relationship("Opponent", back_populates="matches")
+    opponent = db.relationship("Opponent", uselist=False, back_populates="matches")
 
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
     campaign = db.relationship("Campaign", back_populates="matches")
+
+    @hybrid_property
+    def result(self):
+        goals_for = self.num_goals
+        goals_against = self.num_goals_allowed
+
+        if goals_for > goals_against:
+            result = "win"
+        elif goals_for < goals_against:
+            result = "loss"
+        else:
+            result = "tie"
+
+        return result
+
+    @hybrid_property
+    def result_long(self):
+
+        return "{}-{} {} vs {}".format(self.num_goals,
+                                       self.num_goals_allowed,
+                                       self.result,
+                                       self.opponent.name)
+
+    @hybrid_property
+    def num_goals(self):
+        return sum([i.num_goals for i in self.player_matches])
+
+    @hybrid_property
+    def num_goals_allowed(self):
+        return sum([i.num_goals_allowed for i in self.player_matches])
+
+    @hybrid_property
+    def num_shots(self):
+        return sum([i.num_shots for i in self.player_matches])
+
+    @hybrid_property
+    def num_shots_against(self):
+        return sum([i.num_shots_against for i in self.player_matches])
 
     def __init__(self, date_time, team, opponent, campaign=None, at_home=True):
         self.date_time = datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
@@ -147,8 +193,9 @@ class Match(db.Model, CRUD_MixIn):
 
 class Player(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), unique=True, nullable=False)
+    name = db.Column(db.String(), nullable=False)
     number = db.Column(db.Integer(), nullable=True)
+    active = db.Column(db.Integer(), nullable=False, default=True)
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="player")
@@ -187,6 +234,31 @@ class PlayerMatch(db.Model, CRUD_MixIn):
                             cascade="all, delete-orphan")
     assists = db.relationship("Assist", back_populates="player_match")  # goal cascades to assist
 
+
+    @hybrid_property
+    def num_shots(self):
+        return len([i for i in self.shots if (i.by_opponent == False)])
+
+    @hybrid_property
+    def num_shots_against(self):
+        return len([i for i in self.shots if (i.by_opponent == True)])
+
+    @hybrid_property
+    def num_goals(self):
+        return len([i for i in self.shots if (i.scored and not i.by_opponent)])
+
+    @hybrid_property
+    def num_goals(self):
+        return len([i for i in self.shots if (i.scored and not i.by_opponent)])
+
+    @hybrid_property
+    def num_assists(self):
+        return len(self.assists)
+
+    @hybrid_property
+    def num_goals_allowed(self):
+        return len([i for i in self.shots if (i.scored and i.by_opponent)])
+
     def __init__(self, player, match, started=True, minutes=0,
                  subbed_due_to_injury=None,
                  yellow_card=None, red_card=None, corners=None,):
@@ -206,8 +278,8 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
 class Shot(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    x = db.Column(db.Integer(), )
-    y = db.Column(db.Integer(), )
+    x = db.Column(db.Integer(),)
+    y = db.Column(db.Integer(),)
     on_goal = db.Column(db.Boolean(), default=False, nullable=False)
     scored = db.Column(db.Boolean(), default=False, nullable=False)
     pk = db.Column(db.Boolean(), default=False)
@@ -229,7 +301,7 @@ class Shot(db.Model, CRUD_MixIn):
         self.on_goal = on_goal
         self.scored = scored
         self.pk = pk
-        self.by_opponent=by_opponent
+        self.by_opponent = by_opponent
 
     def __repr__(self):
         return "Shot (player={}, x={}, y={}, on_goal={}, pk={})".format(

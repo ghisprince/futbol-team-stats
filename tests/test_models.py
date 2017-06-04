@@ -140,17 +140,24 @@ class TestModels:
         db.session.commit()
 
         # now try some deletes
-        assert(len(Goal.query.all())) == 2
-        assert(len(Assist.query.all())) == 1
-        assert(len(Shot.query.all())) == 3
+        assert(len(Goal.query.all()) == 2)
+        assert(len(Assist.query.all()) == 1)
+        assert(len(Shot.query.all()) == 3)
 
         # delete teh shot that scored, and has an assist
         shot = Shot.query.first()
         shot.delete(shot)
 
-        assert(len(Goal.query.all())) == 1
-        assert(len(Assist.query.all())) == 0
-        assert(len(Shot.query.all())) == 2
+        assert(len(Goal.query.all()) == 1)
+        assert(len(Assist.query.all()) == 0)
+        assert(len(Shot.query.all()) == 2)
+
+        # delete playermatch should delete all dependent objects
+        match.delete(match)
+        assert(len(PlayerMatch.query.all()) == 0)
+        assert(len(Goal.query.all()) == 0)
+        assert(len(Assist.query.all()) == 0)
+        assert(len(Shot.query.all()) == 0)
 
 
     def test_goal(self, testapp):

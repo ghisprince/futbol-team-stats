@@ -210,8 +210,9 @@ class TestViews:
 
 
         code, resp = get_result(testapp.post('/api/v1/matches/',
-                          data=json.dumps(match_data),
-                          content_type='application/json'))
+                                data=json.dumps(match_data),
+                                content_type='application/json'))
+
         assert code == 201
 
         assert resp['opponent']['name'] == match_data['opponent']['name']
@@ -406,7 +407,7 @@ class TestViews:
         assert resp[0]['name'] == "Curly"
 
 
-    def test_playermatch_post_patch(self, testapp):
+    def test_playermatch_post_patch_delete(self, testapp):
         match = self._load_generic_match(testapp)
 
         _, team = get_result(testapp.get('/api/v1/teams/1',))
@@ -491,6 +492,17 @@ class TestViews:
         assert pmatch['player']['name'] == player_2['name']
         assert pmatch['minutes'] == 55
 
+        _, resp = get_result(testapp.get('/api/v1/playermatches/'))
+        assert len(resp) == 2
+        code, resp = get_result(testapp.delete(pmatch['_links']['self']))
+        assert code == 204
+        assert resp == {}
+
+        _, resp = get_result(testapp.get('/api/v1/playermatches/'))
+        assert len(resp) == 1
+
+
+
     def test_shot(self, testapp):
         def asserShottEqual(source, result):
             # test shot 1
@@ -499,7 +511,7 @@ class TestViews:
             assert source['on_goal'] == result['on_goal']
             assert source['scored'] == result['scored']
             assert source['pk'] == result['pk']
-            assert source['player_match']['id'] == result['player_match']
+            assert source['player_match']['id'] == result['player_match']['id']
             assert source['by_opponent'] is result['by_opponent']
 
         pm = self._load_generic_playermatch(testapp)
@@ -586,7 +598,7 @@ class TestViews:
             assert base['on_goal'] is result['on_goal']
             assert base['scored'] is result['scored']
             assert base['pk'] is result['pk']
-            assert base['player_match']['id'] == result['player_match']
+            assert base['player_match']['id'] == result['player_match']['id']
             assert base['by_opponent'] is result['by_opponent']
 
         pm = self._load_generic_playermatch(testapp)
@@ -610,7 +622,3 @@ class TestViews:
                                             content_type='application/json'))
         assert code == 201
         assertShotAgainstEqual(shotagainst_data_2, shotagainst_2)
-
-
-    def test_playermatch_delete(self, testapp):
-        pass
