@@ -237,11 +237,11 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def num_shots(self):
-        return len([i for i in self.shots if (i.by_opponent == False)])
+        return len([i for i in self.shots if (i.by_opponent)])
 
     @hybrid_property
     def num_shots_against(self):
-        return len([i for i in self.shots if (i.by_opponent == True)])
+        return len([i for i in self.shots if (i.by_opponent)])
 
     @hybrid_property
     def num_goals(self):
@@ -258,6 +258,10 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     @hybrid_property
     def num_goals_allowed(self):
         return len([i for i in self.shots if (i.scored and i.by_opponent)])
+
+    @hybrid_property
+    def num_saves(self):
+        return len([i for i in self.shots if (not i.scored and i.by_opponent)])
 
     def __init__(self, player, match, started=True, minutes=0,
                  subbed_due_to_injury=None,

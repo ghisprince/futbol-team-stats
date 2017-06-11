@@ -227,7 +227,7 @@
             "x": null,
             "y": null,
             "on_goal": true,
-            "scored": true,
+            "scored": false,
             "pk": false,
             "keeper": "Player K"
         }

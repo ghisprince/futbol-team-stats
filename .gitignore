@@ -93,3 +93,7 @@ ENV/
 
 # database
 *.db
+
+# backup folders
+bu_*/
+app/static/public/

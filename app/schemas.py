@@ -171,8 +171,6 @@ class MatchSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), match_id="<id>"),
          'collection': ma.URLFor('CreateListMatch'.lower()),
-         #'playermatches': ma.URLFor('AddRemoveListMatchPlayerMatch'.lower(),
-         #                           match_id="<id>"),
          })
 
     campaign = fields.Nested(CampaignSchema,
@@ -207,6 +205,7 @@ class MatchSchema(ModelSchema):
     num_shots_against = fields.Integer(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
     num_goals_allowed = fields.Integer(dump_only=True)
+    num_saves = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True

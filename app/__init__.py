@@ -18,6 +18,19 @@ from app.extensions import (
 )
 
 
+class CustomFlask(Flask):
+    jinja_options = Flask.jinja_options.copy()
+    jinja_options.update(dict(
+      block_start_string='{%',
+      block_end_string='%}',
+      variable_start_string='((', # instead of jinja2 default of {{
+      variable_end_string='))',   # instead of }}
+      comment_start_string='{#',
+      comment_end_string='#}',
+    ))
+
+
+
 def create_app(object_name):
     """
     An flask application factory, as explained here:
@@ -28,7 +41,8 @@ def create_app(object_name):
                      e.g. app.settings.ProdConfig
     """
 
-    app = Flask(__name__)
+    #app = Flask(__name__)
+    app = CustomFlask(__name__)
 
     app.config.from_object(object_name)
 

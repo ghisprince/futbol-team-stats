@@ -38,6 +38,19 @@ def logout():
     return redirect(url_for(".home"))
 
 
+@main.route("/stats")
+def matches():
+    return render_template('stats.html')
+
+@main.route("/match")
+def match():
+    return render_template('match.html')
+
+@main.route("/edit-stats")
+def edit_stats():
+    return "TODO"
+
+
 @main.route("/restricted")
 @login_required
 def restricted():
