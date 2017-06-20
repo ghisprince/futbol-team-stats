@@ -1,237 +1,229 @@
 [
-  {
-    "team": "A Team",
-    "opponent": "B Team",
-    "date_time": "2017-01-01T08:00:00",
-    "campaign": "Alphabet League",
-    "player_match": [
-        {
-            "name": "Player X",
-            "starter": true,
-            "minutes": 60,
-            "subbed_due_to_injury": false,
-            "yellow_card": 1,
-            "red_card": 1,
-            "corners": 1
-        },
-        {
-            "name": "Player Y",
-            "starter": false,
-            "minutes": 70,
-            "subbed_due_to_injury": false,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 0
-        },
-        {
-            "name": "Player K",
-            "starter": true,
-            "minutes": 80,
-            "subbed_due_to_injury": true,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 10
-        }
-
-    ],
-    "shot":[
-        {
-            "player": "Player X",
-            "x": 11,
-            "y": 22,
-            "on_goal": true,
-            "pk": false,
-            "scored": true,
-            "assist": null
-        },
-        {
-            "player": "Player X",
-            "x": 22,
-            "y": 33,
-            "on_goal": true,
-            "pk": false,
-            "scored": true,
-            "assist": null
-        },
-        {
-            "player": "Player X",
-            "x": 33,
-            "y": 44,
-            "on_goal": true,
-            "pk": false,
-            "scored": false,
-            "assist": "Player Y"
-        },
-        {
-            "player": "Player Y",
-            "x": 55,
-            "y": 66,
-            "on_goal": false,
-            "pk": false,
-            "scored": false,
-            "assist": null
-        }
-
-    ],
-    "shot_against": [
-        {
-            "x": null,
-            "y": null,
-            "on_goal": true,
-            "scored": false,
-            "pk": false,
-            "keeper": "Player K"
-        }
-    ]
- },
-  {
-    "team": "A Team",
-    "opponent": "C Team",
-    "date_time": "2017-02-02T08:00:00",
-    "campaign": "Alphabet League",
-    "player_match": [
-        {
-            "name": "Player X",
-            "starter": true,
-            "minutes": 62,
-            "subbed_due_to_injury": false,
-            "yellow_card": 2,
-            "red_card": 2,
-            "corners": 2
-        },
-        {
-            "name": "Player Y",
-            "starter": false,
-            "minutes": 72,
-            "subbed_due_to_injury": false,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 0
-        },
-        {
-            "name": "Player K",
-            "starter": true,
-            "minutes": 82,
-            "subbed_due_to_injury": false,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 0
-        }
-
-    ],
-    "shot":[
-        {
-            "player": "Player X",
-            "x": 50,
-            "y": 51,
-            "on_goal": true,
-            "pk": false,
-            "scored": true,
-            "assist": null
-        },
-        {
-            "player": "Player Y",
-            "x": 30,
-            "y": 31,
-            "on_goal": true,
-            "pk": false,
-            "scored": true,
-            "assist": "Player X"
-        },
-        {
-            "player": "Player Y",
-            "x": 10,
-            "y": 11,
-            "on_goal": true,
-            "pk": false,
-            "scored": false,
-            "assist": null
-        }
-
-    ],
-    "shot_against": [
-        {
-            "x": null,
-            "y": null,
-            "on_goal": false,
-            "scored": false,
-            "pk": false,
-            "keeper": "Player K"
-        },
-        {
-            "x": null,
-            "y": null,
-            "on_goal": true,
-            "scored": true,
-            "pk": false,
-            "keeper": "Player K"
-        }
-    ]
- },
-  {
-    "team": "A Team",
-    "opponent": "B Team",
-    "date_time": "2017-03-03T08:00:00",
-    "campaign": "Alphabet League",
-    "player_match": [
-        {
-            "name": "Player X",
-            "starter": true,
-            "minutes": 80,
-            "subbed_due_to_injury": false,
-            "yellow_card": 1,
-            "red_card": 1,
-            "corners": 1
-        },
-        {
-            "name": "Player Y",
-            "starter": false,
-            "minutes": 81,
-            "subbed_due_to_injury": false,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 0
-        },
-        {
-            "name": "Player K",
-            "starter": true,
-            "minutes": 83,
-            "subbed_due_to_injury": false,
-            "yellow_card": 0,
-            "red_card": 0,
-            "corners": 0
-        }
-
-    ],
-    "shot":[
-        {
-            "player": "Player X",
-            "x": 10,
-            "y": 11,
-            "on_goal": true,
-            "scored": true,
-            "pk": false,
-            "assist": null
-        }
-    ],
-    "shot_against": [
-        {
-            "x": null,
-            "y": null,
-            "on_goal": true,
-            "scored": true,
-            "pk": false,
-            "keeper": "Player K"
-        },
-        {
-            "x": null,
-            "y": null,
-            "on_goal": true,
-            "scored": false,
-            "pk": false,
-            "keeper": "Player K"
-        }
-    ]
- }
-
+    {
+        "team":"A Team",
+        "opponent":"B Team",
+        "date_time":"2017-01-01T08:00:00",
+        "campaign":"Alphabet League",
+        "player_match":[
+            {
+                "name":"Player X",
+                "starter":true,
+                "minutes":60,
+                "subbed_due_to_injury":false,
+                "yellow_card":1,
+                "red_card":1,
+                "corners":1,
+                "shots":[
+                    {
+                        "x":11,
+                        "y":22,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":true,
+                        "assist":null
+                    },
+                    {
+                        "x":22,
+                        "y":33,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":true,
+                        "assist":null
+                    },
+                    {
+                        "x":33,
+                        "y":44,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":false,
+                        "assist":"Player Y"
+                    }
+                ]
+            },
+            {
+                "name":"Player Y",
+                "starter":false,
+                "minutes":70,
+                "subbed_due_to_injury":false,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":0,
+                "shots":[
+                    {
+                        "x":55,
+                        "y":66,
+                        "on_goal":false,
+                        "pk":false,
+                        "scored":false,
+                        "assist":null
+                    }
+                ]
+            },
+            {
+                "name":"Player K",
+                "starter":true,
+                "minutes":80,
+                "subbed_due_to_injury":true,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":10,
+                "shots":[
+                    {
+                        "x":null,
+                        "y":null,
+                        "on_goal":true,
+                        "scored":false,
+                        "pk":false,
+                        "by_opponent":true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "team":"A Team",
+        "opponent":"C Team",
+        "date_time":"2017-02-02T08:00:00",
+        "campaign":"Alphabet League",
+        "player_match":[
+            {
+                "name":"Player X",
+                "starter":true,
+                "minutes":62,
+                "subbed_due_to_injury":false,
+                "yellow_card":2,
+                "red_card":2,
+                "corners":2,
+                "shots":[
+                    {
+                        "player":"Player X",
+                        "x":50,
+                        "y":51,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":true,
+                        "assist":null
+                    }
+                ]
+            },
+            {
+                "name":"Player Y",
+                "starter":false,
+                "minutes":72,
+                "subbed_due_to_injury":false,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":0,
+                "shots":[
+                    {
+                        "x":30,
+                        "y":31,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":true,
+                        "assist":"Player X"
+                    },
+                    {
+                        "x":10,
+                        "y":11,
+                        "on_goal":true,
+                        "pk":false,
+                        "scored":false,
+                        "assist":null
+                    }
+                ]
+            },
+            {
+                "name":"Player K",
+                "starter":true,
+                "minutes":82,
+                "subbed_due_to_injury":false,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":0,
+                "shots":[
+                    {
+                        "x":null,
+                        "y":null,
+                        "on_goal":false,
+                        "scored":false,
+                        "pk":false,
+                        "by_opponent":true
+                    },
+                    {
+                        "x":null,
+                        "y":null,
+                        "on_goal":true,
+                        "scored":true,
+                        "pk":false,
+                        "by_opponent":true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "team":"A Team",
+        "opponent":"B Team",
+        "date_time":"2017-03-03T08:00:00",
+        "campaign":"Alphabet League",
+        "player_match":[
+            {
+                "name":"Player X",
+                "starter":true,
+                "minutes":80,
+                "subbed_due_to_injury":false,
+                "yellow_card":1,
+                "red_card":1,
+                "corners":1,
+                "shots":[
+                    {
+                        "x":10,
+                        "y":11,
+                        "on_goal":true,
+                        "scored":true,
+                        "pk":false,
+                        "assist":null
+                    }
+                ]
+            },
+            {
+                "name":"Player Y",
+                "starter":false,
+                "minutes":81,
+                "subbed_due_to_injury":false,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":0,
+                "shots": []
+            },
+            {
+                "name":"Player K",
+                "starter":true,
+                "minutes":83,
+                "subbed_due_to_injury":false,
+                "yellow_card":0,
+                "red_card":0,
+                "corners":0,
+                "shots":[
+                    {
+                        "x":null,
+                        "y":null,
+                        "on_goal":true,
+                        "scored":true,
+                        "pk":false,
+                        "by_opponent":true
+                    },
+                    {
+                        "x":null,
+                        "y":null,
+                        "on_goal":true,
+                        "scored":false,
+                        "pk":false,
+                        "by_opponent":true
+                    }
+                ]
+            }
+        ]
+    }
 ]

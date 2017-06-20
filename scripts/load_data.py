@@ -51,6 +51,10 @@ def load_match(match_data):
 
     db.session.add(match)
 
+    # collect all playermatch shot data into a list and defer until all
+    #  playermatch have been created to deal with assist (between 2 playermatch)
+    pm_shot_data = []
+
     print("Load PlayerMatch")
     for pm_data in match_data["player_match"]:
         print(" - player match : {}".format(pm_data["name"]))
@@ -66,40 +70,35 @@ def load_match(match_data):
                                   red_card=pm_data["red_card"],
                                   corners=pm_data["corners"],
                                   )
+        for shot in pm_data['shots']:
+            shot['player'] = pm_data["name"]
+            pm_shot_data.append(shot)
 
         db.session.add(playerMatch)
 
     print("Load Shots")
-    for shot_data in match_data.get("shot", []):
+    for shot_data in pm_shot_data:
         playerMatch = get_player_match_by_name(match, shot_data['player'])
         shot = Shot(playerMatch,
-                    x=shot_data['x'], y=shot_data['y'],
-                    on_goal=shot_data['on_goal'], pk=shot_data['pk'],
-                    scored=shot_data['scored'], by_opponent=False, )
+                    x=shot_data['x'],
+                    y=shot_data['y'],
+                    on_goal=shot_data['on_goal'],
+                    pk=shot_data['pk'],
+                    scored=shot_data['scored'],
+                    by_opponent=shot_data.get('by_opponent', False), )
 
         if shot_data['scored']:
             goal = Goal(shot_data.get('time', None))
 
             goal.player_match = playerMatch
             goal.shot = shot
-            if shot_data['assist']:
+            if shot_data.get('assist', None):
                 assistPlayerMatch = get_player_match_by_name(match,
                                                              shot_data['assist'])
                 assist = Assist(assistPlayerMatch, goal)
                 db.session.add(assist)
             db.session.add(goal)
         db.session.add(shot)
-
-    for shot_ag_data in match_data.get("shot_against", []):
-        keeper = get_player_match_by_name(match, shot_ag_data['keeper'])
-        shotAgainst = Shot(player_match=keeper,
-                           x=shot_ag_data["x"],
-                           y=shot_ag_data["y"],
-                           on_goal=shot_ag_data["on_goal"],
-                           scored=shot_ag_data["scored"],
-                           pk=shot_ag_data["pk"],
-                           by_opponent=True)
-        db.session.add(shotAgainst)
 
     db.session.commit()
 
