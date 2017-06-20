@@ -39,9 +39,7 @@ requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
-
 class CreateListResourceBase(Resource):
-
     def post(self):
         request_dict = request.get_json(force=True)
         try:
@@ -182,8 +180,10 @@ class CreateListPlayerMatch(CreateListResourceBase):
 
 
     def InstanceFromDict(self, request_dict):
-        player = db.session.query(Player).filter_by(id=request_dict['player']['id']).one()
-        match = db.session.query(Match).filter_by(id=request_dict['match']['id']).one()
+        player = db.session.query(Player).filter_by(
+                                    id=request_dict['player']['id']).one()
+        match = db.session.query(Match).filter_by(
+                                    id=request_dict['match']['id']).one()
         modelInst = self.ModelClass(
                         player=player,
                         match=match,
@@ -197,7 +197,7 @@ class CreateListPlayerMatch(CreateListResourceBase):
 
         return modelInst
 
-#
+
 class CreateListShot(CreateListResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
@@ -258,7 +258,7 @@ class CreateListGoal(CreateListResourceBase):
 
         return modelInst
 
-#
+
 class CreateListAssist(CreateListResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
@@ -281,7 +281,7 @@ class CreateListAssist(CreateListResourceBase):
                         id=request_dict['goal']['id']).one()
         player_match = db.session.query(PlayerMatch).filter_by(
                         id=request_dict['player_match']['id']).one()
-        modelInst = self.ModelClass(goal=goal, player_match=player_match, )
+        modelInst = self.ModelClass(goal=goal, player_match=player_match)
 
         return modelInst
 
@@ -463,7 +463,6 @@ class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
         return super().delete(playermatch_id)
 
 
-#
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     ModelClass = Match
     mm_schema = match_schema
@@ -479,7 +478,6 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
         return super().delete(match_id)
 
 
-#
 class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
@@ -509,7 +507,7 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     def delete(self, goal_id):
         return super().delete(goal_id)
 
-#
+
 class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema

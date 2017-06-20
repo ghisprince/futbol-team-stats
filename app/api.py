@@ -28,7 +28,7 @@ api.add_resource(GetUpdateDeleteShot, '/api/v1/shots/<int:shot_id>')
 api.add_resource(GetUpdateDeleteGoal, '/api/v1/goals/<int:goal_id>')
 api.add_resource(GetUpdateDeleteAssist, '/api/v1/assists/<int:assist_id>')
 
-
+# convinience access points
 api.add_resource(AddRemoveListTeamPlayer, '/api/v1/teams/<int:team_id>/players/')
 api.add_resource(AddRemoveListTeamMatch, '/api/v1/teams/<int:team_id>/matches/')
 #api.add_resource(AddRemoveListPlayerPlayerMatch, '/api/v1/players/<int:player_id>/playermatches/')

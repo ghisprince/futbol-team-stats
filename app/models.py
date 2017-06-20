@@ -136,7 +136,8 @@ class Match(db.Model, CRUD_MixIn):
     team = db.relationship("Team", back_populates="matches")
 
     opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'))
-    opponent = db.relationship("Opponent", uselist=False, back_populates="matches")
+    opponent = db.relationship("Opponent", uselist=False,
+                               back_populates="matches")
 
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
     campaign = db.relationship("Campaign", back_populates="matches")
@@ -180,7 +181,8 @@ class Match(db.Model, CRUD_MixIn):
         return sum([i.num_shots_against for i in self.player_matches])
 
     def __init__(self, date_time, team, opponent, campaign=None, at_home=True):
-        self.date_time = datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
+        self.date_time = datetime.datetime.strptime(date_time,
+                                                    "%Y-%m-%dT%H:%M:%S")
         self.team = team
         self.opponent = opponent
         self.campaign = campaign
@@ -255,12 +257,11 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def num_saves(self):
-        return len([i for i in self.shots if (i.by_opponent)])
+        return len([i for i in self.shots if i.by_opponent])
 
     @hybrid_property
     def num_assists(self):
         return len(self.assists)
-
 
     def __init__(self, player, match, starter=True, minutes=0,
                  subbed_due_to_injury=None,

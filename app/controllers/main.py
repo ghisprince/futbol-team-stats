@@ -1,14 +1,14 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
 from flask_login import login_user, logout_user, login_required
 
-
 from app.extensions import cache
 from app.forms import LoginForm
 from app.models import *
-
+from app.api import *
 
 
 main = Blueprint('main', __name__)
+
 
 @main.route('/')
 @cache.cached(timeout=1000)
@@ -42,9 +42,11 @@ def logout():
 def matches():
     return render_template('stats.html')
 
+
 @main.route("/match")
 def match():
     return render_template('match.html')
+
 
 @main.route("/edit-stats")
 def edit_stats():
@@ -71,9 +73,7 @@ rest api version 1.0
 
 """
 
+
 @main.route("/api/v1")
 def api_v1():
     return api_v1_html
-
-
-from app.api import *

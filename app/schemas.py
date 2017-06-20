@@ -160,6 +160,7 @@ class PlayerMatchSchema(ModelSchema):
     num_goals = fields.Integer(dump_only=True)
     num_goals_against = fields.Integer(dump_only=True)
     num_assists = fields.Integer(dump_only=True)
+    num_saves = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
@@ -205,7 +206,6 @@ class MatchSchema(ModelSchema):
     num_shots_against = fields.Integer(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
     num_goals_against = fields.Integer(dump_only=True)
-    num_saves = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
