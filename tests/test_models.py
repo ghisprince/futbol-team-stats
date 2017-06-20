@@ -113,11 +113,11 @@ class TestModels:
         # test
         assert player_match1.match.team.name == "Lil' Barca"
         assert player_match1.match.opponent.name == "Lil' Real Madrid"
-        assert player_match1.started
+        assert player_match1.starter
         assert player_match1.subbed_due_to_injury
         assert player_match1.yellow_card == 1
 
-        assert not player_match2.started
+        assert not player_match2.starter
         assert not player_match2.subbed_due_to_injury
         assert player_match2.red_card == 1
 
@@ -174,11 +174,11 @@ class TestModels:
         player_match2 = PlayerMatch(Player("Lil' Ronaldo", 7),
                                     match, False, 60, False, 0, 1, 2)
 
-        assert player_match1.started
+        assert player_match1.starter
         assert player_match1.subbed_due_to_injury
         assert player_match1.yellow_card == 1
 
-        assert not player_match2.started
+        assert not player_match2.starter
         assert not player_match2.subbed_due_to_injury
         assert player_match2.red_card == 1
 

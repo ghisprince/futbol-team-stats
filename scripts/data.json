@@ -7,7 +7,7 @@
     "player_match": [
         {
             "name": "Player X",
-            "started": true,
+            "starter": true,
             "minutes": 60,
             "subbed_due_to_injury": false,
             "yellow_card": 1,
@@ -16,7 +16,7 @@
         },
         {
             "name": "Player Y",
-            "started": false,
+            "starter": false,
             "minutes": 70,
             "subbed_due_to_injury": false,
             "yellow_card": 0,
@@ -25,7 +25,7 @@
         },
         {
             "name": "Player K",
-            "started": true,
+            "starter": true,
             "minutes": 80,
             "subbed_due_to_injury": true,
             "yellow_card": 0,
@@ -92,7 +92,7 @@
     "player_match": [
         {
             "name": "Player X",
-            "started": true,
+            "starter": true,
             "minutes": 62,
             "subbed_due_to_injury": false,
             "yellow_card": 2,
@@ -101,7 +101,7 @@
         },
         {
             "name": "Player Y",
-            "started": false,
+            "starter": false,
             "minutes": 72,
             "subbed_due_to_injury": false,
             "yellow_card": 0,
@@ -110,7 +110,7 @@
         },
         {
             "name": "Player K",
-            "started": true,
+            "starter": true,
             "minutes": 82,
             "subbed_due_to_injury": false,
             "yellow_card": 0,
@@ -176,7 +176,7 @@
     "player_match": [
         {
             "name": "Player X",
-            "started": true,
+            "starter": true,
             "minutes": 80,
             "subbed_due_to_injury": false,
             "yellow_card": 1,
@@ -185,7 +185,7 @@
         },
         {
             "name": "Player Y",
-            "started": false,
+            "starter": false,
             "minutes": 81,
             "subbed_due_to_injury": false,
             "yellow_card": 0,
@@ -194,7 +194,7 @@
         },
         {
             "name": "Player K",
-            "started": true,
+            "starter": true,
             "minutes": 83,
             "subbed_due_to_injury": false,
             "yellow_card": 0,

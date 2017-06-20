@@ -7,7 +7,7 @@ Web-site to collect and report soccer team and player's stats.
    * players
    * campaigns (tournaments, seasons)
  * by player
-   * started
+   * starter
    * minutes played
    * cards
    * corners

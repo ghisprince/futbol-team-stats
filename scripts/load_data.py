@@ -59,7 +59,7 @@ def load_match(match_data):
                                                        name=pm_data["name"],
                                                        team=team),
                                   match=match,
-                                  started=pm_data["started"],
+                                  starter=pm_data["starter"],
                                   minutes=pm_data["minutes"],
                                   subbed_due_to_injury=pm_data["subbed_due_to_injury"],
                                   yellow_card=pm_data["yellow_card"],

@@ -158,7 +158,7 @@ class PlayerMatchSchema(ModelSchema):
     num_shots = fields.Integer(dump_only=True)
     num_shots_against = fields.Integer(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
-    num_goals_allowed = fields.Integer(dump_only=True)
+    num_goals_against = fields.Integer(dump_only=True)
     num_assists = fields.Integer(dump_only=True)
 
     class Meta:
@@ -188,13 +188,13 @@ class MatchSchema(ModelSchema):
                                    dump_only=True,
                                    many=True,
                                    only=("_links", "id",
-                                         "player", "minutes", "started",
+                                         "player", "minutes", "starter",
                                          "subbed_due_to_injury",
                                          "yellow_card", "red_card",
                                          "num_shots", "num_goals",
                                          "num_assists",
                                          "num_shots_against",
-                                         "num_goals_allowed",
+                                         "num_goals_against",
                                          )
                                    )
 
@@ -204,7 +204,7 @@ class MatchSchema(ModelSchema):
     num_shots = fields.Integer(dump_only=True)
     num_shots_against = fields.Integer(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
-    num_goals_allowed = fields.Integer(dump_only=True)
+    num_goals_against = fields.Integer(dump_only=True)
     num_saves = fields.Integer(dump_only=True)
 
     class Meta:

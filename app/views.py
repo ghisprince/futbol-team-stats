@@ -187,7 +187,7 @@ class CreateListPlayerMatch(CreateListResourceBase):
         modelInst = self.ModelClass(
                         player=player,
                         match=match,
-                        started=request_dict['started'],
+                        starter=request_dict['starter'],
                         minutes=request_dict['minutes'],
                         subbed_due_to_injury=request_dict['subbed_due_to_injury'],
                         yellow_card=request_dict['yellow_card'],

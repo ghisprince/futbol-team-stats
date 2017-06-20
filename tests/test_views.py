@@ -60,7 +60,7 @@ class TestViews:
 
         playerMatch = {"player": player,
                        "match": match,
-                       "started": True,
+                       "starter": True,
                        "minutes": 90,
                        "subbed_due_to_injury": False,
                        "yellow_card": 1,
@@ -419,7 +419,7 @@ class TestViews:
         player_match_1 = {
             'player': player_1,
             'match': match,
-            'started': True,
+            'starter': True,
             'minutes': 50,
             'subbed_due_to_injury': False,
             'yellow_card': 1,
@@ -438,7 +438,7 @@ class TestViews:
         assert pmatch['minutes'] == player_match_1['minutes']
         assert pmatch['red_card'] == player_match_1['red_card']
         assert pmatch['yellow_card'] == player_match_1['yellow_card']
-        assert pmatch['started'] is player_match_1['started']
+        assert pmatch['starter'] is player_match_1['starter']
         assert pmatch['subbed_due_to_injury'] is \
                             player_match_1['subbed_due_to_injury']
 
@@ -454,7 +454,7 @@ class TestViews:
         player_match_2 = {
             'player': player_2,
             'match': match,
-            'started': False,
+            'starter': False,
             'minutes': 89,
             'subbed_due_to_injury': True,
             'yellow_card': 0,
@@ -473,7 +473,7 @@ class TestViews:
         assert pmatch['minutes'] == player_match_2['minutes']
         assert pmatch['red_card'] == player_match_2['red_card']
         assert pmatch['yellow_card'] == player_match_2['yellow_card']
-        assert pmatch['started'] is player_match_2['started']
+        assert pmatch['starter'] is player_match_2['starter']
         assert pmatch['subbed_due_to_injury'] is \
                             player_match_2['subbed_due_to_injury']
 
@@ -551,7 +551,7 @@ class TestViews:
 
         playerMatch_data = {"player": player,
                             "match": pm['match'],
-                            "started": True,
+                            "starter": True,
                             "minutes": 90,
                             "subbed_due_to_injury": False,
                             "yellow_card": 0,

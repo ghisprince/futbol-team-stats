@@ -144,7 +144,7 @@ class Match(db.Model, CRUD_MixIn):
     @hybrid_property
     def result(self):
         goals_for = self.num_goals
-        goals_against = self.num_goals_allowed
+        goals_against = self.num_goals_against
 
         if goals_for > goals_against:
             result = "win"
@@ -159,7 +159,7 @@ class Match(db.Model, CRUD_MixIn):
     def result_long(self):
 
         return "{}-{} {} vs {}".format(self.num_goals,
-                                       self.num_goals_allowed,
+                                       self.num_goals_against,
                                        self.result,
                                        self.opponent.name)
 
@@ -168,8 +168,8 @@ class Match(db.Model, CRUD_MixIn):
         return sum([i.num_goals for i in self.player_matches])
 
     @hybrid_property
-    def num_goals_allowed(self):
-        return sum([i.num_goals_allowed for i in self.player_matches])
+    def num_goals_against(self):
+        return sum([i.num_goals_against for i in self.player_matches])
 
     @hybrid_property
     def num_shots(self):
@@ -216,7 +216,7 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     __table_args__ = (db.UniqueConstraint('player_id', 'match_id'),)
 
     id = db.Column(db.Integer(), primary_key=True)
-    started = db.Column(db.Boolean(), default=False, nullable=False)
+    starter = db.Column(db.Boolean(), default=False, nullable=False)
     minutes = db.Column(db.Integer(), default=0, nullable=False)
     subbed_due_to_injury = db.Column(db.Boolean(), default=False)
     yellow_card = db.Column(db.Integer(), default=0)
@@ -232,43 +232,42 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     shots = db.relationship("Shot", back_populates="player_match",
                             cascade="all, delete-orphan")
-    assists = db.relationship("Assist", back_populates="player_match")  # goal cascades to assist
+
+    # goal cascades to assist
+    assists = db.relationship("Assist", back_populates="player_match")
 
 
     @hybrid_property
     def num_shots(self):
-        return len([i for i in self.shots if (i.by_opponent)])
+        return len([i for i in self.shots if not i.by_opponent])
 
     @hybrid_property
     def num_shots_against(self):
+        return len([i for i in self.shots if i.by_opponent])
+
+    @hybrid_property
+    def num_goals(self):
+        return len([i for i in self.shots if (i.scored and not i.by_opponent)])
+
+    @hybrid_property
+    def num_goals_against(self):
+        return len([i for i in self.shots if (i.scored and i.by_opponent)])
+
+    @hybrid_property
+    def num_saves(self):
         return len([i for i in self.shots if (i.by_opponent)])
-
-    @hybrid_property
-    def num_goals(self):
-        return len([i for i in self.shots if (i.scored and not i.by_opponent)])
-
-    @hybrid_property
-    def num_goals(self):
-        return len([i for i in self.shots if (i.scored and not i.by_opponent)])
 
     @hybrid_property
     def num_assists(self):
         return len(self.assists)
 
-    @hybrid_property
-    def num_goals_allowed(self):
-        return len([i for i in self.shots if (i.scored and i.by_opponent)])
 
-    @hybrid_property
-    def num_saves(self):
-        return len([i for i in self.shots if (not i.scored and i.by_opponent)])
-
-    def __init__(self, player, match, started=True, minutes=0,
+    def __init__(self, player, match, starter=True, minutes=0,
                  subbed_due_to_injury=None,
                  yellow_card=None, red_card=None, corners=None,):
         self.player = player
         self.match = match
-        self.started = started
+        self.starter = starter
         self.minutes = minutes
         self.subbed_due_to_injury = subbed_due_to_injury
         self.yellow_card = yellow_card
@@ -276,8 +275,8 @@ class PlayerMatch(db.Model, CRUD_MixIn):
         self.corners = corners
 
     def __repr__(self):
-        return "PlayerMatch (player={}, started={}, minutes={})".format(
-            self.player.name, self.started, self.minutes,)
+        return "PlayerMatch (player={}, starter={}, minutes={})".format(
+            self.player.name, self.starter, self.minutes,)
 
 
 class Shot(db.Model, CRUD_MixIn):
@@ -317,10 +316,6 @@ class Shot(db.Model, CRUD_MixIn):
 class Goal(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     time = db.Column(db.Integer(), nullable=True)
-
-    #player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
-    #                            nullable=False)
-    #player_match = db.relationship("PlayerMatch", back_populates="goals")
 
     # relationships
     shot_id = db.Column(db.Integer, db.ForeignKey('shot.id'), nullable=False)
