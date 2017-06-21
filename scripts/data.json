@@ -3,7 +3,7 @@
         "team":"A Team",
         "opponent":"B Team",
         "date_time":"2017-01-01T08:00:00",
-        "campaign":"Alphabet League",
+        "competition":"Alphabet League",
         "player_match":[
             {
                 "name":"Player X",
@@ -84,7 +84,7 @@
         "team":"A Team",
         "opponent":"C Team",
         "date_time":"2017-02-02T08:00:00",
-        "campaign":"Alphabet League",
+        "competition":"Alphabet League",
         "player_match":[
             {
                 "name":"Player X",
@@ -166,7 +166,7 @@
         "team":"A Team",
         "opponent":"B Team",
         "date_time":"2017-03-03T08:00:00",
-        "campaign":"Alphabet League",
+        "competition":"Alphabet League",
         "player_match":[
             {
                 "name":"Player X",

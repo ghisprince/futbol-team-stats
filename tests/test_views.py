@@ -27,7 +27,7 @@ class TestViews:
     def _load_generic_match(self, testapp):
         match_data = {
             "opponent": {"name": "B Team"},
-            "campaign": None,
+            "competition": None,
             "date_time": "2017-03-18T08:00:00",
             "team": {"name": "A Team"},
             "at_home": False,
@@ -179,7 +179,7 @@ class TestViews:
     def test_match(self, testapp):
         match_data = {
             "opponent": {"name": "B Team"},
-            "campaign": {"name": "Alphabet League"},
+            "competition": {"name": "Alphabet League"},
             "date_time": "2017-01-18T08:00:00",
             "team": {"name": "A Team"},
             "at_home": True,
@@ -198,15 +198,15 @@ class TestViews:
         assert code == 201
         team_id = resp['id']
 
-        code, resp = get_result(testapp.post('/api/v1/campaigns/',
-                                       data=json.dumps(match_data['campaign']),
+        code, resp = get_result(testapp.post('/api/v1/competitions/',
+                                       data=json.dumps(match_data['competition']),
                                        content_type='application/json'))
         assert code == 201
-        campaign_id = resp['id']
+        competition_id = resp['id']
 
         match_data['team']['id'] = team_id
         match_data['opponent']['id'] = opponent_id
-        match_data['campaign']['id'] = campaign_id
+        match_data['competition']['id'] = competition_id
 
 
         code, resp = get_result(testapp.post('/api/v1/matches/',
@@ -216,12 +216,12 @@ class TestViews:
         assert code == 201
 
         assert resp['opponent']['name'] == match_data['opponent']['name']
-        assert resp['campaign']['name'] == match_data['campaign']['name']
+        assert resp['competition']['name'] == match_data['competition']['name']
         assert resp['date_time'] == "2017-01-18T08:00:00+00:00"
         assert resp['at_home'] == match_data['at_home']
 
-        # Lastly create a match with null campaign (aka scrimmage, friendly)
-        match_data['campaign'] = None
+        # Lastly create a match with null competition (aka scrimmage, friendly)
+        match_data['competition'] = None
         match_data["date_time"] = "2019-09-09T09:00:00"
 
         code, resp = get_result(testapp.post('/api/v1/matches/',
@@ -230,29 +230,29 @@ class TestViews:
         assert code == 201
 
         # then test
-        assert resp['campaign'] is None
+        assert resp['competition'] is None
         assert resp['date_time'] == "2019-09-09T09:00:00+00:00"
 
 
-    def test_campaign_post(self, testapp):
+    def test_competition_post(self, testapp):
         # POST
-        code, resp = get_result(testapp.post('/api/v1/campaigns/',
+        code, resp = get_result(testapp.post('/api/v1/competitions/',
                           data='{"name":"S1"}',
                           content_type='application/json'))
         assert code == 201
         assert resp['name'] == "S1"
 
         # POST 2 more
-        testapp.post('/api/v1/campaigns/',
+        testapp.post('/api/v1/competitions/',
                      data='{"name":"S2"}',
                      content_type='application/json')
 
-        testapp.post('/api/v1/campaigns/',
+        testapp.post('/api/v1/competitions/',
                      data='{"name":"S3"}',
                      content_type='application/json')
 
         # GET all 3
-        code, resp = get_result(testapp.get('/api/v1/campaigns/'))
+        code, resp = get_result(testapp.get('/api/v1/competitions/'))
 
         # fully test the team data
         assert len(resp) == 3
@@ -260,8 +260,8 @@ class TestViews:
                                 ["S1", "S2", "S3"]
 
 
-    def test_campaign_delete(self, testapp):
-        def get_campaigns_name(resp):
+    def test_competition_delete(self, testapp):
+        def get_competitions_name(resp):
             return {i['name']: i['_links']['self']
                                 for i in resp}
 
@@ -270,43 +270,43 @@ class TestViews:
         data = {"name": None}
         for i in ['A', 'B', 'C', 'D', 'E']:
             data['name'] = i
-            testapp.post('/api/v1/campaigns/', data=json.dumps(data),
+            testapp.post('/api/v1/competitions/', data=json.dumps(data),
                          content_type=content_type)
 
-        code, resp = get_result(testapp.get('/api/v1/campaigns/'))
-        camps = get_campaigns_name(resp)
+        code, resp = get_result(testapp.get('/api/v1/competitions/'))
+        camps = get_competitions_name(resp)
         assert sorted(camps.keys()) == ['A', 'B', 'C', 'D', 'E']
 
         # DELETE
-        assert camps['B'] == '/api/v1/campaigns/2'
+        assert camps['B'] == '/api/v1/competitions/2'
         testapp.delete(camps['B'])
         testapp.delete(camps['D'])
 
-        code, resp = get_result(testapp.get('/api/v1/campaigns/'))
-        camps = get_campaigns_name(resp)
+        code, resp = get_result(testapp.get('/api/v1/competitions/'))
+        camps = get_competitions_name(resp)
         assert sorted(camps.keys()) == ['A', 'C', 'E']
 
 
-    def test_campaign_query(self, testapp):
+    def test_competition_query(self, testapp):
         # POST TEAMS
-        testapp.post('/api/v1/campaigns/',
+        testapp.post('/api/v1/competitions/',
                      data='{"name":"2016 Season"}',
                      content_type='application/json')
 
-        testapp.post('/api/v1/campaigns/',
+        testapp.post('/api/v1/competitions/',
                      data='{"name":"2017 Season"}',
                      content_type='application/json')
 
-        testapp.post('/api/v1/campaigns/',
+        testapp.post('/api/v1/competitions/',
                      data='{"name":"State Cup 2016"}',
                      content_type='application/json')
 
 
-        code, resp = get_result(testapp.get('/api/v1/campaigns/'))
+        code, resp = get_result(testapp.get('/api/v1/competitions/'))
         assert len(resp) == 3
 
         code, resp = get_result(testapp.get(
-                            '/api/v1/campaigns/?name=2017%20Season'))
+                            '/api/v1/competitions/?name=2017%20Season'))
 
         assert len(resp) == 1
         assert resp[0]['name'] == "2017 Season"

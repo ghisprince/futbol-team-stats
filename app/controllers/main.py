@@ -65,7 +65,7 @@ rest api version 1.0
     <ul>
     <li><a href="/api/v1/teams/">/api/v1/teams/</a></li>
     <li><a href="/api/v1/players/">/api/v1/players/</a></li>
-    <li><a href="/api/v1/campaigns/">/api/v1/campaigns/</a></li>
+    <li><a href="/api/v1/competitions/">/api/v1/competitions/</a></li>
     <li><a href="/api/v1/matches/">/api/v1/matches/</a></li>
     <li><a href="/api/v1/playermatches/">/api/v1/playermatches/</a></li>    
     </ul>

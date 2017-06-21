@@ -58,8 +58,8 @@ class TestModels:
         player = Player("Lil' Ronaldhino", 11, team)
         assert player.team.name == "Barca"
 
-    def test_campaign(self, testapp):
-        camp = Campaign("Spring 2017")
+    def test_competition(self, testapp):
+        camp = Competition("Spring 2017")
         assert camp.name == "Spring 2017"
 
         camp.result = "2nd place"
@@ -71,15 +71,15 @@ class TestModels:
                       Opponent("Lil' Real Madrid"),)
         assert match.team.name == "Lil' Barca"
         assert match.opponent.name == "Lil' Real Madrid"
-        assert match.campaign is None
+        assert match.competition is None
 
-    def test_match_campaign(self, testapp):
+    def test_match_competition(self, testapp):
         match = Match("2017-11-12T08:00:00",
                       Team("Lil' Barca"),
                       Opponent("Lil' Real Madrid"),
-                      Campaign("Fall 2017"))
+                      Competition("Fall 2017"))
 
-        assert match.campaign.name == "Fall 2017"
+        assert match.competition.name == "Fall 2017"
 
     def test_complete(self, testapp):
 
@@ -88,7 +88,7 @@ class TestModels:
         match = Match("2017-11-12T08:00:00",
                       team,
                       opponent,
-                      Campaign("Fall 2017"))
+                      Competition("Fall 2017"))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
                                     match,
@@ -166,7 +166,7 @@ class TestModels:
         match = Match("2017-11-12T08:00:00",
                       team,
                       opponent,
-                      Campaign("Fall 2017"))
+                      Competition("Fall 2017"))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
                                     match, True, 60, True, 1, 0, 1)

@@ -36,10 +36,10 @@ def load_match(match_data):
                                                        match_data["date_time"]))
         return
 
-    if match_data["campaign"]:
-        campaign = get_or_create(db.session, Campaign, name=match_data["campaign"])
+    if match_data["competition"]:
+        competition = get_or_create(db.session, Competition, name=match_data["competition"])
     else:
-        campaign = None
+        competition = None
 
     print("Load Match")
     match = Match(date_time=match_data["date_time"],
@@ -47,7 +47,7 @@ def load_match(match_data):
                                      name=match_data["team"]),
                   opponent=get_or_create(db.session, Opponent,
                                          name=match_data["opponent"]),
-                  campaign=campaign)
+                  competition=competition)
 
     db.session.add(match)
 

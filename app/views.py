@@ -13,7 +13,7 @@ import webargs
 team_schema = TeamSchema(only=("_links", "id", "name"))
 player_schema = PlayerSchema(only=("_links", "id", "name", "number", "team"))
 match_schema = MatchSchema()
-campaign_schema = CampaignSchema()
+competition_schema = CompetitionSchema()
 opponent_schema = OpponentSchema()
 playermatch_schema = PlayerMatchSchema()
 shot_schema = ShotSchema()
@@ -99,9 +99,9 @@ class CreateListPlayer(CreateListResourceBase):
                                team=team)
 
 
-class CreateListCampaign(CreateListResourceBase):
-    ModelClass = Campaign
-    mm_schema = campaign_schema
+class CreateListCompetition(CreateListResourceBase):
+    ModelClass = Competition
+    mm_schema = competition_schema
 
     @use_kwargs({'name': webargs.fields.Str(required=False)})
     def get(self, name):
@@ -134,29 +134,29 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema = match_schema
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
-                 'campaign_id': webargs.fields.Int(required=False)
+                 'competition_id': webargs.fields.Int(required=False)
                  })
-    def get(self, opponent_id, campaign_id, ):
+    def get(self, opponent_id, competition_id, ):
         query = self.ModelClass.query
 
         if opponent_id:
             query = query.filter(self.ModelClass.opponent_id == opponent_id)
 
-        if campaign_id:
-            query = query.join(Campaign).filter(Campaign.id == campaign_id)
+        if competition_id:
+            query = query.join(Competition).filter(Competition.id == competition_id)
 
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        campaign = None
-        if request_dict['campaign']:
-            campaign = Campaign.query.get_or_404(request_dict['campaign']['id'])
+        competition = None
+        if request_dict['competition']:
+            competition = Competition.query.get_or_404(request_dict['competition']['id'])
 
         modelInst = self.ModelClass(
             date_time=request_dict['date_time'].replace("+00:00", ""),
             team=Team.query.get_or_404(request_dict['team']['id']),
             opponent=Opponent.query.get_or_404(request_dict['opponent']['id']),
-            campaign=campaign,
+            competition=competition,
             at_home=request_dict['at_home']
             )
         return modelInst
@@ -418,19 +418,19 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
         return super().delete(match_id)
 
 
-class GetUpdateDeleteCampaign(GetUpdateDeleteResourceBase):
-    ModelClass = Campaign
-    mm_schema = campaign_schema
+class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
+    ModelClass = Competition
+    mm_schema = competition_schema
 
-    def get(self, campaign_id):
-        query = Campaign.query.get_or_404(campaign_id)
-        return campaign_schema.dump(query).data
+    def get(self, competition_id):
+        query = Competition.query.get_or_404(competition_id)
+        return competition_schema.dump(query).data
 
-    def patch(self, campaign_id):
-        return super().patch(campaign_id)
+    def patch(self, competition_id):
+        return super().patch(competition_id)
 
-    def delete(self, campaign_id):
-        return super().delete(campaign_id)
+    def delete(self, competition_id):
+        return super().delete(competition_id)
 
 
 class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):

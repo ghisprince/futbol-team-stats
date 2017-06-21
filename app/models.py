@@ -102,11 +102,11 @@ class Opponent(db.Model, CRUD_MixIn):
         return "Opponent (name={})".format(self.name)
 
 
-class Campaign(db.Model, CRUD_MixIn):
+class Competition(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     result = db.Column(db.String(), nullable=True)
-    matches = db.relationship("Match", back_populates="campaign")
+    matches = db.relationship("Match", back_populates="competition")
     external_url = db.Column(db.String())
 
     @hybrid_property
@@ -120,7 +120,19 @@ class Campaign(db.Model, CRUD_MixIn):
         self.name = name
 
     def __repr__(self):
-        return "Campaign (name={})".format(self.name)
+        return "Competition (name={})".format(self.name)
+
+
+class Season(db.Model, CRUD_MixIn):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    matches = db.relationship("Match", back_populates="season")
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "Season (name={})".format(self.name)
 
 
 class Match(db.Model, CRUD_MixIn):
@@ -136,11 +148,13 @@ class Match(db.Model, CRUD_MixIn):
     team = db.relationship("Team", back_populates="matches")
 
     opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'))
-    opponent = db.relationship("Opponent", uselist=False,
-                               back_populates="matches")
+    opponent = db.relationship("Opponent", back_populates="matches")
 
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
-    campaign = db.relationship("Campaign", back_populates="matches")
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
+    competition = db.relationship("Competition", back_populates="matches")
+
+    season_id = db.Column(db.Integer, db.ForeignKey('season.id'))
+    season = db.relationship("Season", back_populates="matches")
 
     @hybrid_property
     def result(self):
@@ -180,12 +194,12 @@ class Match(db.Model, CRUD_MixIn):
     def num_shots_against(self):
         return sum([i.num_shots_against for i in self.player_matches])
 
-    def __init__(self, date_time, team, opponent, campaign=None, at_home=True):
+    def __init__(self, date_time, team, opponent, competition=None, at_home=True):
         self.date_time = datetime.datetime.strptime(date_time,
                                                     "%Y-%m-%dT%H:%M:%S")
         self.team = team
         self.opponent = opponent
-        self.campaign = campaign
+        self.competition = competition
         self.at_home = at_home
 
     def __repr__(self):

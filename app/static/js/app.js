@@ -80,7 +80,7 @@ var playersAggView = new Vue({
   data: {
     searchQuery: '',
     gridColumns: ['player', 'starter', 'minutes',
-                  'goals', 'assists', 'shots', 'saves'],
+                  'goals', 'assists', 'shots'],
     gridData: []
   },
     created() {
@@ -114,7 +114,7 @@ var matchesView = new Vue({
   el: '#demo2',
   data: {
     searchQuery: '',
-    gridColumns: ['date', 'opponent', 'campaign', 'result',
+    gridColumns: ['date', 'opponent', 'competition', 'result',
                   'goals for', 'goals against',
                   'shots for', 'shots against'],
     gridData: [
@@ -127,7 +127,7 @@ var matchesView = new Vue({
             this.gridData = response.data.map(function(obj){
                 obj['date'] = obj['date_time'].slice(0,-9);
                 obj['opponent'] = obj['opponent']['name'];
-                obj['campaign'] = obj['campaign']['name'];
+                obj['competition'] = obj['competition']['name'];
                 obj['goals for'] = obj['num_goals'];
                 obj['goals against'] = obj['num_goals_against'];
                 obj['shots for'] = obj['num_shots'];

@@ -40,10 +40,10 @@ class PlayerSchema(ModelSchema):
         sqla_session = db.session
 
 
-class CampaignSchema(ModelSchema):
+class CompetitionSchema(ModelSchema):
     _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteCampaign'.lower(), campaign_id="<id>"),
-         'collection': ma.URLFor('CreateListCampaign'.lower())
+        {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(), competition_id="<id>"),
+         'collection': ma.URLFor('CreateListCompetition'.lower())
         })
 
     matches = fields.Nested('MatchSchema',
@@ -56,7 +56,7 @@ class CampaignSchema(ModelSchema):
 
     class Meta:
         strict = True
-        model = Campaign
+        model = Competition
         sqla_session = db.session
 
 
@@ -174,7 +174,7 @@ class MatchSchema(ModelSchema):
          'collection': ma.URLFor('CreateListMatch'.lower()),
          })
 
-    campaign = fields.Nested(CampaignSchema,
+    competition = fields.Nested(CompetitionSchema,
                              dump_only=True,
                              only=("_links", "id", "name"))
 
