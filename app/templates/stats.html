@@ -1,45 +1,15 @@
-{% extends "base.html" %}
+{% extends "vue-templates.html" %}
 
 
 <html ng-app="myapp">
-{% block head_js %}
-	<link rel="stylesheet" href="(( url_for('static', filename='css/vendor/bootstrap.min.css') ))">
-{% endblock %}
+
 {% block body %}
-
-
-	<!-- component template -->
-	<section class="box" style="background-color: #eee;">
-
-		<script type="text/x-template" id="grid-template">
-		  <table class="table table-striped table-bordered">
-			<thead>
-			  <tr>
-				<th v-for="key in columns"
-				  @click="sortBy(key)"
-				  :class="{ active: sortKey == key }">
-				  {{ key | capitalize }}
-				  <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
-				  </span>
-				</th>
-			  </tr>
-			</thead>
-			<tbody>
-			  <tr v-for="entry in filteredData">
-				<td v-for="key in columns">
-				  {{entry[key]}}
-				</td>
-			  </tr>
-			</tbody>
-		  </table>
-		</script>
-	</section>
-
+	(( super() ))
 
 	<!-- demo root element -->
 	<section class="box" style="background-color: #eee;">
-		<div id="demo">
-			<h1>Player Match</h1>
+		<div id="players-agg-stats">
+			<h1>Player Aggregated Stats</h1>
 			<form id="search">
 				Search <input name="query" v-model="searchQuery">
 			</form>
@@ -54,8 +24,8 @@
 
 	<!-- demo root element -->
 	<section class="box" style="background-color: #eee;">
-		<div id="demo2">
-			<h1>Match</h1>
+		<div id="matches-summary">
+			<h1>Matches</h1>
 			<form id="search">
 				Search <input name="query" v-model="searchQuery">
 			</form>
@@ -67,9 +37,4 @@
 		</div>
 	</section>
 
-
-	<script src="(( url_for('static', filename='js/vendor/vue.min.js') ))"></script>
-	<script src="(( url_for('static', filename='js/vendor/axios.min.js') ))"></script>
-	<script src="(( url_for('static', filename='js/vendor/marked.min.js') ))"></script>
-	<script src="(( url_for('static', filename='js/app.js') ))"></script>
 {% endblock %}

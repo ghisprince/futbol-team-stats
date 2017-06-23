@@ -80,15 +80,15 @@ def load_match(match_data):
     for shot_data in pm_shot_data:
         playerMatch = get_player_match_by_name(match, shot_data['player'])
         shot = Shot(playerMatch,
-                    x=shot_data['x'],
-                    y=shot_data['y'],
-                    on_goal=shot_data['on_goal'],
-                    pk=shot_data['pk'],
-                    scored=shot_data['scored'],
+                    x=shot_data.get('x', None),
+                    y=shot_data.get('y', None),
+                    on_goal=shot_data.get('on_goal', False),
+                    pk=shot_data.get('pk', False),
+                    scored=shot_data.get('scored', False),
                     by_opponent=shot_data.get('by_opponent', False), )
 
-        if shot_data['scored']:
-            goal = Goal(shot_data.get('time', None))
+        if shot_data.get('scored', False):
+            goal = Goal(shot, shot_data.get('time', None))
 
             goal.player_match = playerMatch
             goal.shot = shot
@@ -115,7 +115,6 @@ def pprint():
     print("PM")
     for pm in db.session.query(PlayerMatch).all():
         print(pm)
-
 
 
 d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),

@@ -48,9 +48,9 @@ def match():
     return render_template('match.html')
 
 
-@main.route("/edit-stats")
+@main.route("/edit-data")
 def edit_stats():
-    return "TODO"
+    return render_template('edit.html')
 
 
 @main.route("/restricted")
