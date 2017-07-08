@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
+from flask import Blueprint, render_template, flash, redirect, url_for, send_file
 from flask_login import login_user, logout_user, login_required
 
 from app.extensions import cache
@@ -39,13 +39,28 @@ def logout():
 
 
 @main.route("/stats")
-def matches():
+def stats():
     return render_template('stats.html')
+
+
+@main.route("/players")
+def players():
+    return render_template('players.html')
+
+
+@main.route("/edit", methods=["GET", "POST"])
+def edit():
+    return render_template('edit.html')
 
 
 @main.route("/match")
 def match():
     return render_template('match.html')
+
+
+@main.route("/opponents")
+def opponents():
+    return render_template('opponents.html')
 
 
 @main.route("/edit-data")

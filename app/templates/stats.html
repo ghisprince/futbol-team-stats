@@ -1,40 +1,11 @@
-{% extends "vue-templates.html" %}
+{% extends "base.html" %}
 
-
-<html ng-app="myapp">
 
 {% block body %}
-	(( super() ))
-
-	<!-- demo root element -->
-	<section class="box" style="background-color: #eee;">
-		<div id="players-agg-stats">
-			<h1>Player Aggregated Stats</h1>
-			<form id="search">
-				Search <input name="query" v-model="searchQuery">
-			</form>
-			<demo-grid
-				:data="gridData"
-				:columns="gridColumns"
-				:filter-key="searchQuery">
-			</demo-grid>
-		</div>
-	</section>
+	<div id="app"></div>
+{% endblock %}
 
 
-	<!-- demo root element -->
-	<section class="box" style="background-color: #eee;">
-		<div id="matches-summary">
-			<h1>Matches</h1>
-			<form id="search">
-				Search <input name="query" v-model="searchQuery">
-			</form>
-			<demo-grid
-				:data="gridData"
-				:columns="gridColumns"
-				:filter-key="searchQuery">
-			</demo-grid>
-		</div>
-	</section>
-
+{% block js %}
+	<script src="(( url_for('static', filename='js/dist/build.js') ))"></script>
 {% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+	<div id="app-container"></div>
+{% endblock %}
+
+
+{% block js %}
+	<script src="(( url_for('static', filename='js/dist/players.build.js') ))"></script>
+{% endblock %}
