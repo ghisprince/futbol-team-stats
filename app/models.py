@@ -28,11 +28,11 @@ def get_or_create(session, model, **kwargs):
         session.commit()
         return instance
 
+
 # many to many relationship between User and Team
 association = db.Table('association',
-                       db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                       db.Column('team_id', db.Integer, db.ForeignKey('team.id'))
-                       )
+                  db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+                  db.Column('team_id', db.Integer, db.ForeignKey('team.id')))
 
 
 class User(db.Model, CRUD_MixIn, UserMixin):
@@ -75,7 +75,6 @@ class User(db.Model, CRUD_MixIn, UserMixin):
         return '<User {}>'.format(self.username)
 
 
-# objects
 class Team(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False, unique=True)
@@ -94,6 +93,7 @@ class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     matches = db.relationship("Match", back_populates="opponent")
+    external_url = db.Column(db.String())
 
     def __init__(self, name=None):
         self.name = name
@@ -105,6 +105,7 @@ class Opponent(db.Model, CRUD_MixIn):
 class Competition(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+    details = db.Column(db.String(), nullable=True)
     result = db.Column(db.String(), nullable=True)
     matches = db.relationship("Match", back_populates="competition")
     external_url = db.Column(db.String())
@@ -194,7 +195,8 @@ class Match(db.Model, CRUD_MixIn):
     def num_shots_against(self):
         return sum([i.num_shots_against for i in self.player_matches])
 
-    def __init__(self, date_time, team, opponent, competition=None, at_home=True):
+    def __init__(self, date_time, team, opponent, competition=None,
+                 at_home=True):
         self.date_time = datetime.datetime.strptime(date_time,
                                                     "%Y-%m-%dT%H:%M:%S")
         self.team = team
@@ -251,7 +253,6 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     # goal cascades to assist
     assists = db.relationship("Assist", back_populates="player_match")
-
 
     @hybrid_property
     def num_shots(self):
@@ -344,16 +345,17 @@ class Goal(db.Model, CRUD_MixIn):
         self.time = time
 
     def __repr__(self):
-        return "Goal (player={}, )".format(self.shot.player_match.player.name, )
+        return "Goal (player={}, )".format(self.shot.player_match.player.name)
 
 
 class Assist(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
+
+    # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
                                 nullable=False)
     player_match = db.relationship("PlayerMatch", back_populates="assists")
 
-    # relationships
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=False)
     goal = db.relationship("Goal", back_populates="assist")
 

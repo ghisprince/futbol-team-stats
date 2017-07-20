@@ -44,14 +44,12 @@ class PlayerSchemaEx(PlayerSchema):
                          exclude=("matches", "players"))
 
 
-
 class CompetitionSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(),
                            competition_id="<id>"),
          'collection': ma.URLFor('CreateListCompetition'.lower())
         })
-
 
     class Meta:
         strict = True
@@ -62,10 +60,9 @@ class CompetitionSchema(ModelSchema):
 class CompetitionSchemaEx(CompetitionSchema):
     match_results = fields.String()
     matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True,
-                            exclude=("player_matches","competition"))
+                            exclude=("player_matches", "competition"))
 
 
-#
 class OpponentSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), opponent_id="<id>"),

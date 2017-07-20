@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="pm in playermatches">
+                <tr v-for="pm in orderedPlayerMatches">
                     <td align="left">
                         {{ pm.match.date_time | formatDate }}
                     </td>
@@ -67,6 +67,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
     data () {
@@ -87,6 +88,11 @@ export default {
         .then(response => {
             this.playermatches = response.data;
         })
+    },
+    computed: {
+        orderedPlayerMatches: function() {
+            return _.orderBy(this.playermatches, 'match.date_time', 'desc')
+        }
     }
 }
 

@@ -8,7 +8,7 @@
         </div>
         <div class="filters row">
             <div class="form-group col-sm-3">
-                <label for="search-element">Player name</label>
+                <label for="search-element">Name filter</label>
                 <input v-model="searchKey" class="form-control" id="search-element" requred/>
             </div>
         </div>
@@ -16,6 +16,8 @@
             <thead>
                 <tr>
                 <th>Name</th>
+                <th>Active</th>
+                <th>Appearances</th>
                 <th>Statistics</th>
                 <th class="col-sm-2">Actions</th>
                 </tr>
@@ -23,9 +25,13 @@
             <tbody>
                 <tr v-for="player in filteredPlayers">
                 <td align="left">
-                    <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">
-                        {{ player.name }} #{{ player.number }}
-                    </router-link>
+                    {{ player.name }} #{{ player.number }}
+                </td>
+                <td align="left">
+                    {{ player.active }}
+                </td>
+                <td align="left">
+                    {{ player.player_matches.length }}
                 </td>
                 <td align="left">
                     <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">
@@ -45,6 +51,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
     data () {

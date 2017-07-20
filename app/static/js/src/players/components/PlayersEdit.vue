@@ -10,8 +10,13 @@
             <label for="edit-number">Number</span></label>
             <input type="number" class="form-control" id="edit-number" v-model="player.number"/>
         </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-            <router-link class="btn btn-default" v-bind:to="'/'">Cancel</router-link>
+        <div class="form-group">
+            <label for="edit-number">Active</span></label>
+            <input type="checkbox" class="form-control" id="edit-active" v-model="player.active"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <router-link class="btn btn-default" v-bind:to="'/'">Cancel</router-link>
         </form>
     </div>
 </template>
@@ -22,7 +27,7 @@ import axios from 'axios'
 
 export default {
     data () {
-        return {player: {name: 'x'}}
+        return {player: {name: '', number: null, active: true}}
     },
     created() {
         axios.get(`/api/v1/players/` + this.$route.params.player_id)
@@ -38,6 +43,7 @@ export default {
             axios.patch(`/api/v1/players/` + this.$route.params.player_id,
                         {'name': this.player.name,
                          'number': this.player.number,
+                         'active': this.player.active
                         }
              )
             .then(response => {
@@ -49,6 +55,5 @@ export default {
             })
         }
     }
-
 }
 </script>
