@@ -19,20 +19,16 @@ class TeamSchema(ModelSchema):
         sqla_session = db.session
 
 
+class TeamSchemaEx(TeamSchema):
+    matches = fields.Nested('MatchSchema', many=True, dump_only=True)
+    players = fields.Nested('PlayerSchema', many=True, dump_only=True)
+
+
 class PlayerSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeletePlayer'.lower(), player_id="<id>"),
          'collection': ma.URLFor('CreateListPlayer'.lower()),
         })
-
-    player_matches = fields.Nested('PlayerMatchSchema',
-                                   many=True,
-                                   dump_only=True,
-                                   only=("_links", "id",))
-
-    team = fields.Nested('TeamSchema',
-                         dump_only=True,
-                         only=("_links", "id", "name"))
 
     class Meta:
         strict = True
@@ -40,24 +36,33 @@ class PlayerSchema(ModelSchema):
         sqla_session = db.session
 
 
+class PlayerSchemaEx(PlayerSchema):
+    player_matches = fields.Nested('PlayerMatchSchemaEx', many=True,
+                                   dump_only=True)
+
+    team = fields.Nested('TeamSchema', dump_only=True,
+                         exclude=("matches", "players"))
+
+
+
 class CompetitionSchema(ModelSchema):
     _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(), competition_id="<id>"),
+        {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(),
+                           competition_id="<id>"),
          'collection': ma.URLFor('CreateListCompetition'.lower())
         })
 
-    matches = fields.Nested('MatchSchema',
-                            many=True,
-                            dump_only=True,
-                            only=("_links", "id", "date_time", "team",
-                                  "at_home", "result", "result_long"))
-
-    match_results = fields.String()
 
     class Meta:
         strict = True
         model = Competition
         sqla_session = db.session
+
+
+class CompetitionSchemaEx(CompetitionSchema):
+    match_results = fields.String()
+    matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True,
+                            exclude=("player_matches","competition"))
 
 
 #
@@ -67,16 +72,15 @@ class OpponentSchema(ModelSchema):
          'collection': ma.URLFor('CreateListOpponent'.lower())
         })
 
-    matches = fields.Nested('MatchSchema',
-                            many=True,
-                            dump_only=True,
-                            only=("_links", "id", "date_time", "team_id",
-                                  "opponent_id", "result"))
-
     class Meta:
         strict = True
         model = Opponent
         sqla_session = db.session
+
+
+#
+class OpponentSchemaEx(OpponentSchema):
+    matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True)
 
 
 class ShotSchema(ModelSchema):
@@ -85,17 +89,15 @@ class ShotSchema(ModelSchema):
          'collection': ma.URLFor('CreateListShot'.lower())
         })
 
-    goal = fields.Nested('GoalSchema',
-                          dump_only=True,
-                          only=("_links", "id", "time", ))
-
-    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
-                                 only=("_links", "id"))
-
     class Meta:
         strict = True
         model = Shot
         sqla_session = db.session
+
+#
+class ShotSchemaEx(ShotSchema):
+    goal = fields.Nested('GoalSchema', dump_only=True)
+    player_match = fields.Nested('PlayerMatchSchema', dump_only=True)
 
 
 class AssistSchema(ModelSchema):
@@ -104,13 +106,15 @@ class AssistSchema(ModelSchema):
          'collection': ma.URLFor('CreateListAssist'.lower())
         })
 
-    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
-                                 only=("_links", "id"))
-
     class Meta:
         strict = True
         model = Assist
         sqla_session = db.session
+
+
+#
+class AssistSchemaEx(AssistSchema):
+    player_match = fields.Nested('PlayerMatchSchema', dump_only=True)
 
 
 class GoalSchema(ModelSchema):
@@ -119,21 +123,19 @@ class GoalSchema(ModelSchema):
          'collection': ma.URLFor('CreateListGoal'.lower())
         })
 
-    assist = fields.Nested('AssistSchema',
-                            dump_only=True,
-                            only=("_links", "id"))
-
-    shot = fields.Nested('ShotSchema',
-                            dump_only=True,
-                            only=("_links", "id", ))
-
-    player_match = fields.Nested('PlayerMatchSchema', dump_only=True,
-                                 only=("_links", "id"))
-
     class Meta:
         strict = True
         model = Goal
         sqla_session = db.session
+
+#
+class GoalSchemaEx(GoalSchema):
+    assist = fields.Nested('AssistSchema', dump_only=True)
+
+    shot = fields.Nested('ShotSchema', dump_only=True)
+
+    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True, )
+
 
 
 class PlayerMatchSchema(ModelSchema):
@@ -142,17 +144,6 @@ class PlayerMatchSchema(ModelSchema):
                            playermatch_id="<id>"),
          'collection': ma.URLFor('CreateListPlayerMatch'.lower()),
          })
-
-    player = fields.Nested(PlayerSchema,
-                             dump_only=True,
-                             only=("_links", "id", "name", "number"))
-
-    match = fields.Nested('MatchSchema', dump_only=True,
-                          only=("_links", "id", ))
-
-    shots = fields.Nested(ShotSchema, dump_only=True, many=True)
-    assists = fields.Nested(AssistSchema, dump_only=True, many=True)
-    goals = fields.Nested(GoalSchema, dump_only=True, many=True)
 
     # hybrid properties on model
     num_shots = fields.Integer(dump_only=True)
@@ -167,37 +158,22 @@ class PlayerMatchSchema(ModelSchema):
         model = PlayerMatch
         sqla_session = db.session
 
+#
+class PlayerMatchSchemaEx(PlayerMatchSchema):
+    player = fields.Nested(PlayerSchemaEx, dump_only=True,
+                           exclude=("player_matches",))
+    match = fields.Nested('MatchSchemaEx', dump_only=True,
+                          exclude=("player_matches",))
+    shots = fields.Nested(ShotSchema, dump_only=True, many=True)
+    assists = fields.Nested(AssistSchema, dump_only=True, many=True)
+    goals = fields.Nested(GoalSchema, dump_only=True, many=True)
+
 
 class MatchSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), match_id="<id>"),
          'collection': ma.URLFor('CreateListMatch'.lower()),
          })
-
-    competition = fields.Nested(CompetitionSchema,
-                             dump_only=True,
-                             only=("_links", "id", "name"))
-
-    opponent = fields.Nested(OpponentSchema, dump_only=True,
-                             only=("_links", "id", "name"))
-
-    team = fields.Nested(TeamSchema, dump_only=True,
-                         only=("_links", "id", "name"))
-
-
-    player_matches = fields.Nested(PlayerMatchSchema,
-                                   dump_only=True,
-                                   many=True,
-                                   only=("_links", "id",
-                                         "player", "minutes", "starter",
-                                         "subbed_due_to_injury",
-                                         "yellow_card", "red_card",
-                                         "num_shots", "num_goals",
-                                         "num_assists",
-                                         "num_shots_against",
-                                         "num_goals_against",
-                                         )
-                                   )
 
     # add hybrid properties on model
     result = fields.String(dump_only=True)
@@ -211,3 +187,11 @@ class MatchSchema(ModelSchema):
         strict = True
         model = Match
         sqla_session = db.session
+
+#
+class MatchSchemaEx(MatchSchema):
+    competition = fields.Nested(CompetitionSchema, dump_only=True, exclude=("matches",))
+    opponent = fields.Nested(OpponentSchema, dump_only=True, exclude=("matches",))
+    team = fields.Nested(TeamSchema, dump_only=True, exclude=("players", "matches"))
+    player_matches = fields.Nested(PlayerMatchSchemaEx, dump_only=True, many=True,
+                                   exclude=("match", ))

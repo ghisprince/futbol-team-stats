@@ -2,7 +2,6 @@ from flask_restful import Resource
 
 from flask import jsonify, make_response, request
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import or_
 from webargs.flaskparser import use_kwargs
 
 from app.models import *
@@ -10,15 +9,32 @@ from app.schemas import *
 from marshmallow import ValidationError
 import webargs
 
-team_schema = TeamSchema(only=("_links", "id", "name"))
-player_schema = PlayerSchema(only=("_links", "id", "name", "number", "team"))
+team_schema = TeamSchema()
+team_schema_ex = TeamSchemaEx()
+
+player_schema = PlayerSchema()
+player_schema_ex = PlayerSchemaEx()
+
 match_schema = MatchSchema()
+match_schema_ex = MatchSchemaEx()
+
 competition_schema = CompetitionSchema()
+competition_schema_ex = CompetitionSchemaEx()
+
 opponent_schema = OpponentSchema()
+opponent_schema_ex = OpponentSchemaEx()
+
 playermatch_schema = PlayerMatchSchema()
+playermatch_schema_ex = PlayerMatchSchemaEx()
+
 shot_schema = ShotSchema()
+shot_schema_ex = ShotSchemaEx()
+
 goal_schema = GoalSchema()
+goal_schema_ex = GoalSchemaEx()
+
 assist_schema = AssistSchema()
+assist_schema_ex = AssistSchemaEx()
 
 """http://jsonapi.org/format/#fetching
 A server MUST respond to a successful request to fetch an individual 
@@ -66,12 +82,16 @@ class CreateListResourceBase(Resource):
 class CreateListTeam(CreateListResourceBase):
     ModelClass = Team
     mm_schema = team_schema
+    mm_schema_ex = team_schema_ex
 
-    @use_kwargs({'name': webargs.fields.Str(required=False)})
-    def get(self, name):
+    @use_kwargs({'name': webargs.fields.Str(required=False)},
+                {'expand': webargs.fields.Bool(required=False)})
+    def get(self, name, expand):
         query = self.ModelClass.query
         if name:
             query = query.filter_by(name=name)
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -102,12 +122,18 @@ class CreateListPlayer(CreateListResourceBase):
 class CreateListCompetition(CreateListResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
+    mm_schema_ex = competition_schema_ex
 
-    @use_kwargs({'name': webargs.fields.Str(required=False)})
-    def get(self, name):
+    @use_kwargs({'name': webargs.fields.Str(required=False),
+                 'expand': webargs.fields.Bool(required=False)
+                 })
+    def get(self, name, expand):
+
         query = self.ModelClass.query
         if name:
             query = query.filter_by(name=name)
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -132,11 +158,13 @@ class CreateListOpponent(CreateListResourceBase):
 class CreateListMatch(CreateListResourceBase):
     ModelClass = Match
     mm_schema = match_schema
+    mm_schema_ex = match_schema_ex
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
-                 'competition_id': webargs.fields.Int(required=False)
+                 'competition_id': webargs.fields.Int(required=False),
+                 'expand': webargs.fields.Bool(required=False)
                  })
-    def get(self, opponent_id, competition_id, ):
+    def get(self, opponent_id, competition_id, expand=False):
         query = self.ModelClass.query
 
         if opponent_id:
@@ -145,6 +173,8 @@ class CreateListMatch(CreateListResourceBase):
         if competition_id:
             query = query.join(Competition).filter(Competition.id == competition_id)
 
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
@@ -165,17 +195,17 @@ class CreateListMatch(CreateListResourceBase):
 class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
+    mm_schema_ex = playermatch_schema_ex
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
-                 'player': webargs.fields.Str(required=False)})
-    def get(self, player_id, player):
+                 'expand': webargs.fields.Bool(required=False) })
+    def get(self, player_id, expand=False):
         query = self.ModelClass.query
         if player_id:
             query = query.join(Player).filter(Player.id == player_id)
 
-        if player:
-            query = query.join(Player).filter(Player.name == player)
-
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
 
@@ -330,8 +360,11 @@ class GetUpdateDeleteResourceBase(Resource):
         - patch(id)
         - delete(id)
       """
-    def get(self, id):
+
+    def get(self, id, expand=False):
         query = self.ModelClass.query.get_or_404(id)
+        if expand:
+            return self.mm_schema_ex.dump(query).data
         return self.mm_schema.dump(query).data
 
     def patch(self, id):
@@ -373,9 +406,11 @@ class GetUpdateDeleteResourceBase(Resource):
 class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
     ModelClass = Team
     mm_schema = team_schema
+    mm_schema_ex = team_schema_ex
 
-    def get(self, team_id):
-        return super().get(team_id)
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, team_id, expand=False):
+        return super().get(team_id, expand)
 
     def patch(self, team_id):
         return super().delete(team_id)
@@ -389,10 +424,11 @@ class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
 class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
     ModelClass = Player
     mm_schema = player_schema
+    mm_schema_ex = player_schema_ex
 
-    def get(self, player_id):
-        query = Player.query.get_or_404(player_id)
-        return player_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, player_id, expand=False):
+        return super().get(player_id, expand)
 
     def patch(self, player_id):
         return super().patch(player_id)
@@ -406,10 +442,11 @@ class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     ModelClass = Match
     mm_schema = match_schema
+    mm_schema_ex = match_schema_ex
 
-    def get(self, match_id):
-        query = Match.query.get_or_404(match_id)
-        return match_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, match_id, expand=False):
+        return super().get(match_id, expand)
 
     def patch(self, match_id):
         return super().patch(match_id)
@@ -421,10 +458,11 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
+    mm_schema_ex = competition_schema_ex
 
-    def get(self, competition_id):
-        query = Competition.query.get_or_404(competition_id)
-        return competition_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, competition_id, expand=False):
+        return super().get(competition_id, expand)
 
     def patch(self, competition_id):
         return super().patch(competition_id)
@@ -436,10 +474,11 @@ class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
+    mm_schema_ex = opponent_schema_ex
 
-    def get(self, opponent_id):
-        query = Opponent.query.get_or_404(opponent_id)
-        return opponent_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, opponent_id, expand=False):
+        return super().get(opponent_id, expand)
 
     def patch(self, opponent_id):
         return super().patch(opponent_id)
@@ -451,10 +490,11 @@ class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
 class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
+    mm_schema_ex = playermatch_schema_ex
 
-    def get(self, playermatch_id):
-        query = PlayerMatch.query.get_or_404(playermatch_id)
-        return playermatch_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, playermatch_id, expand=False):
+        return super().get(playermatch_id, expand)
 
     def patch(self, playermatch_id):
         return super().patch(playermatch_id)
@@ -466,10 +506,11 @@ class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     ModelClass = Match
     mm_schema = match_schema
+    mm_schema_ex = match_schema_ex
 
-    def get(self, match_id):
-        query = Match.query.get_or_404(match_id)
-        return match_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, match_id, expand=False):
+        return super().get(match_id, expand)
 
     def patch(self, match_id):
         return super().patch(match_id)
@@ -481,10 +522,11 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
+    mm_schema_ex = shot_schema_ex
 
-    def get(self, shot_id):
-        query = Shot.query.get_or_404(shot_id)
-        return match_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, shot_id, expand=False):
+        return super().get(shot_id, expand)
 
     def patch(self, shot_id):
         return super().patch(shot_id)
@@ -496,10 +538,11 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     ModelClass = Goal
     mm_schema = goal_schema
+    mm_schema_ex = goal_schema_ex
 
-    def get(self, goal_id):
-        query = Goal.query.get_or_404(goal_id)
-        return match_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, goal_id, expand=False):
+        return super().get(goal_id, expand)
 
     def patch(self, goal_id):
         return super().patch(goal_id)
@@ -511,10 +554,11 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
 class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
+    mm_schema_ex = assist_schema_ex
 
-    def get(self, assist_id):
-        query = Assist.query.get_or_404(assist_id)
-        return match_schema.dump(query).data
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
+    def get(self, assist_id, expand=False):
+        return super().get(assist_id, expand)
 
     def patch(self, assist_id):
         return super().patch(assist_id)

@@ -25,6 +25,7 @@
         "vuetable-2": "^1.6.5",
         "vue-router": "^2.7.0",
         "vuex": "^2.3.1",
-        "bootstrap": "^3.3.5"
+        "bootstrap": "^3.3.5",
+        "moment": "^2.18.1"
     }
 }
