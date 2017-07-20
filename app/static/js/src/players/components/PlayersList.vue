@@ -16,7 +16,6 @@
             <thead>
                 <tr>
                 <th>Name</th>
-                <th>Number</th>
                 <th>Statistics</th>
                 <th class="col-sm-2">Actions</th>
                 </tr>
@@ -24,13 +23,18 @@
             <tbody>
                 <tr v-for="player in filteredPlayers">
                 <td align="left">
-                    <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">{{ player.name }}</router-link>
+                    <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">
+                        {{ player.name }} #{{ player.number }}
+                    </router-link>
                 </td>
-                <td align="left">{{ player.number}}</td>
-                <td align="left"> Stats page </td>
-                <td>
-                    <router-link class="btn btn-warning btn-xs" v-bind:to="{name: 'player-edit', params: {player_id: player.id}}">Edit</router-link>
-                    <router-link class="btn btn-danger btn-xs" v-bind:to="{name: 'player-delete', params: {player_id: player.id}}">Delete</router-link>
+                <td align="left">
+                    <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">
+                        <span class="glyphicon glyphicon-stats"></span> Player stats
+                    </router-link>
+                </td>
+                <td align="left">
+                    <router-link class="btn btn-warning btn-xs" v-bind:to="{name: 'player-edit', params: {player_id: player.id}}"><span class="glyphicon glyphicon-pencil"></span> </router-link>
+                    <router-link class="btn btn-danger btn-xs" v-bind:to="{name: 'player-delete', params: {player_id: player.id}}"><span class="glyphicon glyphicon-remove"></span> </router-link>
                 </td>
                 </tr>
             </tbody>

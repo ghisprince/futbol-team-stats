@@ -6,7 +6,7 @@
             <label for="edit-name">Name</label>
             <input class="form-control" id="edit-name" v-model="player.name" required/>
         </div>
-            <div class="form-group">
+        <div class="form-group">
             <label for="edit-number">Number</span></label>
             <input type="number" class="form-control" id="edit-number" v-model="player.number"/>
         </div>
@@ -44,7 +44,7 @@ export default {
                 this.player = response.data
             })
             .catch(e => {
-                alert("updatePlayer failed")
+                alert("UPDATE Player failed")
                 console.log(e)
             })
         }

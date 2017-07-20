@@ -22,7 +22,7 @@ import axios from 'axios'
 
 export default {
     data () {
-        return {player: {name: '', number: 0}}
+        return {player: {name: '', number: null}}
     },
     methods: {
         createPlayer: function() {
@@ -30,11 +30,9 @@ export default {
             .then(response => {
                 this.player = response.data
                 console.log("CREATE PLAYER SUCCESSFULL")
-                console.log(this.player)
             })
             .catch(e => {
                 console.log("CREATE PLAYER FAILED")
-                alert(e)
                 console.log(e)
             })
         }

@@ -3,7 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
   entry: {
-    players: "./src/players"
+    players: "./src/players/main.js"
   },
   output: {
     path: path.resolve(__dirname, './dist'),
