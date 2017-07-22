@@ -1,9 +1,9 @@
-<template id="player-list">
+<template id="opponent-list">
     <div>
         <div class="actions">
-            <router-link class="btn btn-default" v-bind:to="{path: '/add-player'}">
+            <router-link class="btn btn-default" v-bind:to="{path: '/add-opponent'}">
                 <span class="glyphicon glyphicon-plus"></span>
-                Add player
+                Add opponent
             </router-link>
         </div>
         <div class="filters row">
@@ -16,31 +16,27 @@
             <thead>
                 <tr>
                 <th>Name</th>
-                <th>Active</th>
-                <th>Appearances</th>
-                <th>Statistics</th>
+                <th># matches against</th>
+                <th>Stats</th>
                 <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="player in filteredPlayers">
+                <tr v-for="opponent in filteredOpponents">
                 <td align="left">
-                    {{ player.name }} #{{ player.number }}
+                    {{ opponent.name }}
                 </td>
                 <td align="left">
-                    {{ player.active }}
+                    {{ opponent.matches.length }}
                 </td>
                 <td align="left">
-                    {{ player.player_matches.length }}
-                </td>
-                <td align="left">
-                    <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">
+                    <router-link v-bind:to="{name: 'opponent', params: {opponent_id: opponent.id}}">
                         <span class="glyphicon glyphicon-stats"></span> Match stats
                     </router-link>
                 </td>
                 <td align="left">
-                    <router-link class="btn btn-warning btn-xs" v-bind:to="{name: 'player-edit', params: {player_id: player.id}}"><span class="glyphicon glyphicon-pencil"></span> Edit</router-link>
-                    <router-link class="btn btn-danger btn-xs" v-bind:to="{name: 'player-delete', params: {player_id: player.id}}"><span class="glyphicon glyphicon-remove"></span> Delete</router-link>
+                    <router-link class="btn btn-warning btn-xs" v-bind:to="{name: 'opponent-edit', params: {opponent_id: opponent.id}}"><span class="glyphicon glyphicon-pencil"></span> Edit </router-link>
+                    <router-link class="btn btn-danger btn-xs" v-bind:to="{name: 'opponent-delete', params: {opponent_id: opponent.id}}"><span class="glyphicon glyphicon-remove"></span> Delete </router-link>
                 </td>
                 </tr>
             </tbody>
@@ -54,25 +50,26 @@ import axios from 'axios'
 import _ from 'lodash'
 
 export default {
+
     data () {
         return {
-            players: [],
+            opponents: [],
             searchKey: ''
         }
     },
     created() {
-        axios.get(`/api/v1/players`)
+        axios.get(`/api/v1/opponents`)
         .then(response => {
-            this.players = response.data
+            this.opponents = response.data
         })
         .catch(e => {
             console.log(e)
         })
     },
     computed: {
-        filteredPlayers: function () {
-            return this.players.filter(function (player) {
-                return this.searchKey=='' || player.name.indexOf(this.searchKey) !== -1;
+        filteredOpponents: function () {
+            return this.opponents.filter(function (opponent) {
+                return this.searchKey=='' || opponent.name.indexOf(this.searchKey) !== -1;
             },this);
         }
     }

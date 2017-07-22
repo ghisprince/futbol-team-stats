@@ -39,6 +39,7 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String())
     password = db.Column(db.String())
+    email = db.Column(db.String())
     team = db.relationship('Team', secondary=association,
                            backref=db.backref('teams', lazy='dynamic'))
 
@@ -79,6 +80,7 @@ class Team(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False, unique=True)
 
+    # relationships
     matches = db.relationship('Match', back_populates="team")
     players = db.relationship("Player", back_populates="team")
 
@@ -92,8 +94,10 @@ class Team(db.Model, CRUD_MixIn):
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+
+    # relationships
     matches = db.relationship("Match", back_populates="opponent")
-    external_url = db.Column(db.String())
+    # external_urls = db.Column(db.String(), nullable=True)
 
     def __init__(self, name=None):
         self.name = name
@@ -105,10 +109,11 @@ class Opponent(db.Model, CRUD_MixIn):
 class Competition(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
-    details = db.Column(db.String(), nullable=True)
     result = db.Column(db.String(), nullable=True)
+    # external_urls = db.Column(db.String(), nullable=True)
+
+    # relationships
     matches = db.relationship("Match", back_populates="competition")
-    external_url = db.Column(db.String())
 
     @hybrid_property
     def match_results(self):
@@ -127,6 +132,8 @@ class Competition(db.Model, CRUD_MixIn):
 class Season(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+
+    # relationships
     matches = db.relationship("Match", back_populates="season")
 
     def __init__(self, name):

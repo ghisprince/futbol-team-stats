@@ -77,7 +77,8 @@ class OpponentSchema(ModelSchema):
 
 #
 class OpponentSchemaEx(OpponentSchema):
-    matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True)
+    matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True,
+                            exclude=("player_matches", "opponent", "team"))
 
 
 class ShotSchema(ModelSchema):

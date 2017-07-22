@@ -11,11 +11,12 @@
 
 
 <script>
+
 import axios from 'axios'
 
 export default {
     data () {
-        return {player: {name: 'x'}}
+        return {player: {name: ''}}
     },
     created() {
         axios.get(`/api/v1/players/` + this.$route.params.player_id)
@@ -28,7 +29,7 @@ export default {
     },
     methods: {
         deletePlayer: function() {
-            axios.delete(`/api/v1/players/` + this.$route.params.player_id)
+            axios.delete(this.player._links.self)
 
             .then(response => {
                 this.player = response.data

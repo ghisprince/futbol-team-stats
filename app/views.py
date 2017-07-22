@@ -390,6 +390,12 @@ class GetUpdateDeleteResourceBase(Resource):
 
     def delete(self, id):
         modelInst = self.ModelClass.query.get_or_404(id)
+        for att in ['matches', 'playermatches', ]:
+            if getattr(modelInst, att, None):
+                resp = jsonify({"error": "Delete failed, object has associated " + att})
+                resp.status_code = 401
+                return resp
+
         try:
             modelInst.delete(modelInst)
             resp = make_response()
