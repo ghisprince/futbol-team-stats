@@ -97,7 +97,14 @@ class Opponent(db.Model, CRUD_MixIn):
 
     # relationships
     matches = db.relationship("Match", back_populates="opponent")
-    # external_urls = db.Column(db.String(), nullable=True)
+    external_url = db.Column(db.String(), nullable=True)
+
+    @hybrid_property
+    def match_results(self):
+        win = len([i for i in self.matches if (i.result == "win")])
+        loss = len([i for i in self.matches if (i.result == "loss")])
+        tie = len([i for i in self.matches if (i.result == "tie")])
+        return "{}-{}-{}".format(win, loss, tie)
 
     def __init__(self, name=None):
         self.name = name
@@ -110,7 +117,7 @@ class Competition(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     result = db.Column(db.String(), nullable=True)
-    # external_urls = db.Column(db.String(), nullable=True)
+    external_url = db.Column(db.String(), nullable=True)
 
     # relationships
     matches = db.relationship("Match", back_populates="competition")
@@ -135,6 +142,13 @@ class Season(db.Model, CRUD_MixIn):
 
     # relationships
     matches = db.relationship("Match", back_populates="season")
+
+    @hybrid_property
+    def match_results(self):
+        win = len([i for i in self.matches if (i.result == "win")])
+        loss = len([i for i in self.matches if (i.result == "loss")])
+        tie = len([i for i in self.matches if (i.result == "tie")])
+        return "{}-{}-{}".format(win, loss, tie)
 
     def __init__(self, name):
         self.name = name

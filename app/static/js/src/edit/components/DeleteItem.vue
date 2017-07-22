@@ -1,11 +1,11 @@
 <template id="opponent-delete">
     <div>
-        <h2>Delete opponent : {{ opponent.name }}</h2>
-        <form v-on:submit="deleteOpponent">
+        <h2>Delete {{ type }} '{{ name }}'</h2>
+        <div>
             <p>The action cannot be undone.</p>
-            <button type="submit" class="btn btn-danger">Delete</button>
-            <router-link class="btn btn-default" v-bind:to="'/'">Cancel</router-link>
-        </form>
+            <button class="btn btn-danger" v-on:click="deleteOpponent">Delete</button>
+            <button class="btn btn-default" v-on:click="goBack">Cancel</button>
+        </div>
 
         <div v-if="showAlert"> <!-- hack due to https://github.com/vuejs/vue-router/issues/252 -->
             <alert :show='true' placement="top" :duration="5" type="danger" width="400px" dismissable>
@@ -19,37 +19,32 @@
 
 
 <script>
+
 import axios from 'axios'
 import alert from 'vue-strap/src/alert.vue'
 
 export default {
+    props: ['name', 'uri', 'type', 'canDelete'],
     data () {
-        return {opponent: {name: ''},
-                showAlert: false,
-                alertMessage: "aaa" }
+        return {showAlert: false,
+                alertMessage: ""
+                }
     },
     components: {alert: alert},
-    created() {
-        axios.get(`/api/v1/opponents/` + this.$route.params.opponent_id)
-        .then(response => {
-            this.opponent = response.data
-        })
-        .catch(e => {
-            console.log(e)
-        })
-    },
-
+    created() {},
     methods: {
+        goBack: function() {
+            this.$router.go(-1)
+        },
         deleteOpponent: function() {
-            axios.delete(this.opponent._links.self)
+            axios.delete(this.uri)
 
             .then(response => {
-                this.$router.push('/')
+                this.$router.go(-1)
             })
             .catch(e => {
                 this.alertMessage = e.response.data.error;
                 this.showAlert = true;
-
             })
         }
     }

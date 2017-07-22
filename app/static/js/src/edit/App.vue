@@ -1,12 +1,10 @@
 <template>
-    <div id="app-style">
-        <router-view></router-view>
-    </div>
+<div id="app-style">
+    <router-view></router-view>
+</div>
 </template>
 
 <script>
-
-
 export default {
     name: 'app',
     components: {},
@@ -14,7 +12,6 @@ export default {
         return {}
     }
 }
-
 </script>
 
 <style>
@@ -25,5 +22,8 @@ export default {
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+}
+td {
+    text-align: left;
 }
 </style>

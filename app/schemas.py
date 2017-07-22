@@ -51,6 +51,8 @@ class CompetitionSchema(ModelSchema):
          'collection': ma.URLFor('CreateListCompetition'.lower())
         })
 
+    match_results = fields.String()
+
     class Meta:
         strict = True
         model = Competition
@@ -58,7 +60,7 @@ class CompetitionSchema(ModelSchema):
 
 
 class CompetitionSchemaEx(CompetitionSchema):
-    match_results = fields.String()
+
     matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True,
                             exclude=("player_matches", "competition"))
 
@@ -68,6 +70,8 @@ class OpponentSchema(ModelSchema):
         {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), opponent_id="<id>"),
          'collection': ma.URLFor('CreateListOpponent'.lower())
         })
+
+    match_results = fields.String()
 
     class Meta:
         strict = True

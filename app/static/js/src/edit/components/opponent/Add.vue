@@ -5,19 +5,18 @@
         <div class="form-group">
             <label for="add-name">Name</label>
             <input class="form-control" id="add-name" v-model="opponent.name" required/>
-        </div>
-        <div class="form-group">
             <label for="add-url">Url</label>
             <input type="url" class="form-control" id="add-url" v-model="opponent.url"/>
         </div>
-            <button type="submit" class="btn btn-primary">Create</button>
-            <router-link class="btn btn-default" v-bind:to="'/'">Cancel</router-link>
+        <button type="submit" class="btn btn-primary">Create</button>
+        <router-link class="btn btn-default" v-bind:to="'/opponent-list'">Cancel</router-link>
         </form>
     </div>
 </template>
 
 
 <script>
+
 import axios from 'axios'
 
 export default {
@@ -29,11 +28,9 @@ export default {
             axios.post(`/api/v1/opponents/`, this.opponent)
             .then(response => {
                 this.opponent = response.data
-                this.$router.push({path: '/'})
-                console.log("CREATE Opponent SUCCESSFULL")
+                this.$router.go(-1)
             })
             .catch(e => {
-                console.log("CREATE Opponent FAILED")
                 console.log(e)
             })
         }
