@@ -38,7 +38,6 @@ export default {
         },
         deleteOpponent: function() {
             axios.delete(this.uri)
-
             .then(response => {
                 this.$router.go(-1)
             })

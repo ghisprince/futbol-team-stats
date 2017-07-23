@@ -1,7 +1,7 @@
 <template id="opponent-list">
     <div>
         <div class="actions">
-            <router-link class="btn btn-default" v-bind:to="{path: '/add-opponent'}">
+            <router-link class="btn btn-success" v-bind:to="{path: '/add-opponent'}">
                 <span class="glyphicon glyphicon-plus"></span>
                 Add opponent
             </router-link>
@@ -16,23 +16,35 @@
             <thead>
                 <tr>
                 <th>Name</th>
-                <th>Matches</th>
+                <th title="Matches Played">GP</th>
+                <th title="Matches Won">W</th>
+                <th title="Matches Tied">D</th>
+                <th title="Matches Lost">L</th>
                 <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="opponent in filteredOpponents">
                 <td>
-                    {{ opponent.name }}
-                </td>
-                <td>
-                    <router-link v-bind:to="{name: 'opponent', params: {opponent_id: opponent.id, uri: opponent._links.self}}">
-                        {{ opponent.match_results }}
+                    <router-link v-bind:to="{name: 'opponent', params: {opponent_id: opponent.id}}">
+                        {{ opponent.name }}
                     </router-link>
                 </td>
                 <td>
+                    {{ opponent.matches.length }}
+                </td>
+                <td>
+                    {{ opponent.num_match_won }}
+                </td>
+                <td>
+                    {{ opponent.num_match_tied }}
+                </td>
+                <td>
+                    {{ opponent.num_match_lost }}
+                </td>
+                <td>
                     <router-link class="btn btn-warning btn-xs"
-                                 v-bind:to="{name: 'opponent-edit', params: {opponent_id: opponent.id, uri: opponent._links.self}}">
+                                 v-bind:to="{name: 'opponent-edit', params: {opponent_id: opponent.id}}">
                         <span class="glyphicon glyphicon-pencil"></span> Edit
                     </router-link>
                     <router-link v-if="opponent.matches.length == 0"

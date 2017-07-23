@@ -9,8 +9,8 @@ class TeamSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteTeam'.lower(), team_id="<id>"),
          'collection': ma.URLFor('CreateListTeam'.lower(),),
-         'matches': ma.URLFor('AddRemoveListTeamMatch'.lower(), team_id="<id>"),
-         'players': ma.URLFor('AddRemoveListTeamPlayer'.lower(), team_id="<id>"),
+         #'matches': ma.URLFor('AddRemoveListTeamMatch'.lower(), team_id="<id>"),
+         #'players': ma.URLFor('AddRemoveListTeamPlayer'.lower(), team_id="<id>"),
          })
 
     class Meta:
@@ -51,7 +51,10 @@ class CompetitionSchema(ModelSchema):
          'collection': ma.URLFor('CreateListCompetition'.lower())
         })
 
-    match_results = fields.String()
+    num_match_won = fields.String(dump_only=True)
+    num_match_tied = fields.String(dump_only=True)
+    num_match_lost = fields.String(dump_only=True)
+    match_results = fields.String(dump_only=True)
 
     class Meta:
         strict = True
@@ -62,7 +65,7 @@ class CompetitionSchema(ModelSchema):
 class CompetitionSchemaEx(CompetitionSchema):
 
     matches = fields.Nested('MatchSchemaEx', many=True, dump_only=True,
-                            exclude=("player_matches", "competition"))
+                            exclude=("player_matches",))
 
 
 class OpponentSchema(ModelSchema):
@@ -71,7 +74,10 @@ class OpponentSchema(ModelSchema):
          'collection': ma.URLFor('CreateListOpponent'.lower())
         })
 
-    match_results = fields.String()
+    num_match_won = fields.String(dump_only=True)
+    num_match_tied = fields.String(dump_only=True)
+    num_match_lost = fields.String(dump_only=True)
+    match_results = fields.String(dump_only=True)
 
     class Meta:
         strict = True

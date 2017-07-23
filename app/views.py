@@ -8,6 +8,7 @@ from app.models import *
 from app.schemas import *
 from marshmallow import ValidationError
 import webargs
+from pprint import pprint
 
 team_schema = TeamSchema()
 team_schema_ex = TeamSchemaEx()
@@ -84,8 +85,8 @@ class CreateListTeam(CreateListResourceBase):
     mm_schema = team_schema
     mm_schema_ex = team_schema_ex
 
-    @use_kwargs({'name': webargs.fields.Str(required=False)},
-                {'expand': webargs.fields.Bool(required=False)})
+    @use_kwargs({'name': webargs.fields.Str(required=False),
+                 'expand': webargs.fields.Bool(required=False)})
     def get(self, name, expand):
         query = self.ModelClass.query
         if name:
@@ -95,7 +96,8 @@ class CreateListTeam(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        return self.ModelClass(request_dict['name'], )
+        return self.ModelClass(**request_dict)
+
 
 
 class CreateListPlayer(CreateListResourceBase):
@@ -110,13 +112,10 @@ class CreateListPlayer(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        team = None
-        if request_dict.get('team', None):
-            team = Team.query.get_or_404(request_dict.get('team', None))
-
-        return self.ModelClass(name=request_dict['name'],
-                               number=request_dict.get('number', None),
-                               team=team)
+        if request_dict.get('team'):
+            request_dict['team'] = Team.query.get_or_404(
+                                        request_dict.get('team', None))
+        return self.ModelClass(**request_dict)
 
 
 class CreateListCompetition(CreateListResourceBase):
@@ -125,8 +124,7 @@ class CreateListCompetition(CreateListResourceBase):
     mm_schema_ex = competition_schema_ex
 
     @use_kwargs({'name': webargs.fields.Str(required=False),
-                 'expand': webargs.fields.Bool(required=False)
-                 })
+                 'expand': webargs.fields.Bool(required=False)})
     def get(self, name, expand):
 
         query = self.ModelClass.query
@@ -137,7 +135,7 @@ class CreateListCompetition(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        return self.ModelClass(request_dict['name'], )
+        return self.ModelClass(**request_dict)
 
 
 class CreateListOpponent(CreateListResourceBase):
@@ -152,7 +150,7 @@ class CreateListOpponent(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        return self.ModelClass(request_dict['name'], )
+        return self.ModelClass(**request_dict)
 
 
 class CreateListMatch(CreateListResourceBase):
@@ -178,19 +176,16 @@ class CreateListMatch(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        competition = None
-        if request_dict['competition']:
-            competition = Competition.query.get_or_404(request_dict['competition']['id'])
 
-        modelInst = self.ModelClass(
-            date_time=request_dict['date_time'].replace("+00:00", ""),
-            team=Team.query.get_or_404(request_dict['team']['id']),
-            opponent=Opponent.query.get_or_404(request_dict['opponent']['id']),
-            competition=competition,
-            at_home=request_dict['at_home']
-            )
-        return modelInst
+        request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
+        request_dict['opponent'] = Opponent.query.get_or_404(
+            request_dict['opponent']['id'])
 
+        if request_dict.get('competition', None):
+            request_dict['competition'] = Competition.query.get_or_404(
+                                            request_dict['competition']['id'])
+
+        return self.ModelClass(**request_dict)
 
 class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
@@ -208,24 +203,15 @@ class CreateListPlayerMatch(CreateListResourceBase):
             return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
-
     def InstanceFromDict(self, request_dict):
-        player = db.session.query(Player).filter_by(
-                                    id=request_dict['player']['id']).one()
-        match = db.session.query(Match).filter_by(
-                                    id=request_dict['match']['id']).one()
-        modelInst = self.ModelClass(
-                        player=player,
-                        match=match,
-                        starter=request_dict['starter'],
-                        minutes=request_dict['minutes'],
-                        subbed_due_to_injury=request_dict['subbed_due_to_injury'],
-                        yellow_card=request_dict['yellow_card'],
-                        red_card=request_dict['red_card'],
-                        corners=request_dict['corners'],
-                        )
 
-        return modelInst
+        request_dict['player'] = db.session.query(Player).filter_by(
+                                      id=request_dict['player']['id']).one()
+
+        request_dict['match'] = db.session.query(Match).filter_by(
+                                    id=request_dict['match']['id']).one()
+
+        return self.ModelClass(**request_dict)
 
 
 class CreateListShot(CreateListResourceBase):
@@ -246,20 +232,10 @@ class CreateListShot(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        player_match = db.session.query(PlayerMatch).filter_by(
-                        id=request_dict['player_match']['id']).one()
+        request_dict['player_match'] = db.session.query(
+            PlayerMatch).filter_by(id=request_dict['player_match']['id']).one()
 
-        modelInst = self.ModelClass(
-                        player_match=player_match,
-                        x=request_dict['x'],
-                        y=request_dict['y'],
-                        on_goal=request_dict['on_goal'],
-                        scored=request_dict['scored'],
-                        pk=request_dict['pk'],
-                        by_opponent=request_dict['by_opponent'],
-                    )
-
-        return modelInst
+        return self.ModelClass(**request_dict)
 
 
 class CreateListGoal(CreateListResourceBase):
@@ -279,14 +255,10 @@ class CreateListGoal(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        shot = db.session.query(Shot).filter_by(
-                        id=request_dict['shot']['id']).one()
-        modelInst = self.ModelClass(
-                        shot=shot,
-                        time=request_dict['time'],
-        )
+        request_dict['shot'] = db.session.query(Shot).filter_by(
+                                    id=request_dict['shot']['id']).one()
 
-        return modelInst
+        return self.ModelClass(**request_dict)
 
 
 class CreateListAssist(CreateListResourceBase):
@@ -307,15 +279,17 @@ class CreateListAssist(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        goal = db.session.query(Goal).filter_by(
-                        id=request_dict['goal']['id']).one()
-        player_match = db.session.query(PlayerMatch).filter_by(
-                        id=request_dict['player_match']['id']).one()
-        modelInst = self.ModelClass(goal=goal, player_match=player_match)
+        request_dict['goal'] = db.session.query(
+                        Goal).filter_by(id=request_dict['goal']['id']).one()
 
-        return modelInst
+        request_dict['player_match'] = db.session.query(
+                        PlayerMatch).filter_by(
+                            id=request_dict['player_match']['id']).one()
+
+        return self.ModelClass(**request_dict)
 
 
+"""
 # collections within relationships
 class AddRemoveListTeamPlayer(Resource):
     ModelClass = Player
@@ -333,25 +307,7 @@ class AddRemoveListTeamMatch(Resource):
     def get(self, team_id):
         query = self.ModelClass.query.filter(Match.team_id == team_id)
         return self.mm_schema.dump(query.all(), many=True).data
-
-'''
-class AddRemoveListPlayerPlayerMatch(Resource):
-    ModelClass = PlayerMatch
-    mm_schema = playermatch_schema
-
-    def get(self, player_id):
-        query = self.ModelClass.query.join(Player).filter(Player.id == player_id)
-        return self.mm_schema.dump(query.all(), many=True).data
-
-
-class AddRemoveListMatchPlayerMatch(Resource):
-    ModelClass = PlayerMatch
-    mm_schema = playermatch_schema
-
-    def get(self, match_id=None):
-        query = self.ModelClass.query.join(Match).filter(Match.id == match_id)
-        return self.mm_schema.dump(query.all(), many=True).data
-'''
+"""
 
 #
 class GetUpdateDeleteResourceBase(Resource):
@@ -454,9 +410,6 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     def get(self, match_id, expand=False):
         return super().get(match_id, expand)
 
-    def patch(self, match_id):
-        return super().patch(match_id)
-
     def delete(self, match_id):
         return super().delete(match_id)
 
@@ -516,10 +469,44 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
 
     @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, match_id, expand=False):
+        from pprint import pprint
         return super().get(match_id, expand)
 
-    def patch(self, match_id):
+    def patcho(self, match_id):
         return super().patch(match_id)
+
+    def patch(self, match_id):
+
+        modelInst = self.ModelClass.query.get_or_404(match_id)
+
+        request_dict = request.get_json(force=True)
+
+        request_dict['team'] = db.session.query(
+            Team).filter_by(id=request_dict['team']['id']).one()
+
+        print("#"*40)
+        pprint(request_dict)
+        print("#"*40)
+        request_dict['opponent'] = db.session.query(
+            Opponent).filter_by(id=request_dict['opponent']['id']).one()
+
+        request_dict['competition'] = db.session.query(
+            Competition).filter_by(id=request_dict['competition']['id']).one()
+
+        request_dict['date_time'] = datetime.datetime.strptime(
+                                        request_dict['date_time'][:-6],
+                                                        "%Y-%m-%dT%H:%M:%S")
+        try:
+            #self.mm_schema.validate(request_dict, partial=True)
+            for key, value in request_dict.items():
+                setattr(modelInst, key, value)
+            modelInst.update()
+            return self.get(match_id)
+
+        except ValidationError as err:
+            resp = jsonify({"error": err.messages})
+            resp.status_code = 401
+            return resp
 
     def delete(self, match_id):
         return super().delete(match_id)

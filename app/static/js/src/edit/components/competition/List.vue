@@ -1,7 +1,7 @@
 <template id="competition-list">
     <div>
         <div class="actions">
-            <router-link class="btn btn-default" v-bind:to="{path: '/add-competition'}">
+            <router-link class="btn btn-success" v-bind:to="{path: '/add-competition'}">
                 <span class="glyphicon glyphicon-plus"></span>
                 Add competition
             </router-link>
@@ -15,28 +15,41 @@
         <table class="table">
             <thead>
                 <tr>
-                <th>Name</th>
+                <th>Name </th>
                 <th>Result</th>
-                <th>Matches</th>
+                <th title="Matches Played">GP</th>
+                <th title="Matches Won">W</th>
+                <th title="Matches Tied">D</th>
+                <th title="Matches Lost">L</th>
                 <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="competition in filteredCompetitions">
                 <td>
-                    {{ competition.name }}
+                    <router-link v-bind:to="{name: 'competition', params: {competition_id: competition.id}}">
+                        {{ competition.name }}
+                    </router-link>
                 </td>
                 <td>
                     {{ competition.result }}
                 </td>
                 <td>
-                    <router-link v-bind:to="{name: 'competition', params: {competition_id: competition.id, uri: competition._links.self}}">
-                        {{ competition.match_results }}
-                    </router-link>
+                    {{ competition.matches.length }}
                 </td>
                 <td>
+                    {{ competition.num_match_won }}
+                </td>
+                <td>
+                    {{ competition.num_match_tied }}
+                </td>
+                <td>
+                    {{ competition.num_match_lost }}
+                </td>
+
+                <td>
                     <router-link class="btn btn-warning btn-xs"
-                                 v-bind:to="{name: 'competition-edit', params: {competition_id: competition.id, uri: competition._links.self}}">
+                                 v-bind:to="{name: 'competition-edit', params: {competition_id: competition.id}}">
                         <span class="glyphicon glyphicon-pencil"></span> Edit
                     </router-link>
                     <router-link v-if="competition.matches.length == 0"

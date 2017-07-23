@@ -3,17 +3,10 @@
         <h2>Edit opponent</h2>
         <form v-on:submit="updateOpponent">
 
-        <div class="form-group">
-            <label for="edit-name">Name</label>
-            <input class="form-control" id="edit-name" v-model="opponent.name" required/>
+            <opponent :opponent.sync="opponent"></opponent>
 
-            <label for="edit-url">URL</label>
-            <input class="form-control" id="edit-url" v-model="opponent.external_url"/>
-
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save</button>
-        <router-link class="btn btn-default" v-bind:to="'/opponent-list'">Cancel</router-link>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <router-link class="btn btn-default" v-bind:to="'/opponent-list'">Cancel</router-link>
         </form>
     </div>
 </template>
@@ -21,14 +14,19 @@
 
 <script>
 import axios from 'axios'
+import Opponent from './Opponent.vue'
 
 export default {
-    props: ['uri'],
+    props: [],
     data () {
         return {opponent: {}}
     },
+    components: {
+        'opponent': Opponent
+    },
+    
     created() {
-        axios.get(this.uri)
+        axios.get(`/api/v1/opponents/` + this.$route.params.opponent_id + `?expand=true`)
         .then(response => {
             this.opponent = response.data
         })
@@ -38,7 +36,7 @@ export default {
     },
     methods: {
         updateOpponent: function() {
-            axios.patch(this.uri,
+            axios.patch(this.opponent._links.self,
                         {name: this.opponent.name,
                          external_url: this.opponent.external_url
                         }

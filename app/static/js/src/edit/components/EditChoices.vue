@@ -3,19 +3,16 @@
         <h1>What do you wish to edit?</h1>
         <ul>
             <li>
-                <router-link v-bind:to="'opponent-list'">Matches</router-link>
+                <router-link v-bind:to="'match-list'">Matches</router-link>
             </li>
             <li>
                 <router-link v-bind:to="'opponent-list'">Opponents</router-link>
             </li>
             <li>
-                <router-link v-bind:to="'opponent-list'">Players</router-link>
+                <router-link v-bind:to="'player-list'">Players</router-link>
             </li>
             <li>
                 <router-link v-bind:to="'competition-list'">Competitions</router-link>
-            </li>
-            <li>
-                <router-link v-bind:to="'opponent-list'">Team</router-link>
             </li>
         </ul>
     </div>
@@ -23,7 +20,6 @@
 
 
 <script>
-import axios from 'axios'
 import _ from 'lodash'
 
 export default {

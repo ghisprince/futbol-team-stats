@@ -26,4 +26,9 @@ export default {
 td {
     text-align: left;
 }
+tfoot > tr > td {
+    font-weight: bold;
+}
+
+
 </style>

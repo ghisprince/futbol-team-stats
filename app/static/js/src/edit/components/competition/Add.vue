@@ -2,14 +2,11 @@
     <div>
         <h2>Add new competition</h2>
         <form v-on:submit="createCompetition">
-        <div class="form-group">
-            <label for="add-name">Name</label>
-            <input class="form-control" id="add-name" v-model="competition.name" required/>
-            <label for="add-url">Url</label>
-            <input type="url" class="form-control" id="add-url" v-model="competition.url"/>
-        </div>
-        <button type="submit" class="btn btn-primary">Create</button>
-        <router-link class="btn btn-default" v-bind:to="'/competition-list'">Cancel</router-link>
+
+            <competition :competition.sync="competition"></competition>
+
+            <button type="submit" class="btn btn-primary">Create</button>
+            <router-link class="btn btn-default" v-bind:to="'/competition-list'">Cancel</router-link>
         </form>
     </div>
 </template>
@@ -18,10 +15,17 @@
 <script>
 
 import axios from 'axios'
+import Competition from './Competition.vue'
 
 export default {
     data () {
-        return {competition: {name: '', url: null}}
+        return {competition: {name: null,
+                              result: null,
+                              external_url: null}
+                              }
+    },
+    components: {
+        'competition': Competition
     },
     methods: {
         createCompetition: function() {
