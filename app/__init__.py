@@ -49,14 +49,19 @@ def create_app(object_name):
     # initialize the cache
     cache.init_app(app)
 
-    # initialize the debug tool bar
+    # register the debug tool bar
     debug_toolbar.init_app(app)
 
-    # initialize SQLAlchemy
+    # register SQLAlchemy
     db.init_app(app)
+
+    # register Marshmallow
     ma.init_app(app)
+
+    # register flask_restful api
     api.init_app(app)
 
+    # register LoginManager
     login_manager.init_app(app)
 
     # Import and register the different asset bundles

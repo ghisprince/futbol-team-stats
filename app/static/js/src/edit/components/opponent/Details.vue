@@ -6,7 +6,7 @@
             <a v-bind:href="opponent.external_url">Team's gotsoccer web site</a>
         </div>
 
-        <h3>Team's record vs this opponent: {{opponent.match_results}}</h3>
+        <h4>Team's record vs this opponent: {{opponent.match_results}}</h4>
 
         <match-table v-bind:matches="opponent.matches" v-bind:showOpponent=false> </match-table>
 

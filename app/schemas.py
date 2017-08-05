@@ -102,10 +102,14 @@ class ShotSchema(ModelSchema):
         model = Shot
         sqla_session = db.session
 
+
 #
 class ShotSchemaEx(ShotSchema):
-    goal = fields.Nested('GoalSchema', dump_only=True)
-    player_match = fields.Nested('PlayerMatchSchema', dump_only=True)
+    goal = fields.Nested('GoalSchemaEx', dump_only=True,
+                         exclude=["shot", "player_match"])
+
+    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
+                                 exclude=["shots"])
 
 
 class AssistSchema(ModelSchema):
@@ -122,7 +126,11 @@ class AssistSchema(ModelSchema):
 
 #
 class AssistSchemaEx(AssistSchema):
-    player_match = fields.Nested('PlayerMatchSchema', dump_only=True)
+    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
+                                 exclude=["assists"])
+
+    goal = fields.Nested('GoalSchemaEx', dump_only=True,
+                         exclude=["assist", "player_match"])
 
 
 class GoalSchema(ModelSchema):
@@ -138,11 +146,8 @@ class GoalSchema(ModelSchema):
 
 #
 class GoalSchemaEx(GoalSchema):
-    assist = fields.Nested('AssistSchema', dump_only=True)
-
-    shot = fields.Nested('ShotSchema', dump_only=True)
-
-    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True, )
+    assist = fields.Nested('AssistSchemaEx', dump_only=True, exclude=["goal",])
+    shot = fields.Nested('ShotSchemaEx', dump_only=True, exclude=["goal",])
 
 
 
@@ -174,7 +179,7 @@ class PlayerMatchSchemaEx(PlayerMatchSchema):
                           exclude=("player_matches",))
     shots = fields.Nested(ShotSchema, dump_only=True, many=True)
     assists = fields.Nested(AssistSchema, dump_only=True, many=True)
-    goals = fields.Nested(GoalSchema, dump_only=True, many=True)
+    #goals = fields.Nested(GoalSchema, dump_only=True, many=True)
 
 
 class MatchSchema(ModelSchema):

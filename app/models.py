@@ -94,6 +94,7 @@ class Team(db.Model, CRUD_MixIn):
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+    team_crest_uri = db.Column(db.String())
     external_url = db.Column(db.String())
 
     # relationships
@@ -194,6 +195,7 @@ class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     date_time = db.Column(db.DateTime(), nullable=False)
     at_home = db.Column(db.Boolean())  # False=away
+    duration = db.Column(db.Integer())  # False=away
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -229,10 +231,9 @@ class Match(db.Model, CRUD_MixIn):
     @hybrid_property
     def result_long(self):
 
-        return "{}-{} {} vs {}".format(self.num_goals,
+        return "{}-{} {}".format(self.num_goals,
                                        self.num_goals_against,
-                                       self.result,
-                                       self.opponent.name)
+                                       self.result)
 
     @hybrid_property
     def num_goals(self):

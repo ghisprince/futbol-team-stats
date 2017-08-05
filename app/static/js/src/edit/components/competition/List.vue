@@ -12,7 +12,7 @@
                 <input v-model="searchKey" class="form-control" id="search-element" required/>
             </div>
         </div>
-        <table class="table">
+        <table class="table table-striped">
             <thead>
                 <tr>
                 <th>Name </th>

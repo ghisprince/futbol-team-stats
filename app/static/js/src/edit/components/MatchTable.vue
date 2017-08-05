@@ -1,10 +1,10 @@
 <template id="match-table">
     <div>
 
-        <table class="table">
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Date</th>
+                    <th>Match Date</th>
                     <th v-if="showCompetition">Competition</th>
                     <th v-if="showOpponent">Opponent</th>
                     <th>Result</th>
@@ -12,7 +12,6 @@
                     <th title="Goals Against">GA</th>
                     <th title="Shots For">SF</th>
                     <th title="Shots Against">SA</th>
-                    <th>Match details</th>
                 </tr>
             </thead>
             <tfoot>
@@ -23,7 +22,9 @@
             <tbody>
                 <tr v-for="match in orderedMatches">
                     <td>
-                        {{ match.date_time | formatDate }}
+                        <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
+                            {{ match.date_time | formatDate }}
+                        </router-link>
                     </td>
                     <td v-if="showCompetition === true">
                         {{ match.competition.name }}
@@ -45,11 +46,6 @@
                     </td>
                     <td>
                         {{ match.num_shots_against }}
-                    </td>
-                    <td>
-                        <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
-                            Match Details
-                        </router-link>
                     </td>
                     <td v-if="showActions">
                         <router-link class="btn btn-warning btn-xs"
@@ -95,6 +91,7 @@ export default {
             if (this.showCompetition){
                 var tds = tds.concat(["-"]);
             }
+
             if (this.showOpponent){
                 var tds = tds.concat(["-"]);
             }
@@ -104,8 +101,7 @@ export default {
                     _.sum(_.map(this.matches, 'num_goals')),
                     _.sum(_.map(this.matches, 'num_goals_against')),
                     _.sum(_.map(this.matches, 'num_shots')),
-                    _.sum(_.map(this.matches, 'num_shots_against')),
-                    "-"
+                    _.sum(_.map(this.matches, 'num_shots_against'))
                     ]);
              return tds;
         }

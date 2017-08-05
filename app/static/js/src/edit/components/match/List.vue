@@ -6,12 +6,14 @@
                 Add match
             </router-link>
         </div>
+
         <div class="filters row">
             <div class="form-group col-sm-3">
                 <label for="search-element">Name filter</label>
                 <input v-model="searchKey" class="form-control" id="search-element" required/>
             </div>
         </div>
+
         <match-table v-bind:matches="matches" v-bind:showActions=true> </match-table>
 
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>

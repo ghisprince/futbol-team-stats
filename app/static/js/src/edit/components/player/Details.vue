@@ -1,9 +1,8 @@
 <template id="player">
     <div>
         <h2>{{ player.name }}</h2>
-        <h3> Apps: {{  player_num_matches }} </h3>
 
-        <table class="table">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Date</th>
@@ -12,13 +11,12 @@
                     <th>Result</th>
                     <th title="Started the match">Starter</th>
                     <th title="Minutes played">Min</th>
-                    <th title="Shots">S</th>
                     <th title="Goals">G</th>
                     <th title="Assists">A</th>
+                    <th title="Shots">S</th>
                     <th title="Yellow Cards">YC</th>
                     <th title="Red Cards">RC</th>
                     <th title="Subbed out due to injury">injury</th>
-                    <th>Match details</th>
                 </tr>
             </thead>
             <tfoot>
@@ -29,7 +27,9 @@
             <tbody>
                 <tr v-for="pm in orderedPlayerMatches">
                     <td>
-                        {{ pm.match.date_time | formatDate }}
+                        <router-link v-bind:to="{name: 'match', params: {match_id: pm.match.id}}">
+                            {{ pm.match.date_time | formatDate }}
+                        </router-link>
                     </td>
                     <td>
                         {{ pm.match.competition.name }}
@@ -47,13 +47,13 @@
                         {{ pm.minutes }}
                     </td>
                     <td>
-                        {{ pm.shots.length }}
-                    </td>
-                    <td>
                         {{ pm.num_goals }}
                     </td>
                     <td>
                         {{ pm.assists.length }}
+                    </td>
+                    <td>
+                        {{ pm.shots.length }}
                     </td>
                     <td>
                         {{ pm.yellow_card}}
@@ -63,9 +63,6 @@
                     </td>
                     <td>
                         {{ pm.subbed_due_to_injury}}
-                    </td>
-                    <td>
-                        -link-
                     </td>
                 </tr>
             </tbody>
@@ -108,19 +105,18 @@ export default {
             // why not "matches: this.player.player_matches.length? because vue
             //  gives this.player.player_matches is undefined, clearly
             //  lodash does it right though
-            return ["-",
+            return ["Apps: " + _.sum(_.map(this.player.player_matches, 'starter')),
                     "-",
                     "-",
                     "-",
                     _.sum(_.map(this.player.player_matches, 'starter')),
                     _.sum(_.map(this.player.player_matches, 'minutes')),
-                    _.sum(_.map(this.player.player_matches, 'shots.length')),
                     _.sum(_.map(this.player.player_matches, 'num_goals')),
                     _.sum(_.map(this.player.player_matches, 'assists.length')),
+                    _.sum(_.map(this.player.player_matches, 'shots.length')),
                     _.sum(_.map(this.player.player_matches, 'yellow_card')),
                     _.sum(_.map(this.player.player_matches, 'red_card')),
                     _.sum(_.map(this.player.player_matches, 'subbed_due_to_injury')),
-                    "-"
                     ]
         }
     }

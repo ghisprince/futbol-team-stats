@@ -2,7 +2,6 @@ from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
 from flask_assets import Environment
-
 from app.models import User
 
 # Setup flask cache
@@ -13,9 +12,11 @@ assets_env = Environment()
 
 debug_toolbar = DebugToolbarExtension()
 
+# Login Manager
 login_manager = LoginManager()
 login_manager.login_view = "main.login"
 login_manager.login_message_category = "warning"
+
 
 
 @login_manager.user_loader

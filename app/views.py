@@ -193,7 +193,7 @@ class CreateListPlayerMatch(CreateListResourceBase):
     mm_schema_ex = playermatch_schema_ex
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
-                 'expand': webargs.fields.Bool(required=False) })
+                 'expand': webargs.fields.Bool(required=False)})
     def get(self, player_id, expand=False):
         query = self.ModelClass.query
         if player_id:
@@ -217,17 +217,23 @@ class CreateListPlayerMatch(CreateListResourceBase):
 class CreateListShot(CreateListResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
+    mm_schema_ex = shot_schema_ex
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
-                 'match_id': webargs.fields.Int(required=False), })
-    def get(self, player_id, match_id):
+                 'match_id': webargs.fields.Int(required=False),
+                 'expand': webargs.fields.Bool(required=False)})
+    def get(self, player_id, match_id, expand):
         query = self.ModelClass.query
         if player_id:
             query = query.join(PlayerMatch).join(Player).filter(
                                                 Player.id == player_id)
 
         if match_id:
-            query = query.filter(Match.id == match_id)
+            query = query.join(PlayerMatch).join(Match).filter(
+                                                Match.id == match_id)
+
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
 
         return self.mm_schema.dump(query.all(), many=True).data
 

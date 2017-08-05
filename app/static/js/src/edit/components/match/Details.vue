@@ -1,20 +1,55 @@
 <template id="match">
     <div>
-        <h2> {{ match.date_time }}</h2>
-        <h3> {{ match.at_home }} </h3>
-        <h3> {{ match.opponent.name }} </h3>
-        <h3> {{ match.competition.name }} </h3>
-        <h3> {{ match.result }} </h3>
 
-        <table class="table">
+        <div id="match-details">
+            <h2 id="section">Match info</h2>
+            <!--
+
+                <strong>Opponent:</strong> {{ match.opponent.name }} <br/>
+                <strong>Result:</strong> {{ match.result_long }} <br/>
+                <strong>Date/time:</strong> {{ match.date_time | formatDate }}<br/>
+                <strong>Competition:</strong>  {{ match.competition.name }} <br/>
+                <strong>Home/Away:</strong> {{ match.at_home }} <br/>
+            -->
+
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <th>Opponent</th>
+                        <td>{{ match.opponent.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Result</th>
+                        <td>{{ match.result_long }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date/Time</th>
+                        <td>{{ match.date_time | formatDate }}</td>
+                    </tr>
+                    <tr>
+                        <th>Competition</th>
+                        <td>{{ match.competition.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Home game</th>
+                        <td>{{ match.at_home }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <h2 id="section">Player data</h2>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th title="Player">Player</th>
                     <th title="Started the match">Starter</th>
                     <th title="Minutes played">Min</th>
-                    <th title="Shots">S</th>
-                    <th title="Assists">A</th>
                     <th title="Goals">G</th>
+                    <th title="Assists">A</th>
+                    <th title="Shots">S</th>
+                    <th title="Corners taken">C</th>
                     <th title="Yellow Cards">YC</th>
                     <th title="Red Cards">RC</th>
                     <th title="Subbed out due to injury">injury</th>
@@ -28,7 +63,9 @@
             <tbody>
                 <tr v-for="pm in orderedPlayerMatches">
                     <td>
-                        {{ pm.player.name }}
+                        <router-link v-bind:to="{name: 'player', params: {player_id: pm.player.id}}">
+                            {{ pm.player.name }}
+                        </router-link>
                     </td>
                     <td>
                         {{ pm.starter }}
@@ -37,13 +74,16 @@
                         {{ pm.minutes }}
                     </td>
                     <td>
-                        {{ pm.shots.length }}
+                        {{ pm.num_goals }}
                     </td>
                     <td>
                         {{ pm.assists.length }}
                     </td>
                     <td>
-                        {{ pm.num_goals }}
+                        {{ pm.shots.length }}
+                    </td>
+                    <td>
+                        {{ pm.corners }}
                     </td>
                     <td>
                         {{ pm.yellow_card}}
@@ -57,11 +97,14 @@
                 </tr>
             </tbody>
         </table>
-        <div id="canvas-container">
-            <canvas id="canvas" width=400 height=400></canvas>
-        </div>
+
+        <h2 id="section">Shot/Goal data</h2>
+        <shot-graph :player_matches="orderedPlayerMatches"></shot-graph>
+
+        <br/>
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         <router-link v-bind:to="'/match-list'">Back to match list</router-link>
+
     </div>
 </template>
 
@@ -69,6 +112,8 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import ShotGraph from './ShotGraph.vue'
+// The raw data to observe
 
 //  https://jsfiddle.net/n5osgpkg/
 export default {
@@ -79,7 +124,12 @@ export default {
                         team: null,
                         opponent: {name: ""},
                         competition: {name: ""},
-                        player_matches: []} }
+                        player_matches: []
+                        }
+                }
+    },
+    components: {
+        'shot-graph': ShotGraph
     },
     created() {
         // get match data
@@ -101,9 +151,10 @@ export default {
             return ["-",
                     "-",
                     _.sum(_.map(this.match.player_matches, 'minutes')),
-                    _.sum(_.map(this.match.player_matches, 'shots.length')),
                     _.sum(_.map(this.match.player_matches, 'num_goals')),
                     _.sum(_.map(this.match.player_matches, 'num_assists')),
+                    _.sum(_.map(this.match.player_matches, 'shots.length')),
+                    _.sum(_.map(this.match.player_matches, 'corners')),
                     _.sum(_.map(this.match.player_matches, 'yellow_card')),
                     _.sum(_.map(this.match.player_matches, 'red_card')),
                     _.sum(_.map(this.match.player_matches, 'subbed_due_to_injury'))
@@ -118,10 +169,18 @@ export default {
     canvas{border:1px solid red;
            display: inline;
            width: 500;
-           height: 500;}
+           height: 500;
+    }
 
     #canvas-container {
        width: 100%;
        text-align:center;
-}
+    }
+
+    #match-details {
+        text-align: left;
+    }
+    #section{
+        text-align: left;
+    }
 </style>
