@@ -187,17 +187,28 @@ class CreateListMatch(CreateListResourceBase):
 
         return self.ModelClass(**request_dict)
 
+
 class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
+                 'match_id': webargs.fields.Int(required=False),
+                 'competition_id': webargs.fields.Int(required=False),
                  'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, expand=False):
+    def get(self, player_id, match_id, competition_id, expand=False):
+
         query = self.ModelClass.query
         if player_id:
             query = query.join(Player).filter(Player.id == player_id)
+
+        if match_id:
+            query = query.filter_by(match_id=match_id)
+
+        if competition_id:
+            query = query.join(Match).join(Competition).filter(
+                        Competition.id == competition_id)
 
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data

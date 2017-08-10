@@ -6,6 +6,10 @@
 
             <label for="edit-number">Number</span></label>
             <input type="number" class="form-control" id="edit-number" v-model="player.number"/>
+
+            <label for="edit-number">Active</span></label>
+            <input type="checkbox" class="form-control" id="edit-active" v-model="player.active"/>
+
         </div>
     </div>
 </template>

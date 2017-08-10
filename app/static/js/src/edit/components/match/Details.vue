@@ -3,16 +3,8 @@
 
         <div id="match-details">
             <h2 id="section">Match info</h2>
-            <!--
 
-                <strong>Opponent:</strong> {{ match.opponent.name }} <br/>
-                <strong>Result:</strong> {{ match.result_long }} <br/>
-                <strong>Date/time:</strong> {{ match.date_time | formatDate }}<br/>
-                <strong>Competition:</strong>  {{ match.competition.name }} <br/>
-                <strong>Home/Away:</strong> {{ match.at_home }} <br/>
-            -->
-
-            <table class="table table-striped">
+            <table class="table table-striped table-bordered">
                 <tbody>
                     <tr>
                         <th>Opponent</th>
@@ -39,67 +31,9 @@
 
         </div>
 
-        <h2 id="section">Player data</h2>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th title="Player">Player</th>
-                    <th title="Started the match">Starter</th>
-                    <th title="Minutes played">Min</th>
-                    <th title="Goals">G</th>
-                    <th title="Assists">A</th>
-                    <th title="Shots">S</th>
-                    <th title="Corners taken">C</th>
-                    <th title="Yellow Cards">YC</th>
-                    <th title="Red Cards">RC</th>
-                    <th title="Subbed out due to injury">injury</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <td v-for="footSum in footSums"> {{ footSum }}</td>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr v-for="pm in orderedPlayerMatches">
-                    <td>
-                        <router-link v-bind:to="{name: 'player', params: {player_id: pm.player.id}}">
-                            {{ pm.player.name }}
-                        </router-link>
-                    </td>
-                    <td>
-                        {{ pm.starter }}
-                    </td>
-                    <td>
-                        {{ pm.minutes }}
-                    </td>
-                    <td>
-                        {{ pm.num_goals }}
-                    </td>
-                    <td>
-                        {{ pm.assists.length }}
-                    </td>
-                    <td>
-                        {{ pm.shots.length }}
-                    </td>
-                    <td>
-                        {{ pm.corners }}
-                    </td>
-                    <td>
-                        {{ pm.yellow_card}}
-                    </td>
-                    <td>
-                        {{ pm.red_card}}
-                    </td>
-                    <td>
-                        {{ pm.subbed_due_to_injury}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <player-match-table :showActions=false></player-match-table>
 
-        <h2 id="section">Shot/Goal data</h2>
-        <shot-graph :player_matches="orderedPlayerMatches"></shot-graph>
+        <shot-graph></shot-graph>
 
         <br/>
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
@@ -112,8 +46,8 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import PlayerMatchTable from './PlayerMatchTable.vue'
 import ShotGraph from './ShotGraph.vue'
-// The raw data to observe
 
 //  https://jsfiddle.net/n5osgpkg/
 export default {
@@ -129,7 +63,8 @@ export default {
                 }
     },
     components: {
-        'shot-graph': ShotGraph
+        'shot-graph': ShotGraph,
+        'player-match-table': PlayerMatchTable
     },
     created() {
         // get match data
@@ -148,15 +83,15 @@ export default {
         footSums: function () {
             // "matches: this.match.player_matches.length? gives
             // this.match.player_matches is undefined, but lodash does it right
-            return ["-",
+            return [_.size(this.match.player_matches),
                     "-",
                     _.sum(_.map(this.match.player_matches, 'minutes')),
                     _.sum(_.map(this.match.player_matches, 'num_goals')),
                     _.sum(_.map(this.match.player_matches, 'num_assists')),
                     _.sum(_.map(this.match.player_matches, 'shots.length')),
                     _.sum(_.map(this.match.player_matches, 'corners')),
-                    _.sum(_.map(this.match.player_matches, 'yellow_card')),
-                    _.sum(_.map(this.match.player_matches, 'red_card')),
+                    _.sum(_.map(this.match.player_matches, 'yellow_cards')),
+                    _.sum(_.map(this.match.player_matches, 'red_cards')),
                     _.sum(_.map(this.match.player_matches, 'subbed_due_to_injury'))
                     ]
         }
@@ -178,9 +113,6 @@ export default {
     }
 
     #match-details {
-        text-align: left;
-    }
-    #section{
         text-align: left;
     }
 </style>

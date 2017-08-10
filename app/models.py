@@ -94,8 +94,9 @@ class Team(db.Model, CRUD_MixIn):
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+    coach_name = db.Column(db.String())
     team_crest_uri = db.Column(db.String())
-    external_url = db.Column(db.String())
+    external_urls = db.Column(db.String())
 
     # relationships
     matches = db.relationship("Match", back_populates="opponent")
@@ -122,8 +123,9 @@ class Opponent(db.Model, CRUD_MixIn):
                                  self.num_match_tied,
                                  self.num_match_lost)
 
-    def __init__(self, name, external_url=None):
+    def __init__(self, name, coach_name=None, external_url=None):
         self.name = name
+        self.coach_name = coach_name
         self.external_url = external_url
 
     def __repr__(self):
@@ -194,8 +196,11 @@ class Season(db.Model, CRUD_MixIn):
 class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     date_time = db.Column(db.DateTime(), nullable=False)
-    at_home = db.Column(db.Boolean())  # False=away
-    duration = db.Column(db.Integer())  # False=away
+    at_home = db.Column(db.Boolean())
+    duration = db.Column(db.Integer())  # game duration in minutes
+    opponent_yellow_cards = db.Column(db.Integer(), default=0)
+    opponent_red_cards = db.Column(db.Integer(), default=0)
+    opponent_corners = db.Column(db.Integer(), default=0)
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -232,8 +237,8 @@ class Match(db.Model, CRUD_MixIn):
     def result_long(self):
 
         return "{}-{} {}".format(self.num_goals,
-                                       self.num_goals_against,
-                                       self.result)
+                                 self.num_goals_against,
+                                 self.result)
 
     @hybrid_property
     def num_goals(self):
@@ -292,8 +297,8 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     starter = db.Column(db.Boolean(), default=False)
     minutes = db.Column(db.Integer(), default=0)
     subbed_due_to_injury = db.Column(db.Boolean(), default=False)
-    yellow_card = db.Column(db.Integer(), default=0)
-    red_card = db.Column(db.Integer(), default=0)
+    yellow_cards = db.Column(db.Integer(), default=0)
+    red_cards = db.Column(db.Integer(), default=0)
     corners = db.Column(db.Integer(), default=0)
 
     # relationships
@@ -335,14 +340,14 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     def __init__(self, player, match, starter=True, minutes=0,
                  subbed_due_to_injury=None,
-                 yellow_card=None, red_card=None, corners=None,):
+                 yellow_cards=None, red_cards=None, corners=None,):
         self.player = player
         self.match = match
         self.starter = starter
         self.minutes = minutes
         self.subbed_due_to_injury = subbed_due_to_injury
-        self.yellow_card = yellow_card
-        self.red_card = red_card
+        self.yellow_cards = yellow_cards
+        self.red_cards = red_cards
         self.corners = corners
 
     def __repr__(self):

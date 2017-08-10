@@ -115,11 +115,11 @@ class TestModels:
         assert player_match1.match.opponent.name == "Lil' Real Madrid"
         assert player_match1.starter
         assert player_match1.subbed_due_to_injury
-        assert player_match1.yellow_card == 1
+        assert player_match1.yellow_cards == 1
 
         assert not player_match2.starter
         assert not player_match2.subbed_due_to_injury
-        assert player_match2.red_card == 1
+        assert player_match2.red_cards == 1
 
         assert len(match.player_matches) == 3
         assert sorted([i.player.number for i in match.player_matches]) == [4, 7, 10]
@@ -176,11 +176,11 @@ class TestModels:
 
         assert player_match1.starter
         assert player_match1.subbed_due_to_injury
-        assert player_match1.yellow_card == 1
+        assert player_match1.yellow_cards == 1
 
         assert not player_match2.starter
         assert not player_match2.subbed_due_to_injury
-        assert player_match2.red_card == 1
+        assert player_match2.red_cards == 1
 
         assert len(match.player_matches) == 2
         assert sorted([i.player.number for i in match.player_matches]) == [7, 10]

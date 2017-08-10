@@ -69,8 +69,8 @@ class TestViews:
                        "starter": True,
                        "minutes": 90,
                        "subbed_due_to_injury": False,
-                       "yellow_card": 1,
-                       "red_card": 1,
+                       "yellow_cards": 1,
+                       "red_cards": 1,
                        "corners": 3}
 
         code, resp = get_result(testapp.post('/api/v1/playermatches/',
@@ -428,8 +428,8 @@ class TestViews:
             'starter': True,
             'minutes': 50,
             'subbed_due_to_injury': False,
-            'yellow_card': 1,
-            'red_card': 0,
+            'yellow_cards': 1,
+            'red_cards': 0,
             'corners': 5,
         }
 
@@ -442,8 +442,8 @@ class TestViews:
         # assert pmatch['goals'] == []
         assert pmatch['corners'] == player_match_1['corners']
         assert pmatch['minutes'] == player_match_1['minutes']
-        assert pmatch['red_card'] == player_match_1['red_card']
-        assert pmatch['yellow_card'] == player_match_1['yellow_card']
+        assert pmatch['red_cards'] == player_match_1['red_cards']
+        assert pmatch['yellow_cards'] == player_match_1['yellow_cards']
         assert pmatch['starter'] is player_match_1['starter']
         assert pmatch['subbed_due_to_injury'] is \
                player_match_1['subbed_due_to_injury']
@@ -469,8 +469,8 @@ class TestViews:
             'starter': False,
             'minutes': 89,
             'subbed_due_to_injury': True,
-            'yellow_card': 0,
-            'red_card': 1,
+            'yellow_cards': 0,
+            'red_cards': 1,
             'corners': 2,
         }
 
@@ -483,8 +483,8 @@ class TestViews:
         # assert pmatch['goals'] == []
         assert pmatch['corners'] == player_match_2['corners']
         assert pmatch['minutes'] == player_match_2['minutes']
-        assert pmatch['red_card'] == player_match_2['red_card']
-        assert pmatch['yellow_card'] == player_match_2['yellow_card']
+        assert pmatch['red_cards'] == player_match_2['red_cards']
+        assert pmatch['yellow_cards'] == player_match_2['yellow_cards']
         assert pmatch['starter'] is player_match_2['starter']
         assert pmatch['subbed_due_to_injury'] is \
                player_match_2['subbed_due_to_injury']
@@ -574,8 +574,8 @@ class TestViews:
                             "starter": True,
                             "minutes": 90,
                             "subbed_due_to_injury": False,
-                            "yellow_card": 0,
-                            "red_card": 0,
+                            "yellow_cards": 0,
+                            "red_cards": 0,
                             "corners": 0}
 
         code, pm2 = get_result(testapp.post('/api/v1/playermatches/',

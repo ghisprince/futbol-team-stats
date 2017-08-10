@@ -16,6 +16,7 @@
             <thead>
                 <tr>
                 <th>Name</th>
+                <th>Active</th>
                 <th>Matches</th>
                 <th>Actions</th>
                 </tr>
@@ -24,6 +25,9 @@
                 <tr v-for="player in filteredPlayers">
                 <td>
                     {{ player.name }} #{{player.number}}
+                </td>
+                <td>
+                    {{ player.active }}
                 </td>
                 <td>
                     <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">

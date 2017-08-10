@@ -56,13 +56,13 @@
                         {{ pm.shots.length }}
                     </td>
                     <td>
-                        {{ pm.yellow_card}}
+                        {{ pm.yellow_cards }}
                     </td>
                     <td>
-                        {{ pm.red_card}}
+                        {{ pm.red_cards }}
                     </td>
                     <td>
-                        {{ pm.subbed_due_to_injury}}
+                        {{ pm.subbed_due_to_injury }}
                     </td>
                 </tr>
             </tbody>
@@ -105,7 +105,7 @@ export default {
             // why not "matches: this.player.player_matches.length? because vue
             //  gives this.player.player_matches is undefined, clearly
             //  lodash does it right though
-            return ["Apps: " + _.sum(_.map(this.player.player_matches, 'starter')),
+            return ["Apps: " + _(this.player.player_matches).size(),
                     "-",
                     "-",
                     "-",
@@ -114,8 +114,8 @@ export default {
                     _.sum(_.map(this.player.player_matches, 'num_goals')),
                     _.sum(_.map(this.player.player_matches, 'assists.length')),
                     _.sum(_.map(this.player.player_matches, 'shots.length')),
-                    _.sum(_.map(this.player.player_matches, 'yellow_card')),
-                    _.sum(_.map(this.player.player_matches, 'red_card')),
+                    _.sum(_.map(this.player.player_matches, 'yellow_cards')),
+                    _.sum(_.map(this.player.player_matches, 'red_cards')),
                     _.sum(_.map(this.player.player_matches, 'subbed_due_to_injury')),
                     ]
         }

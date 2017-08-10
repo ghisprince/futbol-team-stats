@@ -5,9 +5,12 @@
 
             <match :match.sync="match"></match>
 
+            <player-match-table :showActions=true></player-match-table>
+
             <button type="submit" class="btn btn-primary">Save</button>
             <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
         </form>
+
 
     </div>
 </template>
@@ -16,13 +19,16 @@
 <script>
 import axios from 'axios'
 import Match from './Match.vue'
+import PlayerMatchTable from './PlayerMatchTable.vue'
+
 
 export default {
     data () {
         return {match: {}}
     },
     components: {
-        'match': Match
+        'match': Match,
+        'player-match-table': PlayerMatchTable
     },
     created() {
         axios.get(`/api/v1/matches/` + this.$route.params.match_id + `?expand=true`)

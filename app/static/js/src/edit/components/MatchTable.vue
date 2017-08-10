@@ -12,6 +12,7 @@
                     <th title="Goals Against">GA</th>
                     <th title="Shots For">SF</th>
                     <th title="Shots Against">SA</th>
+                    <th v-if="showActions">Actions</th>
                 </tr>
             </thead>
             <tfoot>
@@ -73,7 +74,7 @@ export default {
             showCompetition: {default: true},
             showOpponent: {default: true},
             showActions: {default: false}
-            },
+    },
     data () {
         return {}
     },
@@ -87,7 +88,8 @@ export default {
             // why not "match: this.player.player_match.length? because vue
             //  gives this.player.player_match is undefined, clearly
             //  lodash does it right though
-            var tds = ["-"];
+            var tds = ["Count: " + _(this.matches).size()];
+
             if (this.showCompetition){
                 var tds = tds.concat(["-"]);
             }
@@ -101,7 +103,7 @@ export default {
                     _.sum(_.map(this.matches, 'num_goals')),
                     _.sum(_.map(this.matches, 'num_goals_against')),
                     _.sum(_.map(this.matches, 'num_shots')),
-                    _.sum(_.map(this.matches, 'num_shots_against'))
+                    _.sum(_.map(this.matches, 'num_shots_against')),
                     ]);
              return tds;
         }

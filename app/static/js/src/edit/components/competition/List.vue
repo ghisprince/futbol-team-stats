@@ -17,7 +17,7 @@
                 <tr>
                 <th>Name </th>
                 <th>Result</th>
-                <th title="Matches Played">GP</th>
+                <th title="Matches Played">MP</th>
                 <th title="Matches Won">W</th>
                 <th title="Matches Tied">D</th>
                 <th title="Matches Lost">L</th>

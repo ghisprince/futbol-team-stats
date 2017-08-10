@@ -10,8 +10,8 @@
                 "starter":true,
                 "minutes":60,
                 "subbed_due_to_injury":false,
-                "yellow_card":1,
-                "red_card":1,
+                "yellow_cards":1,
+                "red_cards":1,
                 "corners":1,
                 "shots":[
                     {
@@ -45,8 +45,8 @@
                 "starter":false,
                 "minutes":70,
                 "subbed_due_to_injury":false,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":0,
                 "shots":[
                     {
@@ -64,8 +64,8 @@
                 "starter":true,
                 "minutes":80,
                 "subbed_due_to_injury":true,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":10,
                 "shots":[
                     {
@@ -91,8 +91,8 @@
                 "starter":true,
                 "minutes":62,
                 "subbed_due_to_injury":false,
-                "yellow_card":2,
-                "red_card":2,
+                "yellow_cards":2,
+                "red_cards":2,
                 "corners":2,
                 "shots":[
                     {
@@ -111,8 +111,8 @@
                 "starter":false,
                 "minutes":72,
                 "subbed_due_to_injury":false,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":0,
                 "shots":[
                     {
@@ -138,8 +138,8 @@
                 "starter":true,
                 "minutes":82,
                 "subbed_due_to_injury":false,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":0,
                 "shots":[
                     {
@@ -173,8 +173,8 @@
                 "starter":true,
                 "minutes":80,
                 "subbed_due_to_injury":false,
-                "yellow_card":1,
-                "red_card":1,
+                "yellow_cards":1,
+                "red_cards":1,
                 "corners":1,
                 "shots":[
                     {
@@ -192,8 +192,8 @@
                 "starter":false,
                 "minutes":81,
                 "subbed_due_to_injury":false,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":0,
                 "shots": []
             },
@@ -202,8 +202,8 @@
                 "starter":true,
                 "minutes":83,
                 "subbed_due_to_injury":false,
-                "yellow_card":0,
-                "red_card":0,
+                "yellow_cards":0,
+                "red_cards":0,
                 "corners":0,
                 "shots":[
                     {

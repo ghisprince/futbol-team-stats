@@ -1,33 +1,60 @@
 <template id="match-props">
-    <div>
-        <div class="form-group">
+    <div class="container-fluid">
+
+        <div class="form-group row">
             <!-- //https://jsfiddle.net/3a2055ub/  -->
-            <label for="edit-date-time">Date and time</label>
-            <input type="datetime-local" class="form-control"
-                   id="edit-date-time" v-model="match.date_time"/>
 
-            <label for="edit-opponent">Opponent</label>
-            <select class="form-control" v-on:change="opponentChanged">
-                <option v-for="opponent in opponents"
-                        v-bind:value="opponent.id"
-                        :selected="opponent.name == match.opponent.name"
-                        >
-                        {{opponent.name}}
-                </option>
-            </select>
+            <div class="col-sm-2"/>
+            <label for="edit-date-time" class="col-sm-2 col-form-label">Date and time :</label>
+            <div class="col-sm-4">
+                <input type="datetime-local" class="form-control"
+                       id="edit-date-time" v-model="match.date_time"
+                       placeholder="2018-01-13T12:00:00+00:00"/>
+            </div>
+        </div>
 
-            <label for="edit-competition">Competition</label>
-            <select class="form-control" v-on:change="competitionChanged">
-                <option v-for="competition in competitions"
-                        v-bind:value="competition.id"
-                        :selected="competition.name == match.competition.name"
-                        >
-                        {{competition.name}}
-                </option>
-            </select>
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-opponent" class="col-sm-2 col-form-label">Opponent :</label>
+            <div class="col-sm-4">
+                <select class="form-control col-sm-4" v-on:change="opponentChanged">
+                    <option v-for="opponent in opponents"
+                            v-bind:value="opponent.id"
+                            :selected="opponent.name == match.opponent.name"
+                            >
+                            {{opponent.name}}
+                    </option>
+                </select>
+            </div>
 
-            <label for="edit-at-home">At Home</label>
-            <input type="checkbox" class="form-control" id="edit-at-home" v-model="match.at_home"/>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-competition" class="col-sm-2 col-form-label">Competition :</label>
+            <div class="col-sm-4">
+                <select class="form-control col-sm-4" v-on:change="competitionChanged">
+                    <option v-for="competition in competitions"
+                            v-bind:value="competition.id"
+                            :selected="competition.name == match.competition.name"
+                            >
+                            {{competition.name}}
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-at-home" class="col-sm-2 col-form-label">Home Game :</label>
+            <div class="col-sm-4">
+                <input type="checkbox"
+                       class="form-control col-sm-4"
+                       id="edit-at-home"
+                       v-model="match.at_home"/>
+            </div>
+
         </div>
     </div>
 </template>

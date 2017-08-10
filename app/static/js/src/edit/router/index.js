@@ -25,6 +25,7 @@ import Match from '../components/match/Details.vue'
 import MatchList from '../components/match/List.vue'
 import MatchAdd from '../components/match/Add.vue'
 import MatchEdit from '../components/match/Edit.vue'
+import PlayerMatchEdit from '../components/match/PlayerMatchEdit.vue'
 
 export default new VueRouter({routes:[
   { path: '/', component: EditChoices},
@@ -51,7 +52,8 @@ export default new VueRouter({routes:[
   { path: '/add-match', component: MatchAdd},
   { path: '/match/:match_id/delete', component: DeleteItem, name: 'match-delete', props: true},
   { path: '/match/:match_id', component: Match, name: 'match'},
-  { path: '/match/:match_id/edit', component: MatchEdit, name: 'match-edit'}
+  { path: '/match/:match_id/edit', component: MatchEdit, name: 'match-edit'},
+  { path: '/playermatch/:playermatch_id/edit', component: PlayerMatchEdit, name: 'playermatch-edit'}
 
 
 ]

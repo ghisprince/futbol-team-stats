@@ -37,7 +37,8 @@ export default {
         updatePlayer: function() {
             axios.patch(this.player._links.self,
                         {name: this.player.name,
-                         number: this.player.number
+                         number: this.player.number,
+                         active: this.player.active
                         }
             )
             .then(response => {
