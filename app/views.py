@@ -473,7 +473,23 @@ class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
         return super().get(playermatch_id, expand)
 
     def patch(self, playermatch_id):
-        return super().patch(playermatch_id)
+        modelInst = self.ModelClass.query.get_or_404(playermatch_id)
+
+        request_dict = request.get_json(force=True)
+
+        request_dict['player'] = db.session.query(
+            Player).filter_by(id=request_dict['player']['id']).one()
+        try:
+            #self.mm_schema.validate(request_dict, partial=True)
+            for key, value in request_dict.items():
+                setattr(modelInst, key, value)
+            modelInst.update()
+            return self.get(playermatch_id)
+
+        except ValidationError as err:
+            resp = jsonify({"error": err.messages})
+            resp.status_code = 401
+            return resp
 
     def delete(self, playermatch_id):
         return super().delete(playermatch_id)
@@ -501,9 +517,6 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
         request_dict['team'] = db.session.query(
             Team).filter_by(id=request_dict['team']['id']).one()
 
-        print("#"*40)
-        pprint(request_dict)
-        print("#"*40)
         request_dict['opponent'] = db.session.query(
             Opponent).filter_by(id=request_dict['opponent']['id']).one()
 

@@ -198,9 +198,6 @@ class Match(db.Model, CRUD_MixIn):
     date_time = db.Column(db.DateTime(), nullable=False)
     at_home = db.Column(db.Boolean())
     duration = db.Column(db.Integer())  # game duration in minutes
-    opponent_yellow_cards = db.Column(db.Integer(), default=0)
-    opponent_red_cards = db.Column(db.Integer(), default=0)
-    opponent_corners = db.Column(db.Integer(), default=0)
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -268,6 +265,21 @@ class Match(db.Model, CRUD_MixIn):
         return "Match (team={}, opponent={}, date_time={})".format(
                                 self.team, self.opponent, self.date_time)
 
+"""
+class MatchTeamStats(db.Model, CRUD_MixIn):
+
+    passes = db.Column(db.Integer())
+    pass_strings = db.Column(db.Integer())
+    pass_completion = db.Column(db.Integer())
+
+    opponent_passes = db.Column(db.Integer())
+    opponent_pass_strings = db.Column(db.Integer())
+    opponent_pass_completion = db.Column(db.Integer())
+
+    opponent_yellow_cards = db.Column(db.Integer())
+    opponent_red_cards = db.Column(db.Integer())
+    opponent_corners = db.Column(db.Integer())
+"""
 
 class Player(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)

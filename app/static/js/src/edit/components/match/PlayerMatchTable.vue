@@ -22,10 +22,12 @@
                 <tr>
                     <td v-for="footSum in footSums"> {{ footSum }}</td>
                     <td v-if="showActions">
-                        <button class="btn btn-success btn-xs" v-on:click="addPlayerMatch()">
-                        <span class="glyphicon glyphicon-plus"></span>
-                        Add
-                        </button>
+                        <router-link class="btn btn-success btn-xs"
+                                     v-bind:to="{name: 'playermatch-add', params: {match_id: -55}}">
+                            <span class="glyphicon glyphicon-plus"></span> Add
+                        </router-link>
+
+
                     </td>
                 </tr>
             </tfoot>
@@ -69,9 +71,9 @@
                             <span class="glyphicon glyphicon-pencil"></span> Edit
                         </router-link>
 
-                        <button class="btn btn-danger btn-xs" v-on:click="deletePlayerMatch( pm._links.self )">
-                        <span class="glyphicon glyphicon-remove"></span> Delete
-                        </button>
+                        <a class="btn btn-danger btn-xs" v-on:click="deletePlayerMatch( pm )">
+                            <span class="glyphicon glyphicon-remove"></span> Delete
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -119,13 +121,23 @@ export default {
         }
     },
     methods: {
-        deletePlayerMatch: function(playermatch_id) {
-            alert(playermatch_id);
+        deletePlayerMatch: function(pm) {
+
+            axios.delete(pm._links.self)
+            .then(response => {
+                alert("Success!");
+                this.player_matches = _.filter(this.player_matches, function(i) {
+                        return i.id != pm.id;
+                    }
+                );
+            })
+            .catch(e => {
+                this.alertMessage = e.response.data.error;
+            })
         },
         addPlayerMatch: function() {
             alert("ADD");
         }
-
     }
 }
 

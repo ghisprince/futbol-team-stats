@@ -10,8 +10,6 @@
             <button type="submit" class="btn btn-primary">Save</button>
             <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
         </form>
-
-
     </div>
 </template>
 

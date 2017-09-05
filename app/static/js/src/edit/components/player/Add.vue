@@ -1,4 +1,4 @@
-<template id="add-player">
+<template id="player-add">
     <div>
         <h2>Add new player</h2>
         <form v-on:submit="createPlayer">

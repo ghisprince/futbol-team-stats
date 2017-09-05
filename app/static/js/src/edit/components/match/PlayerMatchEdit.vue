@@ -1,11 +1,27 @@
 <template id="playermatch-edit">
     <div>
-        <h2>{{ playermatch.player.name}}'s match</h2>
+        <h2>Edit Player's match == {{ create }}</h2>
 
 
         <form v-on:submit="updatePlayerMatch">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
+
+                <div class="form-group row">
+                    <label for="edit-starter" class="col-sm-3 col-form-label">Player :</label>
+                    <div class="col-sm-3">
+
+                        <select class="form-control col-sm-4" v-on:change="playerChanged">
+                            <option v-for="player in players"
+                                    v-bind:value="player.id"
+                                    :selected="player.name == playermatch.player.name"
+                                    >
+                                    {{player.name}}
+                            </option>
+                        </select>
+
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label for="edit-starter" class="col-sm-3 col-form-label">Starter :</label>
@@ -92,7 +108,9 @@ export default {
                     {"player": {"name": ""},
                      "match": {"id": 0},
                      "_links": ""
-                    }
+                    },
+                "players": [],
+                "create": "zzz"
                }
     },
     components: {},
@@ -104,11 +122,21 @@ export default {
         .catch(e => {
             console.log(e)
         })
+
+        axios.get(`/api/v1/players/?expand=true`)
+        .then(response => {
+            this.players = response.data
+        })
+        .catch(e => {
+            console.log(e)
+        })
+
     },
     methods: {
         updatePlayerMatch: function() {
             axios.patch(this.playermatch._links.self,
-                        {starter: this.playermatch.starter,
+                        {player: {id: this.playermatch.player.id},
+                         starter: this.playermatch.starter,
                          minutes: this.playermatch.minutes,
                          subbed_due_to_injury: this.playermatch.subbed_due_to_injury,
                          yellow_cards: this.playermatch.yellow_cards,
@@ -125,7 +153,17 @@ export default {
                 alert("UPDATE playermatch failed")
                 console.log(e)
             })
-        }
+        },
+        playerChanged: function(e) {
+            for (var i=0; i < this.players.length; i++) {
+                if (this.players[i].id == e.target.value) {
+                 this.playermatch.player = this.players[i];
+                 console.log(this.players[i].name);
+                }
+            }
+            //this.$emit('opponentChanged', e.target.value);
+        },
+
     }
 }
 </script>
