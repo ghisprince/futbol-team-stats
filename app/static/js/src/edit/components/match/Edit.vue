@@ -6,7 +6,9 @@
             <match :match.sync="match"></match>
 
             <player-match-table :showActions=true></player-match-table>
+            <shot-graph :enableEditing=true></shot-graph>
 
+            <br/>
             <button type="submit" class="btn btn-primary">Save</button>
             <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
         </form>
@@ -18,6 +20,7 @@
 import axios from 'axios'
 import Match from './Match.vue'
 import PlayerMatchTable from './PlayerMatchTable.vue'
+import ShotGraph from './ShotGraph.vue'
 
 
 export default {
@@ -26,6 +29,7 @@ export default {
     },
     components: {
         'match': Match,
+        'shot-graph': ShotGraph,
         'player-match-table': PlayerMatchTable
     },
     created() {
@@ -49,7 +53,8 @@ export default {
             )
             .then(response => {
                 console.log("UPDATE match successful!")
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/match-list'})
             })
             .catch(e => {
                 alert("UPDATE match failed")

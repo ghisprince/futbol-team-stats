@@ -191,10 +191,27 @@ class MatchSchema(ModelSchema):
     # add hybrid properties on model
     result = fields.String(dump_only=True)
     result_long = fields.String(dump_only=True)
-    num_shots = fields.Integer(dump_only=True)
-    num_shots_against = fields.Integer(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
     num_goals_against = fields.Integer(dump_only=True)
+
+    # add hybrid properties from MatchStats for convenient access
+    goals_timeline = fields.String(dump_only=True)
+    num_shots = fields.Integer(dump_only=True)
+    num_shots_against = fields.Integer(dump_only=True)
+    shot_on_target_pct = fields.String(dump_only=True)
+    opponent_shot_on_target_pct = fields.String(dump_only=True)
+    num_corners = fields.Integer(dump_only=True)
+    num_opponent_corners = fields.Integer(dump_only=True)
+    num_yellow_cards = fields.Integer(dump_only=True)
+    num_opponent_yellow_cards = fields.Integer(dump_only=True)
+    num_red_cards = fields.Integer(dump_only=True)
+    num_opponent_red_cards = fields.Integer(dump_only=True)
+    num_passes = fields.Integer(dump_only=True)
+    num_opponent_passes = fields.Integer(dump_only=True)
+    num_pass_strings = fields.Integer(dump_only=True)
+    num_opponent_pass_strings = fields.Integer(dump_only=True)
+    pass_pct = fields.Integer(dump_only=True)
+    opponent_pass_pct = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
@@ -203,8 +220,11 @@ class MatchSchema(ModelSchema):
 
 #
 class MatchSchemaEx(MatchSchema):
-    competition = fields.Nested(CompetitionSchema, dump_only=True, exclude=("matches",))
-    opponent = fields.Nested(OpponentSchema, dump_only=True, exclude=("matches",))
-    team = fields.Nested(TeamSchema, dump_only=True, exclude=("players", "matches"))
-    player_matches = fields.Nested(PlayerMatchSchemaEx, dump_only=True, many=True,
-                                   exclude=("match", ))
+    competition = fields.Nested(CompetitionSchema, dump_only=True,
+                                exclude=("matches",))
+    opponent = fields.Nested(OpponentSchema, dump_only=True,
+                             exclude=("matches",))
+    team = fields.Nested(TeamSchema, dump_only=True,
+                         exclude=("players", "matches"))
+    player_matches = fields.Nested(PlayerMatchSchemaEx, dump_only=True,
+                                   many=True, exclude=("match", ))

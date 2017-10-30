@@ -20,7 +20,8 @@ import Player from './Player.vue'
 export default {
     data () {
         return {player: {name: '',
-                         number: null}}
+                         number: null,
+                         active: true}}
     },
     components: {
         'player': Player
@@ -30,7 +31,9 @@ export default {
             axios.post(`/api/v1/players/`, this.player)
             .then(response => {
                 this.player = response.data
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/player-list'})
+
             })
             .catch(e => {
                 console.log(e)

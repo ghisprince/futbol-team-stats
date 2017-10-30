@@ -1,7 +1,8 @@
-<template id="playermatch-edit">
+<template id="playermatch-add">
     <div>
+        <h2>Add player match</h2>
 
-        <form v-on:submit="updatePlayerMatch">
+        <form v-on:submit="createPlayerMatch">
             <playermatch-props :playermatch.sync="playermatch"></playermatch-props>
 
             <button type="submit" class="btn btn-primary">Save</button>
@@ -21,43 +22,26 @@ import PlayerMatch from './PlayerMatch.vue'
 
 export default {
     data () {
-        return {"playermatch":
-                    {"player": {"name": ""},
-                     "match": {"id": 0},
-                     "_links": ""
+        return {playermatch:
+                    {player: {name: ""},
+                     match: {id: 0},
+                     starter: false,
+                     _links: ""
                     },
-                "players": [],
-                "create": "zzz"
+                players: []
                }
     },
     components: {
         'playermatch-props': PlayerMatch
     },
-    created() {
-        axios.get(`/api/v1/playermatches/` + this.$route.params.playermatch_id + `?expand=true`)
-        .then(response => {
-            this.playermatch = response.data
-        })
-        .catch(e => {
-            console.log(e)
-        })
-
-        axios.get(`/api/v1/players/?expand=true`)
-        .then(response => {
-            this.players = response.data
-        })
-        .catch(e => {
-            console.log(e)
-        })
-
-    },
     methods: {
         goBack: function() {
             this.$router.go(-1)
         },
-        updatePlayerMatch: function() {
-            axios.patch(this.playermatch._links.self,
+        createPlayerMatch: function() {
+            axios.post(`/api/v1/playermatches/`,
                         {player: {id: this.playermatch.player.id},
+                         match: {id: this.$route.params.match_id},
                          starter: this.playermatch.starter,
                          minutes: this.playermatch.minutes,
                          subbed_due_to_injury: this.playermatch.subbed_due_to_injury,
@@ -76,16 +60,6 @@ export default {
                 console.log(e)
             })
         },
-        playerChanged: function(e) {
-            for (var i=0; i < this.players.length; i++) {
-                if (this.players[i].id == e.target.value) {
-                 this.playermatch.player = this.players[i];
-                 console.log(this.players[i].name);
-                }
-            }
-            //this.$emit('opponentChanged', e.target.value);
-        },
-
     }
 }
 </script>

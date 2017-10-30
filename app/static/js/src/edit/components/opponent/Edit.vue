@@ -44,7 +44,9 @@ export default {
              )
             .then(response => {
                 console.log("UPDATE Opponent successfull!!")
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/opponent-list'})
+
             })
             .catch(e => {
                 console.log("UPDATE Opponent failed!!")

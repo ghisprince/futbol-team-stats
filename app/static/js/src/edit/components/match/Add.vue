@@ -6,7 +6,9 @@
             <match :match.sync="match"></match>
 
             <button type="submit" class="btn btn-primary">Create</button>
-            <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
+            <router-link class="btn btn-default" v-bind:to="'/match-list'">
+                Cancel
+            </router-link>
         </form>
     </div>
 </template>
@@ -19,10 +21,16 @@ import Match from './Match.vue'
 
 export default {
     data () {
-        return {match: {date_time: null,
-                        opponent: {name: null},
-                        competition: {name: null},
-                        at_home: null}}
+        return {match:
+                    {date_time: null,
+                     opponent: {name: null},
+                     competition: {name: null},
+                     at_home: null,
+                     team:{id: 1}
+                     },
+                 opponents: [],
+                 competitions: []
+                }
     },
     components: {
         'match': Match
@@ -32,7 +40,7 @@ export default {
             axios.post(`/api/v1/matches/`, this.match)
             .then(response => {
                 this.match = response.data
-                this.$router.go(-1)
+                this.$router.push({path: '/match-list'})
             })
             .catch(e => {
                 console.log(e)

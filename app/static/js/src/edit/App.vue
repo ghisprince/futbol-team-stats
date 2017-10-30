@@ -38,7 +38,6 @@ tfoot > tr > td {
 }
 
 
-
 label{
     text-align: left;
 }

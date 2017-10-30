@@ -1,15 +1,30 @@
 <template id="competition-props">
-    <div>
-        <div class="form-group">
-            <label for="edit-name">Name</label>
-            <input class="form-control" id="edit-name" v-model="competition.name" required/>
+    <div class="container-fluid">
 
-            <label for="edit-result">Result</label>
-            <input class="form-control" id="edit-result" v-model="competition.result"/>
-
-            <label for="edit-url">Competition's website</label>
-            <input type="url" class="form-control" id="edit-url" v-model="competition.external_url"/>
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-name" class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-4">
+                <input class="form-control" id="edit-name" v-model="competition.name" required/>
+            </div>
         </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-result" class="col-sm-3 col-form-label">Result</label>
+            <div class="col-sm-4">
+                <input class="form-control" id="edit-result" v-model="competition.result"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-url" class="col-sm-3 col-form-label">Competition's website</label>
+            <div class="col-sm-4">
+                <input type="url" class="form-control" id="edit-url" v-model="competition.external_url"/>
+            </div>
+        </div>
+
     </div>
 </template>
 

@@ -6,6 +6,7 @@ from webargs.flaskparser import use_kwargs
 
 from app.models import *
 from app.schemas import *
+import marshmallow
 from marshmallow import ValidationError
 import webargs
 from pprint import pprint
@@ -57,9 +58,12 @@ return a 201 Created status code"""
 
 
 class CreateListResourceBase(Resource):
-    def post(self):
-        request_dict = request.get_json(force=True)
+    def post(self, request_dict=None):
+        if not request_dict:
+            request_dict = request.get_json(force=True)
+
         try:
+
             self.mm_schema.validate(request_dict)
             modelInst = self.InstanceFromDict(request_dict)
             modelInst.add(modelInst)
@@ -99,7 +103,6 @@ class CreateListTeam(CreateListResourceBase):
         return self.ModelClass(**request_dict)
 
 
-
 class CreateListPlayer(CreateListResourceBase):
     ModelClass = Player
     mm_schema = player_schema
@@ -114,7 +117,7 @@ class CreateListPlayer(CreateListResourceBase):
     def InstanceFromDict(self, request_dict):
         if request_dict.get('team'):
             request_dict['team'] = Team.query.get_or_404(
-                                        request_dict.get('team', None))
+                request_dict.get('team', None))
         return self.ModelClass(**request_dict)
 
 
@@ -169,21 +172,48 @@ class CreateListMatch(CreateListResourceBase):
             query = query.filter(self.ModelClass.opponent_id == opponent_id)
 
         if competition_id:
-            query = query.join(Competition).filter(Competition.id == competition_id)
+            query = query.join(Competition).filter(
+                Competition.id == competition_id)
 
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
-    def InstanceFromDict(self, request_dict):
+    #def post(self):
+    #    request_dict = request.get_json(force=True)
+    #    request_dict['date_time'] = request_dict['date_time'] + ".000000+00:00"
+    #    super().post(request_dict)
+    def post(self):
+        request_dict = request.get_json(force=True)
+        request_dict['date_time'] = request_dict['date_time'] + ".000000+00:00"
+        try:
+            self.mm_schema.validate(request_dict)
+            modelInst = self.InstanceFromDict(request_dict)
+            modelInst.add(modelInst)
+            query = self.ModelClass.query.get(modelInst.id)
+            results = self.mm_schema.dump(query).data
+            return results, 201
 
+        except ValidationError as err:
+            resp = jsonify({"error": err.messages})
+            resp.status_code = 403
+            return resp
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            resp = jsonify({"error": str(e)})
+            resp.status_code = 403
+            return resp
+
+
+    def InstanceFromDict(self, request_dict):
         request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
         request_dict['opponent'] = Opponent.query.get_or_404(
             request_dict['opponent']['id'])
 
         if request_dict.get('competition', None):
             request_dict['competition'] = Competition.query.get_or_404(
-                                            request_dict['competition']['id'])
+                request_dict['competition']['id'])
 
         return self.ModelClass(**request_dict)
 
@@ -208,7 +238,7 @@ class CreateListPlayerMatch(CreateListResourceBase):
 
         if competition_id:
             query = query.join(Match).join(Competition).filter(
-                        Competition.id == competition_id)
+                Competition.id == competition_id)
 
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data
@@ -217,10 +247,10 @@ class CreateListPlayerMatch(CreateListResourceBase):
     def InstanceFromDict(self, request_dict):
 
         request_dict['player'] = db.session.query(Player).filter_by(
-                                      id=request_dict['player']['id']).one()
+            id=request_dict['player']['id']).one()
 
         request_dict['match'] = db.session.query(Match).filter_by(
-                                    id=request_dict['match']['id']).one()
+            id=request_dict['match']['id']).one()
 
         return self.ModelClass(**request_dict)
 
@@ -232,16 +262,20 @@ class CreateListShot(CreateListResourceBase):
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
+                 'by_opponent': webargs.fields.Bool(required=False),
                  'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, match_id, expand):
+    def get(self, player_id, match_id, by_opponent, expand):
         query = self.ModelClass.query
         if player_id:
             query = query.join(PlayerMatch).join(Player).filter(
-                                                Player.id == player_id)
+                Player.id == player_id)
 
         if match_id:
             query = query.join(PlayerMatch).join(Match).filter(
-                                                Match.id == match_id)
+                Match.id == match_id)
+
+        if not isinstance(by_opponent, marshmallow.utils._Missing):
+            query = query.filter(Shot.by_opponent == by_opponent)
 
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data
@@ -265,7 +299,7 @@ class CreateListGoal(CreateListResourceBase):
         query = self.ModelClass.query
         if player_id:
             query = query.join(Shot).join(PlayerMatch).join(Player).filter(
-                                                Player.id == player_id)
+                Player.id == player_id)
 
         if match_id:
             query = query.join(Shot).filter(Match.id == match_id)
@@ -273,7 +307,7 @@ class CreateListGoal(CreateListResourceBase):
 
     def InstanceFromDict(self, request_dict):
         request_dict['shot'] = db.session.query(Shot).filter_by(
-                                    id=request_dict['shot']['id']).one()
+            id=request_dict['shot']['id']).one()
 
         return self.ModelClass(**request_dict)
 
@@ -288,7 +322,7 @@ class CreateListAssist(CreateListResourceBase):
         query = self.ModelClass.query
         if player_id:
             query = query.join(PlayerMatch).join(Player).filter(
-                                                Player.id == player_id)
+                Player.id == player_id)
 
         if match_id:
             query = query.filter(Match.id == match_id)
@@ -297,11 +331,11 @@ class CreateListAssist(CreateListResourceBase):
 
     def InstanceFromDict(self, request_dict):
         request_dict['goal'] = db.session.query(
-                        Goal).filter_by(id=request_dict['goal']['id']).one()
+            Goal).filter_by(id=request_dict['goal']['id']).one()
 
         request_dict['player_match'] = db.session.query(
-                        PlayerMatch).filter_by(
-                            id=request_dict['player_match']['id']).one()
+            PlayerMatch).filter_by(
+            id=request_dict['player_match']['id']).one()
 
         return self.ModelClass(**request_dict)
 
@@ -325,6 +359,7 @@ class AddRemoveListTeamMatch(Resource):
         query = self.ModelClass.query.filter(Match.team_id == team_id)
         return self.mm_schema.dump(query.all(), many=True).data
 """
+
 
 #
 class GetUpdateDeleteResourceBase(Resource):
@@ -365,7 +400,8 @@ class GetUpdateDeleteResourceBase(Resource):
         modelInst = self.ModelClass.query.get_or_404(id)
         for att in ['matches', 'playermatches', ]:
             if getattr(modelInst, att, None):
-                resp = jsonify({"error": "Delete failed, object has associated " + att})
+                resp = jsonify(
+                    {"error": "Delete failed, object has associated " + att})
                 resp.status_code = 401
                 return resp
 
@@ -476,11 +512,11 @@ class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
         modelInst = self.ModelClass.query.get_or_404(playermatch_id)
 
         request_dict = request.get_json(force=True)
-
-        request_dict['player'] = db.session.query(
-            Player).filter_by(id=request_dict['player']['id']).one()
+        if 'player' in request_dict:
+            request_dict['player'] = db.session.query(
+                Player).filter_by(id=request_dict['player']['id']).one()
         try:
-            #self.mm_schema.validate(request_dict, partial=True)
+            # self.mm_schema.validate(request_dict, partial=True)
             for key, value in request_dict.items():
                 setattr(modelInst, key, value)
             modelInst.update()
@@ -524,10 +560,10 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
             Competition).filter_by(id=request_dict['competition']['id']).one()
 
         request_dict['date_time'] = datetime.datetime.strptime(
-                                        request_dict['date_time'][:-6],
-                                                        "%Y-%m-%dT%H:%M:%S")
+            request_dict['date_time'][:-6],
+            "%Y-%m-%dT%H:%M:%S")
         try:
-            #self.mm_schema.validate(request_dict, partial=True)
+            # self.mm_schema.validate(request_dict, partial=True)
             for key, value in request_dict.items():
                 setattr(modelInst, key, value)
             modelInst.update()

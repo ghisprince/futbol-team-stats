@@ -6,13 +6,14 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import json
+
 from app import create_app
 from app.models import *
 
 app = create_app('app.settings.DevConfig')
 db.app = app
-db.session.remove()
-db.drop_all()
+#db.session.remove()
+#db.drop_all()
 db.create_all()
 
 
@@ -30,6 +31,7 @@ def load_match(match_data):
     match_data_date_time = datetime.datetime.strptime(match_data["date_time"],
                                                       "%Y-%m-%dT%H:%M:%S")
 
+
     if db.session.query(Match).filter_by(date_time=match_data_date_time).first():
         print("Already loaded {} vs '{}' on {}".format(match_data["team"],
                                                        match_data["opponent"],
@@ -41,15 +43,29 @@ def load_match(match_data):
     else:
         competition = None
 
-    print("Load Match")
+    print("Load Match ({} on {})".format(match_data["opponent"],
+                                         match_data["date_time"]))
+
+    if "duration" not in match_data:
+        match_data["duration"] = 70
+
     match = Match(date_time=match_data["date_time"],
-                  team=get_or_create(db.session, Team,
-                                     name=match_data["team"]),
+                  duration=match_data["duration"],
+                  team=get_or_create(db.session, Team, name=match_data["team"]),
                   opponent=get_or_create(db.session, Opponent,
                                          name=match_data["opponent"]),
                   competition=competition)
 
+    if "match_stats" in match_data:
+        print("Load Additional Stats")
+        add_stats_data = match_data["match_stats"]
+        add_stats_data['match'] = match
+        add_stats = MatchStats(**add_stats_data)
+        db.session.add(add_stats)
+
+
     db.session.add(match)
+
 
     # collect all playermatch shot data into a list and defer until all
     #  playermatch have been created to deal with assist (between 2 playermatch)
@@ -101,6 +117,7 @@ def load_match(match_data):
         db.session.add(shot)
 
     db.session.commit()
+    print("match_stats")
 
 
 def pprint():
@@ -117,8 +134,17 @@ def pprint():
         print(pm)
 
 
-d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                "data.json"), "r"))
-for i in d:
-    load_match(i)
+if True:
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
+    d = json.load(open(f, "r"))
+    for i in d:
+        load_match(i)
+else:
+    import glob
+    for f in glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "bu_all_stats\\*.json")):
+        print("Loading {}".format(f))
+        d = json.load(open(f, "r"))
+        for i in d:
+            load_match(i)
 print("FIN")

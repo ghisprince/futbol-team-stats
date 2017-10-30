@@ -1,7 +1,6 @@
 <template id="player-match-table">
     <div>
-        <h2 id="section">Player data</h2>
-
+        <h2 id="section">Player Stats</h2>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -23,7 +22,7 @@
                     <td v-for="footSum in footSums"> {{ footSum }}</td>
                     <td v-if="showActions">
                         <router-link class="btn btn-success btn-xs"
-                                     v-bind:to="{name: 'playermatch-add', params: {match_id: -55}}">
+                                     v-bind:to="{name: 'playermatch-add', params: {match_id: $route.params.match_id }}">
                             <span class="glyphicon glyphicon-plus"></span> Add
                         </router-link>
 
@@ -45,16 +44,17 @@
                         {{ pm.minutes }}
                     </td>
                     <td>
-                        {{ pm.num_goals }}
+                        {{ pm.num_goals ? pm.num_goals : '' }}
                     </td>
                     <td>
-                        {{ pm.assists.length }}
+                        {{ pm.assists.length ? pm.assists.length : '' }}
                     </td>
                     <td>
-                        {{ pm.shots.length }}
+                        {{ pm.shots.filter(function(i){return i.by_opponent == false;}).length  ? pm.shots.filter(function(i){return i.by_opponent == false;}).length : '' }}
+
                     </td>
                     <td>
-                        {{ pm.corners }}
+                        {{ pm.corners ? pm.corners : '' }}
                     </td>
                     <td>
                         {{ pm.yellow_cards ? pm.yellow_cards : '' }}
@@ -89,9 +89,18 @@
 import axios from 'axios'
 import _ from 'lodash'
 
+function num_shots_not_by_opponent(pm){
+    var iii;
+    var count = 0;
+    for (iii=0; iii < pm.shots.length; iii++){
+        if (pm.shots[iii].by_opponent == false) count ++;
+    }
+    return count;
+}
+
 export default {
     props: {showActions: {default: false}
-            },
+    },
     data () {
         return {player_matches: []}
     },
@@ -110,7 +119,7 @@ export default {
                     _.sum(_.map(this.player_matches, 'minutes')),
                     _.sum(_.map(this.player_matches, 'num_goals')),
                     _.sum(_.map(this.player_matches, 'assists.length')),
-                    _.sum(_.map(this.player_matches, 'shots.length')),
+                    _.sum(_.map(this.player_matches, num_shots_not_by_opponent)),
                     _.sum(_.map(this.player_matches, 'corners')),
                     _.sum(_.map(this.player_matches, 'yellow_cards')),
                     _.sum(_.map(this.player_matches, 'red_cards')),

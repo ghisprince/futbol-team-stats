@@ -41,7 +41,7 @@
                         {{ pm.match.result }}
                     </td>
                     <td>
-                        {{ pm.starter }}
+                        {{ pm.starter ? 'Y' : '' }}
                     </td>
                     <td>
                         {{ pm.minutes }}
@@ -62,7 +62,7 @@
                         {{ pm.red_cards }}
                     </td>
                     <td>
-                        {{ pm.subbed_due_to_injury }}
+                        {{ pm.subbed_due_to_injury ? 'Y' : '' }}
                     </td>
                 </tr>
             </tbody>

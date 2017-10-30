@@ -1,11 +1,22 @@
 <template id="opponent-edit">
-    <div>
-        <div class="form-group">
-            <label for="edit-name">Name</label>
-            <input class="form-control" id="edit-name" v-model="opponent.name" required/>
+    <div class="container-fluid">
 
-            <label for="edit-url">URL</label>
-            <input type="url"  class="form-control" id="edit-url" v-model="opponent.external_url"/>
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-name" class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-4">
+
+                <input class="form-control" id="edit-name" v-model="opponent.name" required/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-url" class="col-sm-3 col-form-label">URL</label>
+            <div class="col-sm-4">
+
+                <input type="url"  class="form-control" id="edit-url" v-model="opponent.external_url"/>
+            </div>
         </div>
     </div>
 </template>

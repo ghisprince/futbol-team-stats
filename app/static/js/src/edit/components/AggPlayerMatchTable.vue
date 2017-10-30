@@ -37,22 +37,22 @@
                         {{ pms.minutes }}
                     </td>
                     <td>
-                        {{ pms.num_goals }}
+                        {{ pms.num_goals ? pms.num_goals : '' }}
                     </td>
                     <td>
-                        {{ pms.assists }}
+                        {{ pms.assists ? pms.assists : '' }}
                     </td>
                     <td>
-                        {{ pms.shots }}
+                        {{ pms.shots ? pms.shots : '' }}
                     </td>
                     <td>
-                        {{ pms.yellow_cards }}
+                        {{ pms.yellow_cards ? pms.yellow_cards : '' }}
                     </td>
                     <td>
-                        {{ pms.red_cards }}
+                        {{ pms.red_cards ? pms.red_cards : '' }}
                     </td>
                     <td>
-                        {{ pms.subbed_due_to_injury ? 'Y' : '' }}
+                        {{ pms.subbed_due_to_injury ? pms.subbed_due_to_injury : '' }}
                     </td>
                 </tr>
             </tbody>
@@ -107,6 +107,8 @@ export default {
                             num_goals: sum(_.map(value, "num_goals")),
                             assists: sum(_.map(value, "assists.length")),
                             shots: sum(_.map(value, "shots.length")),
+                            yellow_cards: sum(_.map(value, "yellow_cards")),
+                            red_cards: sum(_.map(value, "red_cards")),
                             subbed_due_to_injury: countTrue(_.map(value, "subbed_due_to_injury"))
                         }
             })

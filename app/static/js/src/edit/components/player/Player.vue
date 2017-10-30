@@ -1,14 +1,29 @@
 <template id="player-props">
-    <div>
-        <div class="form-group">
-            <label for="edit-name">Name</label>
-            <input class="form-control" id="edit-name" v-model="player.name" required/>
+    <div class="container-fluid">
 
-            <label for="edit-number">Number</span></label>
-            <input type="number" class="form-control" id="edit-number" v-model="player.number"/>
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-name" class="col-sm-3 col-form-label">Name :</label>
+            <div class="col-sm-4">
+                <input class="form-control" id="edit-name" v-model="player.name" required/>
+            </div>
+        </div>
 
-            <label for="edit-number">Active</span></label>
-            <input type="checkbox" class="form-control" id="edit-active" v-model="player.active"/>
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-number" class="col-sm-3 col-form-label">Number :</label>
+
+            <div class="col-sm-4">
+                <input type="number" class="form-control" id="edit-number" v-model="player.number"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-active" class="col-sm-3 col-form-label">Active :</label>
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-control" id="edit-active" v-model="player.active"/>
+            </div>
 
         </div>
     </div>

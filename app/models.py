@@ -96,7 +96,7 @@ class Opponent(db.Model, CRUD_MixIn):
     name = db.Column(db.String(), nullable=False)
     coach_name = db.Column(db.String())
     team_crest_uri = db.Column(db.String())
-    external_urls = db.Column(db.String())
+    external_url = db.Column(db.String())
 
     # relationships
     matches = db.relationship("Match", back_populates="opponent")
@@ -171,33 +171,13 @@ class Competition(db.Model, CRUD_MixIn):
     def __repr__(self):
         return "Competition (name={})".format(self.name)
 
-"""
-class Season(db.Model, CRUD_MixIn):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-
-    # relationships
-    matches = db.relationship("Match", back_populates="season")
-
-    @hybrid_property
-    def match_results(self):
-        win = len([i for i in self.matches if (i.result == "win")])
-        loss = len([i for i in self.matches if (i.result == "loss")])
-        tie = len([i for i in self.matches if (i.result == "tie")])
-        return "{}-{}-{}".format(win, loss, tie)
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return "Season (name={})".format(self.name)
-"""
 
 class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     date_time = db.Column(db.DateTime(), nullable=False)
     at_home = db.Column(db.Boolean())
-    duration = db.Column(db.Integer())  # game duration in minutes
+    duration = db.Column(db.Integer())  # match duration in minutes
+    note = db.Column(db.String())
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -212,9 +192,10 @@ class Match(db.Model, CRUD_MixIn):
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
     competition = db.relationship("Competition", back_populates="matches")
 
-    # could have season but with competition this seems clutter
-    # season_id = db.Column(db.Integer, db.ForeignKey('season.id'))
-    # season = db.relationship("Season", back_populates="matches")
+    match_stats = db.relationship("MatchStats",
+                                  uselist=False,
+                                  back_populates="match",
+                                  cascade="all, delete-orphan")
 
     @hybrid_property
     def result(self):
@@ -232,10 +213,13 @@ class Match(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def result_long(self):
-
         return "{}-{} {}".format(self.num_goals,
                                  self.num_goals_against,
                                  self.result)
+
+    @hybrid_property
+    def label(self):
+        return "match 2 of tourney X (2017/11/5), - or something like that"
 
     @hybrid_property
     def num_goals(self):
@@ -246,40 +230,165 @@ class Match(db.Model, CRUD_MixIn):
         return sum([i.num_goals_against for i in self.player_matches])
 
     @hybrid_property
+    def goals_timeline(self):
+        return ["1' Ghis (Joe)", "33' Ghis (Jim)"]
+
+    @hybrid_property
     def num_shots(self):
         return sum([i.num_shots for i in self.player_matches])
+
+    @hybrid_property
+    def num_shots_on_target(self):
+        return sum([i.num_shots_on_target for i in self.player_matches])
 
     @hybrid_property
     def num_shots_against(self):
         return sum([i.num_shots_against for i in self.player_matches])
 
-    def __init__(self, date_time, team, opponent, competition=None, at_home=True):
-        self.date_time = datetime.datetime.strptime(date_time,
-                                                    "%Y-%m-%dT%H:%M:%S")
+    @hybrid_property
+    def opponent_num_shots_on_target(self):
+        return sum([i.num_shots_against_on_target for i in self.player_matches])
+
+    @hybrid_property
+    def shot_on_target_pct(self):
+        try:
+            return round(self.num_shots_on_target / self.num_shots * 100, 1)
+        except ZeroDivisionError:
+            return 0.0
+
+    @hybrid_property
+    def opponent_shot_on_target_pct(self):
+        try:
+            return round(self.opponent_num_shots_on_target /
+                         self.num_shots_against * 100, 1)
+        except ZeroDivisionError:
+            return 0.0
+
+    @hybrid_property
+    def num_corners(self):
+        return sum([i.corners for i in self.player_matches])
+
+    @hybrid_property
+    def num_opponent_corners(self):
+        try:
+            return self.match_stats.opponent_corners
+        except:
+            return
+
+    @hybrid_property
+    def num_yellow_cards(self):
+        return sum([i.yellow_cards for i in self.player_matches])
+
+    @hybrid_property
+    def num_opponent_yellow_cards(self):
+        try:
+            return self.match_stats.opponent_yellow_cards
+        except:
+            return
+
+    @hybrid_property
+    def num_red_cards(self):
+        return sum([i.red_cards for i in self.player_matches])
+
+    @hybrid_property
+    def num_opponent_red_cards(self):
+        try:
+            return self.match_stats.opponent_red_cards
+        except:
+            return
+
+    @hybrid_property
+    def num_passes(self):
+        try:
+            return self.match_stats.passes
+        except:
+            return
+
+    @hybrid_property
+    def num_opponent_passes(self):
+        try:
+            return self.match_stats.opponent_passes
+        except:
+            return
+
+    @hybrid_property
+    def num_pass_strings(self):
+        try:
+            return self.match_stats.pass_strings
+        except:
+            return
+
+    @hybrid_property
+    def num_opponent_pass_strings(self):
+        try:
+            return self.match_stats.opponent_pass_strings
+        except:
+            return
+
+    @hybrid_property
+    def pass_pct(self):
+        try:
+            return self.match_stats.pass_pct
+        except:
+            return
+
+    @hybrid_property
+    def opponent_pass_pct(self):
+        try:
+            return self.match_stats.opponent_pass_pct
+        except:
+            return
+
+    def __init__(self, date_time, team, opponent, competition=None,
+                 at_home=True, duration=None):
+        self.date_time = datetime.datetime.strptime(date_time.split(".")[0],
+                                                    "%Y-%m-%dT%H:%M:%S",)
         self.team = team
         self.opponent = opponent
         self.competition = competition
         self.at_home = at_home
+        self.duration = duration
 
     def __repr__(self):
         return "Match (team={}, opponent={}, date_time={})".format(
                                 self.team, self.opponent, self.date_time)
 
-"""
-class MatchTeamStats(db.Model, CRUD_MixIn):
+
+class MatchStats(db.Model, CRUD_MixIn):
+    id = db.Column(db.Integer(), primary_key=True)
 
     passes = db.Column(db.Integer())
     pass_strings = db.Column(db.Integer())
-    pass_completion = db.Column(db.Integer())
+    pass_pct = db.Column(db.Integer())
+    possession = db.Column(db.Integer())
 
     opponent_passes = db.Column(db.Integer())
     opponent_pass_strings = db.Column(db.Integer())
-    opponent_pass_completion = db.Column(db.Integer())
+    opponent_pass_pct = db.Column(db.Integer())
 
     opponent_yellow_cards = db.Column(db.Integer())
     opponent_red_cards = db.Column(db.Integer())
     opponent_corners = db.Column(db.Integer())
-"""
+
+    # relationships
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    match = db.relationship("Match", back_populates="match_stats")
+
+    def __init__(self, match, passes=None, pass_strings=None, pass_pct=None,
+                 opponent_passes=None, opponent_pass_strings=None,
+                 opponent_pass_pct=None, opponent_yellow_cards=None,
+                 opponent_red_cards=None, opponent_corners=None):
+        self.match = match
+        self.passes = passes
+        self.pass_strings = pass_strings
+        self.pass_pct = pass_pct
+        self.opponent_passes = opponent_passes
+        self.opponent_pass_strings = opponent_pass_strings
+        self.opponent_pass_pct = opponent_pass_pct
+        self.opponent_yellow_cards = opponent_yellow_cards
+        self.opponent_red_cards = opponent_red_cards
+        self.opponent_corners = opponent_corners
+
 
 class Player(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
@@ -293,10 +402,11 @@ class Player(db.Model, CRUD_MixIn):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     team = db.relationship("Team", back_populates="players")
 
-    def __init__(self, name, number=None, team=None):
+    def __init__(self, name, number=None, team=None, active=True):
         self.name = name
         self.number = number
         self.team = team
+        self.active = active
 
     def __repr__(self):
         return "Player (number={}, name={})".format(self.number, self.name)
@@ -314,7 +424,8 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     corners = db.Column(db.Integer(), default=0)
 
     # relationships
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'),
+                          nullable=False)
     player = db.relationship("Player", back_populates="player_matches")
 
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
@@ -333,6 +444,14 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     @hybrid_property
     def num_shots_against(self):
         return len([i for i in self.shots if i.by_opponent])
+
+    @hybrid_property
+    def num_shots_on_target(self):
+        return len([i for i in self.shots if (not i.by_opponent and i.on_goal)])
+
+    @hybrid_property
+    def num_shots_against_on_target(self):
+        return len([i for i in self.shots if (i.by_opponent and i.on_goal)])
 
     @hybrid_property
     def num_goals(self):

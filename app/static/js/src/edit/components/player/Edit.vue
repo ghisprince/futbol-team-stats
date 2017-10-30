@@ -42,7 +42,8 @@ export default {
             )
             .then(response => {
                 console.log("UPDATE match successfull!")
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/player-list'})
             })
             .catch(e => {
                 alert("UPDATE match failed")

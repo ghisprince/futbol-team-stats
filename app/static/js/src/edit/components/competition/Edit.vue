@@ -44,7 +44,8 @@ export default {
             )
             .then(response => {
                 console.log("UPDATE competition successfull!!")
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/competition-list'})
             })
             .catch(e => {
                 alert("UPDATE competition failed")

@@ -31,7 +31,8 @@ export default {
             axios.post(`/api/v1/opponents/`, this.opponent)
             .then(response => {
                 this.opponent = response.data
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/opponent-list'})
             })
             .catch(e => {
                 console.log(e)

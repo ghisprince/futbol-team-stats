@@ -32,7 +32,8 @@ export default {
             axios.post(`/api/v1/competitions/`, this.competition)
             .then(response => {
                 this.competition = response.data
-                this.$router.go(-1)
+                //this.$router.go(-1)
+                this.$router.push({path: '/competition-list'})
             })
             .catch(e => {
                 console.log(e)
