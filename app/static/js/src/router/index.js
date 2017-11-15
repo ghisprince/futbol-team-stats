@@ -25,8 +25,8 @@ import Match from '../components/match/Details.vue'
 import MatchList from '../components/match/List.vue'
 import MatchAdd from '../components/match/Add.vue'
 import MatchEdit from '../components/match/Edit.vue'
-import PlayerMatchEdit from '../components/match/PlayerMatchEdit.vue'
-import PlayerMatchAdd from '../components/match/PlayerMatchAdd.vue'
+import PlayerMatchEdit from '../components/player_match/Edit.vue'
+import PlayerMatchAdd from '../components/player_match/Add.vue'
 
 export default new VueRouter({routes:[
   { path: '/', component: EditChoices},

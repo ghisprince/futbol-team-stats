@@ -3,7 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
   entry: {
-    edit: "./src/edit/main.js",
+    main: "./src/main.js",
     stats: "./src/stats/main.js"
   },
   output: {

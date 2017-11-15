@@ -19,8 +19,8 @@
 <script>
 import axios from 'axios'
 import Match from './Match.vue'
-import PlayerMatchTable from './PlayerMatchTable.vue'
-import ShotGraph from './ShotGraph.vue'
+import PlayerMatchTable from '../player_match/PlayerMatchTable.vue'
+import ShotGraph from '../player_match/ShotGraph.vue'
 
 
 export default {

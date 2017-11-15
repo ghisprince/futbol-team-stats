@@ -21,7 +21,7 @@
 import axios from 'axios'
 import _ from 'lodash'
 import MatchTable from '../MatchTable.vue'
-import AggPlayerMatchTable from '../AggPlayerMatchTable.vue'
+import AggPlayerMatchTable from '../player_match/AggPlayerMatchTable.vue'
 
 export default {
     data () {

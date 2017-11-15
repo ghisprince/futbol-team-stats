@@ -100,8 +100,8 @@
 import axios from 'axios'
 import _ from 'lodash'
 import moment from 'moment'
-import PlayerMatchTable from './PlayerMatchTable.vue'
-import ShotGraph from './ShotGraph.vue'
+import PlayerMatchTable from '../player_match/PlayerMatchTable.vue'
+import ShotGraph from '../player_match/ShotGraph.vue'
 
 
 //  https://jsfiddle.net/n5osgpkg/

@@ -59,7 +59,7 @@
         <div class="form-group row">
             <div class="col-sm-2"/>
             <label for="edit-yellow_cards" class="col-sm-3 col-form-label">
-                Yellow Cards :
+                Yellow Card :
             </label>
             <div class="col-sm-4">
                 <input class="form-control"
@@ -72,7 +72,7 @@
         <div class="form-group row">
             <div class="col-sm-2"/>
             <label for="edit-red_cards" class="col-sm-3 col-form-label">
-                Red Cards :
+                Red Card :
             </label>
             <div class="col-sm-4">
                 <input class="form-control"
