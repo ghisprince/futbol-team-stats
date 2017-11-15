@@ -14,9 +14,9 @@ Flask-restful==0.3
 itsdangerous==0.24
 cssmin==0.2.0
 jsmin==2.2.1
-marshmallow==2.13
-marshmallow-jsonapi==0.14
-webargs==1.6
+marshmallow==2.14
+marshmallow-jsonapi==0.16
+webargs==1.8.1
 
 # Testing
 pytest==3.0.5
