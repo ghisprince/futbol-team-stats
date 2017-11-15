@@ -174,22 +174,24 @@ class Competition(db.Model, CRUD_MixIn):
 
 class Match(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    date_time = db.Column(db.DateTime(), nullable=False)
+    date_time = db.Column(db.DateTime(), nullable=False, index=True)
     at_home = db.Column(db.Boolean())
     duration = db.Column(db.Integer())  # match duration in minutes
-    note = db.Column(db.String())
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
                                      cascade="all, delete-orphan")
 
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'),
+                        nullable=False, index=True)
     team = db.relationship("Team", back_populates="matches")
 
-    opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'))
+    opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'),
+                            nullable=False, index=True)
     opponent = db.relationship("Opponent", back_populates="matches")
 
-    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'),
+                               index=True)
     competition = db.relationship("Competition", back_populates="matches")
 
     match_stats = db.relationship("MatchStats",
@@ -371,7 +373,8 @@ class MatchStats(db.Model, CRUD_MixIn):
     opponent_corners = db.Column(db.Integer())
 
     # relationships
-    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'),
+                         nullable=False, index=True)
     match = db.relationship("Match", back_populates="match_stats")
 
     def __init__(self, match, passes=None, pass_strings=None, pass_pct=None,
@@ -425,10 +428,11 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     # relationships
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'),
-                          nullable=False)
+                          nullable=False, index=True)
     player = db.relationship("Player", back_populates="player_matches")
 
-    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'),
+                         nullable=False, index=True)
     match = db.relationship("Match", back_populates="player_matches")
 
     shots = db.relationship("Shot", back_populates="player_match",
@@ -497,9 +501,9 @@ class Shot(db.Model, CRUD_MixIn):
 
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
-                                nullable=False)
-
+                                nullable=False, index=True)
     player_match = db.relationship("PlayerMatch", back_populates="shots")
+
     goal = db.relationship("Goal", uselist=False, back_populates="shot",
                            cascade="all, delete-orphan")
 
@@ -525,7 +529,8 @@ class Goal(db.Model, CRUD_MixIn):
     time = db.Column(db.Integer(), nullable=True)
 
     # relationships
-    shot_id = db.Column(db.Integer, db.ForeignKey('shot.id'), nullable=False)
+    shot_id = db.Column(db.Integer, db.ForeignKey('shot.id'),
+                        nullable=False, index=True)
     shot = db.relationship("Shot", back_populates="goal")
 
     assist = db.relationship("Assist", back_populates="goal", uselist=False,
@@ -544,10 +549,11 @@ class Assist(db.Model, CRUD_MixIn):
 
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
-                                nullable=False)
+                                nullable=False, index=True)
     player_match = db.relationship("PlayerMatch", back_populates="assists")
 
-    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=False)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'),
+                        nullable=False, index=True)
     goal = db.relationship("Goal", back_populates="assist")
 
     def __init__(self, player_match, goal):
