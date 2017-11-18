@@ -96,6 +96,7 @@ export default {
             for (var i=0; i<this.opponents.length; i++) {
                 if (this.opponents[i].id == e.target.value) {
                  this.match.opponent = this.opponents[i];
+                 console.log(e.target.value);
                  console.log(this.opponents[i].name);
                 }
             }

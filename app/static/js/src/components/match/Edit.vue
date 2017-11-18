@@ -4,14 +4,18 @@
         <form v-on:submit="updateMatch">
 
             <match :match.sync="match"></match>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
 
             <player-match-table :showActions=true></player-match-table>
             <shot-graph :enableEditing=true></shot-graph>
 
             <br/>
-            <button type="submit" class="btn btn-primary">Save</button>
-            <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
         </form>
+        <br/>
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <router-link v-bind:to="'/match-list'">Back to match list</router-link>
+
     </div>
 </template>
 

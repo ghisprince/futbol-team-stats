@@ -18,15 +18,20 @@
                         <form class="form-horizontal">
 
                             <div class="form-group">
-                                <label for="shotPlayer"
-                                       class="col-sm-4 control-label">Player :
+                                <label for="shotPlayer" class="col-sm-4 control-label">
+                                       Player :
                                 </label>
-                                <div class="col-sm-8">
-                                    <input type="text"
-                                           class="form-control"
-                                           id="shotPlayer"
-                                           v-model="selectedShot.player_match.player.name"
-                                           :disabled="enableEditing == 0">
+                                <div class="col-sm-4">
+                                    <select class="form-control" v-on:change="updateShotPlayerMatch">
+                                        <option
+                                            v-for="player_match in player_matches"
+                                            v-bind:value="player_match.id"
+                                            :selected="player_match.player.name == selectedShot.player_match.player.name"
+                                            :disabled="enableEditing == 0"
+                                            >
+                                            {{ player_match.player.name }}
+                                        </option>
+                                     </select>
                                 </div>
                             </div>
 
@@ -35,21 +40,11 @@
                                        class="col-sm-4 control-label">On Goal :
                                 </label>
                                 <div class="col-sm-2">
-                                    <input type="checkbox"
+                                    <input v-on:change="updateShotOnTarget"
+                                           type="checkbox"
                                            class="form-control"
                                            id="shotOnGoal"
                                            v-model="selectedShot.on_goal"
-                                           :disabled="enableEditing == 0">
-                                </div>
-                                <label for="shotScored"
-                                       class="col-sm-3 control-label">Scored :
-                                </label>
-                                <div class="col-sm-3">
-                                    <input type="checkbox"
-                                           class="form-control"
-                                           id="shotScored"
-                                           v-on:click="toggleShotScored"
-                                           v-model="selectedShot.scored"
                                            :disabled="enableEditing == 0">
                                 </div>
                             </div>
@@ -76,38 +71,74 @@
                                     <label for="goalTime"
                                            class="col-sm-4 control-label">Time :
                                     </label>
-                                    <div class="col-sm-8">
-                                        <input type="number disabled"
+                                    <div class="col-sm-4">
+                                        <input v-on:change="updateGoalTime"
+                                               type="number disabled"
                                                class="form-control"
                                                id="goalTime"
                                                v-model="selectedShot.goal.time"
                                                :disabled="enableEditing == 0">
                                     </div>
+                                    <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteGoal">
+                                        <span class="glyphicon glyphicon-remove"></span> Goal
+                                    </a>
                                 </div>
 
-                                <div class="form-group" v-if="selectedShot.goal.assist">
-                                    <label for="shotScored"
-                                           class="col-sm-4 control-label">Assist :
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <input type="text"
-                                               class="form-control"
-                                               id="shotScored"
-                                               v-model="selectedShot.goal.assist.player_match.player.name"
-                                               :disabled="enableEditing == 0">
+
+                                <div class="form-group">
+                                        <label for="assist"
+                                               class="col-sm-4 control-label">Assist :
+                                        </label>
+
+                                    <div v-if="selectedShot.goal.assist">
+                                        <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteAssist">
+                                            <span class="glyphicon glyphicon-remove"></span> Assist
+                                        </a>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" v-on:change="updateAssist">
+                                                <option
+                                                    v-for="player_match in player_matches"
+                                                    v-bind:value="player_match.id"
+                                                    :selected="player_match.player.name == selectedShot.goal.assist.player_match.player.name"
+                                                    :disabled="enableEditing == 0"
+                                                    >
+                                                    {{ player_match.player.name }}
+                                                </option>
+                                             </select>
+                                        </div>
+
+
+                                    </div>
+                                    <div v-if="enableEditing && !selectedShot.goal.assist">
+                                        <div class="col-sm-4"> - </div>
+                                        <div>
+                                            <a class="btn btn-success" v-on:click="addAssist">
+                                                <span class="glyphicon glyphicon-plus"></span> Assist
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
 
+
+                            </div>
+                            <div v-else-if="enableEditing">
+                                <a class="btn btn-success" v-on:click="addGoal">
+                                    <span class="glyphicon glyphicon-plus"></span> Goal
+                                </a>
+                            </div>
+
+                        </form>
+                        <hr>
                         <div v-if="enableEditing">
-                            <a class="btn btn-default" v-on:click="saveShotEdits">Save</a>
-                            <a class="btn btn-default" v-on:click="deleteShot">Delete</a>
+                            <a class="btn btn-danger" v-on:click="deleteShot">Delete Shot</a>
                         </div>
                     </div>
-                    <div v-else>
-                            Click on existing shot to modify it<br/> or <br/>
-                            <a class="btn btn-default" v-on:click="newShot">Add a Shot</a><br/>
+                    <div v-else-if="enableEditing">
+                            Click on shot to modify <br/> or <br/>
+                            <a class="btn btn-primary" v-on:click="addShot">Add a Shot</a><br/>
+                    </div>
+                    <div v-else="enableEditing">
+                            Click on shot for details.
                     </div>
 
                 </div>
@@ -129,45 +160,44 @@ export default {
     data () {
         return {
             shots: [],
+            player_matches: [],
             circles: [],
             canvas: null,
             selectedShot: "",
-            selectedShotIsModified: false}
+            selectedShotIsModified: false
+            }
     },
     ready (){
-        console.log("READY");
     },
     created() {
-        var parent = this;
+        //var parent = this; // delete this
         axios.get(`/api/v1/shots/?match_id=` + this.$route.params.match_id + `&by_opponent=false&expand=true`)
         .then(response => {
             this.shots = response.data;
-
             this.drawShotsOnCanvas()
         })
+        axios.get(`/api/v1/playermatches/?match_id=` + this.$route.params.match_id + `&expand=true`)
+        .then(response => {
+            this.player_matches = response.data;
+        })
+
     },
     mounted() {
-        console.log("MOUNTED");
         var parent = this;
         var canvas = new fabric.Canvas('canvas');
 
         canvas.selection = false; // disable group selection
         canvas.on('mouse:down', function(options) {
             if (options.target) {
-                console.log('Shot clicked ');
-                console.log(' - id     : ' + options.target.shot.id);
-                console.log(' - player : ' + options.target.shot.player_match.player.name);
-                console.log(' - scored : ' + options.target.shot.scored);
+                //console.log(' - id     : ' + options.target.shot.id);
                 parent.selectedShot = options.target.shot.id;
                 parent.selectedShot = JSON.parse(JSON.stringify(options.target.shot));
 
             }
             else {
-                console.log('blanky');
                 parent.selectedShot = "";
             }
         });
-        //canvas.renderAll()
         this.canvas = canvas
 
     },
@@ -179,16 +209,11 @@ export default {
     },
     methods: {
         drawShotsOnCanvas: function(event){
-            console.log("inside drawShotsOnCanvas!")
             var parent = this;
             var canvas = this.canvas; // keeps adding to same canvas
 
-            //canvas = new fabric.Canvas('canvas');
             canvas.clear()
-            console.log("inside drawShotsOnCanvas 2!")
-            console.log(this.shots.length)
-            var iii = 0;
-            for (iii = 0; iii < this.shots.length; iii++) {
+            for (var iii = 0; iii < this.shots.length; iii++) {
                 var shot = this.shots[iii];
                 var color = 'black';
                 if (shot.scored) {
@@ -241,8 +266,14 @@ export default {
                     parent.selectedShot.x = this.left;
                     parent.selectedShot.y = this.top;
                     parent.selectedShotIsModified = true;
+                    axios.patch(parent.selectedShot._links.self,
+                                {x: this.left,
+                                 y: this.top }
+                    )
+                    .then(response => {
+                        parent.refreshShot(response.data._links.self);
+                    })
                 })
-
                 canvas.add(group)
             }
             canvas.setBackgroundImage("static/assets/soccer-pitch.png",
@@ -251,92 +282,121 @@ export default {
                                        backgroundImageStretch: false
                                       }
             );
-            //canvas.renderAll()
         },
-        toggleShotScored: function(e){
-
-
-            if ((e.target.checked == true) &
-               (_.has(this.selectedShot.goal, 'id') == false)) {
-                console.log("OK1")
-                axios.post(`/api/v1/goals/`, {shot: this.selectedShot})
-                .then(response => {
-                    this.data = response.data;
-                    console.log("ADDED GOAL")
-                })
-                .catch(e => {
-                    console.log(e)
-                })
-                console.log("OK2")
-            } else {
-                console.log("REMOVE GOAL")
-            };
-            console.log("OK3")
-
-
+        refreshShot: function (uri){
+            axios.get(uri + `?expand=true`)
+            .then(response => {
+                var shot = response.data;
+                this.selectedShot = response.data;
+                var index = _.findIndex(this.shots, {id: shot.id});
+                this.shots.splice(index, 1, shot);
+                this.drawShotsOnCanvas();
+            })
         },
-        refreshCanvas: function (event) {
-            console.log("REFRESH CANVAS")
-        },
-        saveShotEdits: function (event) {
-            console.log(this.selectedShot);
-
-            // capture player_match since patch returns non-expanded
-            var pm = this.selectedShot.player_match;
-            axios.patch(this.selectedShot._links.self,
-                        {x: this.selectedShot.x,
-                         y: this.selectedShot.y,
-                         on_goal: this.selectedShot.on_goal,
-                         scored: this.selectedShot.scored,
-                         pk: this.selectedShot.pk,
-                         by_opponent: this.selectedShot.by_opponent
-                        }
+        addShot: function (event) {
+            axios.post(`/api/v1/shots/`,
+                    {by_opponent: false,
+                     player_match:{id: this.player_matches[0].id}
+                    }
             )
             .then(response => {
-                console.log("UPDATE shot successful!")
-                var shot = response.data;
-                shot['player_match'] = pm;
-                var index = _.findIndex(this.shots, {id: shot.id})
-                this.shots.splice(index, 1, shot)
+                var data = response.data;
+                data['player_match'] = this.player_matches[0];
+                this.shots.push(data);
                 this.drawShotsOnCanvas()
             })
-            .catch(e => {
-                alert("UPDATE shot failed")
-                console.log(e)
-            })
-
         },
         deleteShot: function (event) {
-
             // capture the seleected shot info
             var selectedShotUri = this.selectedShot._links.self
             var selectedShotId = this.selectedShot.id
 
-            // clear it so control goes back to default mode
+            // clear selectedShot so control goes to default mode
             this.selectedShot = ""
 
             // delete the shot
             axios.delete(selectedShotUri)
-            .then(response => {
-                console.log("DELETE shot successful!")
-                //this.$router.go(-1)
-            })
-            .catch(e => {
-                alert("DELETE shot failed")
-                console.log(e)
-            })
             _.remove(this.shots, {id: selectedShotId})
             this.drawShotsOnCanvas()
         },
-        newShot: function (event) {
-            alert("newShot");
-            this.drawShotsOnCanvas()
+        updateShotOnTarget: function(e){
+            axios.patch(this.selectedShot._links.self,
+                    {on_goal:e.target.checked}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
         },
-        highlightShot: function (event) {
-            //http://fabricjs.com/docs/fabric.Circle.html
-            //circle.bringToFront
-            //circle.transform(
+        updateShotPlayerMatch: function(e) {
+            axios.patch(this.selectedShot._links.self,
+                        {player_match: {id: e.target.value}}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+        },
+        addGoal: function(event){
+            if (!this.selectedShot.on_goal) {
+                axios.patch(this.selectedShot._links.self,
+                        {on_goal:true}
+                )
+            }
+            axios.post(`/api/v1/goals/`,
+                    {shot:{id: this.selectedShot.id}}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+        },
+        deleteGoal: function(event){
+            axios.delete(this.selectedShot.goal._links.self,
+            )
+            axios.patch(this.selectedShot._links.self,
+                    {goal: null}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+        },
+        updateGoalTime: function(e) {
+            if (e.type == "change") {
+                axios.patch(this.selectedShot.goal._links.self,
+                            {time: parseInt(e.target.value)}
+                )
+                .then(response => {
+                    this.refreshShot(this.selectedShot._links.self);
+                })
+            }
+        },
+        addAssist: function(event){
+            axios.post(`/api/v1/assists/`,
+                    {goal: {id: this.selectedShot.goal.id},
+                     player_match:{id: this.player_matches[0].id}
+                     }
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
 
+        },
+        deleteAssist: function(event){
+            axios.delete(this.selectedShot.goal.assist._links.self,
+            )
+            axios.patch(this.selectedShot._links.self,
+                    {assist: null}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+
+        },
+        updateAssist: function(e) {
+            axios.patch(this.selectedShot.goal.assist._links.self,
+                        {player_match:{id: e.target.value}}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
         }
     }
 }
