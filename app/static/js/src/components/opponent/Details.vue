@@ -36,8 +36,7 @@ export default {
             this.opponent = response.data
         })
     },
-    computed: {
-    }
+    computed: {}
 }
 
 </script>

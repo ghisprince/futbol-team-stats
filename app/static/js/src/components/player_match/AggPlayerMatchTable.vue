@@ -71,6 +71,17 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 
+function countShotsfor(pm) {
+    var count = 0;
+
+    for (var i=0; i < pm.shots.length; i++) {
+        if (pm.shots[i].by_opponent == false) {
+            count ++;
+        }
+    }
+    return count
+}
+
 function sum(numbers) {
     return _.reduce(numbers, function(result, current) {
         return result + parseFloat(current);
@@ -106,7 +117,9 @@ export default {
                             minutes: sum(_.map(value, "minutes")),
                             num_goals: sum(_.map(value, "num_goals")),
                             assists: sum(_.map(value, "assists.length")),
-                            shots: sum(_.map(value, "shots.length")),
+                            //shots: sum(_.map(value, "shots.length")),
+                            //shots: _.filter(value, {'shots.by_opponent': true} ).length,
+                            shots: sum(_.map(value, countShotsfor)),
                             yellow_cards: sum(_.map(value, "yellow_cards")),
                             red_cards: sum(_.map(value, "red_cards")),
                             subbed_due_to_injury: countTrue(_.map(value, "subbed_due_to_injury"))
@@ -116,6 +129,7 @@ export default {
 
         },
         footSums: function () {
+
             var tds = [
                     "Count: " + _(this.aggregatedPlayerMatches).size(),
                     "-",
@@ -123,7 +137,7 @@ export default {
                     _.sum(_.map(this.player_matches, 'minutes')),
                     _.sum(_.map(this.player_matches, 'num_goals')),
                     _.sum(_.map(this.player_matches, 'assists.length')),
-                    _.sum(_.map(this.player_matches, 'shots.length')),
+                    _.sum(_.map(this.player_matches, countShotsfor)),
                     _.sum(_.map(this.player_matches, 'yellow_cards')),
                     _.sum(_.map(this.player_matches, 'red_cards')),
                     _.sum(_.map(this.player_matches, 'subbed_due_to_injury')),
@@ -131,9 +145,6 @@ export default {
 
             return tds;
         }
-    },
-    methods: {
-
     }
 }
 

@@ -111,16 +111,11 @@ export default {
     created() {
         axios.get(`/api/v1/players/`)
         .then(response => {
-            this.players = response.data;
+            this.players = _.orderBy(response.data, "name");
             if (_.has(this.playermatch.player, 'id') == false) {
                 this.playermatch.player = response.data[0];
             }
-            console.log(this.playermatch.player.name)
         })
-        .catch(e => {
-            console.log(e)
-        })
-
     },
     methods: {
         playerChanged: function(e) {

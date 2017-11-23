@@ -30,12 +30,8 @@ export default {
         createOpponent: function() {
             axios.post(`/api/v1/opponents/`, this.opponent)
             .then(response => {
-                this.opponent = response.data
-                //this.$router.go(-1)
+                this.opponent = response.data;
                 this.$router.push({path: '/opponent-list'})
-            })
-            .catch(e => {
-                console.log(e)
             })
         }
     }

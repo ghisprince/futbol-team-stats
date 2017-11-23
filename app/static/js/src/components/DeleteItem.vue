@@ -41,10 +41,6 @@ export default {
             .then(response => {
                 this.$router.go(-1)
             })
-            .catch(e => {
-                this.alertMessage = e.response.data.error;
-                this.showAlert = true;
-            })
         }
     }
 }

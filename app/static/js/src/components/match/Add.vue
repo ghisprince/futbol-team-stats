@@ -39,11 +39,14 @@ export default {
         createMatch: function() {
             axios.post(`/api/v1/matches/`, this.match)
             .then(response => {
-                this.match = response.data
+                this.match = response.data;
+
+                // for convinience create matchstats also
+                axios.post(`/api/v1/matchstats/`,
+                           {match: {id: response.data.id}}
+                )
+
                 this.$router.push({path: '/match-list'})
-            })
-            .catch(e => {
-                console.log(e)
             })
         }
     }

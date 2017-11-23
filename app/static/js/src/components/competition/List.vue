@@ -82,20 +82,14 @@ export default {
     created() {
         axios.get(`/api/v1/competitions`)
         .then(response => {
-            this.competitions = response.data
-        })
-        .catch(e => {
-            console.log(e)
+            this.competitions = _.orderBy(response.data, 'name');
         })
     },
     computed: {
         filteredCompetitions: function () {
-            return this.orderedCompetitions.filter(function (competition) {
+            return this.competitions.filter(function (competition) {
                 return this.searchKey=='' || competition.name.indexOf(this.searchKey) !== -1;
             },this);
-        },
-        orderedCompetitions: function() {
-            return _.orderBy(this.competitions, 'name')
         }
     }
 }

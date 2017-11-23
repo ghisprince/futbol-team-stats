@@ -18,7 +18,6 @@ def get_result(req):
         resp = json.loads(req.data.decode('utf-8'))
     return code, resp
 
-
 team_data = {"name": "A Team"}
 
 
@@ -27,7 +26,7 @@ class TestViews:
     def _load_generic_match(self, testapp):
         match_data = {
             "opponent": {"name": "B Team"},
-            "competition": None,
+            "competition": {"name": "League 1"},
             "date_time": "2017-03-18T08:00:00",
             "team": {"name": "A Team"},
             "at_home": False,
@@ -45,14 +44,19 @@ class TestViews:
                                              content_type='application/json'))
         opponent_id = resp['id']
 
+        code, resp = get_result(testapp.post('/api/v1/competitions/',
+                                             data=json.dumps(
+                                                 match_data['competition']),
+                                             content_type='application/json'))
+        competition_id = resp['id']
+
         match_data['team']['id'] = team_id
         match_data['opponent']['id'] = opponent_id
-        _, resp = get_result(testapp.post('/api/v1/matches/',
-                                             data=json.dumps(match_data),
-                                             content_type='application/json'))
+        match_data['competition']['id'] = competition_id
+        _, resp = get_result(testapp.post('/api/v1/matches/', data=json.dumps(match_data), content_type='application/json'))
 
         _, resp = get_result(testapp.get(resp['_links']['self'] + "?expand=true",
-                                          content_type='application/json'))
+                                         content_type='application/json'))
 
         return resp
 
@@ -87,29 +91,30 @@ class TestViews:
     def test_team_post(self, testapp):
         code, resp = get_result(testapp.get('/api/v1/teams/'))
         assert code == 200
-        assert resp == []
+        team_count = len(resp)
 
         # POST
-        code, resp = get_result(testapp.post('/api/v1/teams/',
-                                             data='{"name":"Team T"}',
-                                             content_type='application/json'))
+        code, team_t = get_result(testapp.post('/api/v1/teams/',
+                                               data='{"name":"Team T"}',
+                                               content_type='application/json'))
         assert code == 201
 
         # GET
         code, resp = get_result(testapp.get('/api/v1/teams/'))
 
         # fully test the team data
-        assert len(resp) == 1
+        assert len(resp) == team_count + 1
 
-        team1 = resp[0]
-        assert sorted(list(team1)) == sorted(['_links', 'id', 'matches', 'name',
-                                              'players', 'teams'])
-        assert team1['id'] == 1
-        assert team1['name'] == "Team T"
-        assert sorted(list(team1['_links'])) == ['collection', 'self']
-                                                #'matches', 'players', ]
-        assert team1['_links']['self'] == '/api/v1/teams/1'
-        #assert team1['_links']['players'] == '/api/v1/teams/1/players/'
+        _, team = get_result(testapp.get(team_t['_links']['self'],
+                                          data='{"name":"Team T"}',
+                                          content_type='application/json'))
+        assert sorted(list(team)) == sorted(['_links', 'id', 'matches', 'name',
+                                             'players', 'teams',
+                                             'team_crest_uri'])
+        assert team['name'] == "Team T"
+        assert sorted(list(team['_links'])) == ['collection', 'self']
+
+        assert team['_links']['self'] == team_t['_links']['self']
 
 
     def test_team_getbylink(self, testapp):
@@ -146,6 +151,7 @@ class TestViews:
         resp = json.loads(rv.data.decode('utf-8'))
         assert len(resp) == 1
         assert resp[0]['id'] == team_id
+
 
     def test_team_delete(self, testapp):
         code, resp = get_result(testapp.get('/api/v1/teams/'))
@@ -220,7 +226,6 @@ class TestViews:
         match_data['team']['id'] = team_id
         match_data['opponent']['id'] = opponent_id
         match_data['competition']['id'] = competition_id
-
         code, resp = get_result(testapp.post('/api/v1/matches/',
                                              data=json.dumps(match_data),
                                              content_type='application/json'))
@@ -246,6 +251,60 @@ class TestViews:
         # then test
         assert resp['competition'] is None
         assert resp['date_time'] == "2019-09-09T09:00:00+00:00"
+
+    def test_matchstats(self, testapp):
+        match = self._load_generic_match(testapp)
+
+        matchstats_data = {
+            'match': match,
+            'passes': 1001,
+            'pass_strings': 101,
+            'pass_pct': 90,
+            'possession': 80,
+            'opponent_passes': 30,
+            'opponent_pass_strings': 3,
+            'opponent_pass_pct': None,
+            'opponent_yellow_cards': 4,
+            'opponent_red_cards': 2,
+            'opponent_corners': 1,
+            'opponent_fouls': 100}
+
+        # test post
+        code, matchstats = get_result(testapp.post('/api/v1/matchstats/',
+                                data=json.dumps(matchstats_data),
+                                content_type='application/json'))
+        assert code == 201
+        assert matchstats['match'] == match['id']
+        assert matchstats['passes'] == 1001
+        assert matchstats['pass_strings'] == 101
+        assert matchstats['opponent_pass_pct'] is None
+
+
+        matchstats_patch = {
+            'pass_strings': 202,
+            'opponent_pass_pct': 11
+        }
+
+        # test patch
+        code, matchstats2 = get_result(testapp.patch(matchstats['_links']['self'],
+                                data=json.dumps(matchstats_patch),
+                                content_type='application/json'))
+        assert code == 200
+        assert matchstats2['match'] == match['id']
+        assert matchstats2['pass_strings'] == 202
+        assert matchstats2['passes'] == 1001
+        assert matchstats2['opponent_pass_pct'] == 11
+
+        # test delete
+        code, resp = get_result(testapp.delete(matchstats['_links']['self'],
+                                        content_type='application/json'))
+        assert code == 204
+        assert resp == {}
+
+        code, resp = get_result(testapp.get(matchstats['_links']['self'],
+                                        content_type='application/json'))
+        assert code == 404
+
 
     def test_competition_post(self, testapp):
         # POST
@@ -527,15 +586,14 @@ class TestViews:
             # test shot 1
             assert source['x'] == result['x']
             assert source['y'] == result['y']
-            assert source['on_goal'] == result['on_goal']
-            assert source['scored'] == result['scored']
+            assert source['on_target'] == result['on_target']
             assert source['pk'] == result['pk']
             #assert source['player_match']['id'] == result['player_match']['id']
             assert source['by_opponent'] is result['by_opponent']
 
         pm = self._load_generic_playermatch(testapp)
-        shot_data = {"player_match": pm, "x": 1, "y": 10, "on_goal": True,
-                     "scored": False, "pk": False, "by_opponent": False}
+        shot_data = {"player_match": pm, "x": 1, "y": 10, "on_target": True,
+                     "pk": False, "by_opponent": False}
 
         code, shot = get_result(testapp.post('/api/v1/shots/',
                                              data=json.dumps(shot_data),
@@ -545,8 +603,8 @@ class TestViews:
         asserShottEqual(shot_data, shot)
 
         # POST another
-        shot_data = {"player_match": pm, "x": 20, "y": 2, "on_goal": False,
-                     "scored": True, "pk": True, "by_opponent": False}
+        shot_data = {"player_match": pm, "x": 20, "y": 2, "on_target": False,
+                     "pk": True, "by_opponent": False}
 
         code, shot = get_result(testapp.post('/api/v1/shots/',
                                              data=json.dumps(shot_data),
@@ -584,7 +642,7 @@ class TestViews:
         assert code == 201
 
         shot_data = {"player_match": pm, "x": 1, "y": 10,
-                     "on_goal": True, "scored": True, "pk": False,
+                     "on_target": True, "pk": False,
                      "by_opponent": False}
 
         code, shot = get_result(testapp.post('/api/v1/shots/',
@@ -592,11 +650,19 @@ class TestViews:
                                              content_type='application/json'))
         assert code == 201
 
+        assert shot['scored'] is False
+
         goal_data = {'shot': shot, 'time': 91}
         code, goal = get_result(testapp.post('/api/v1/goals/',
                                              data=json.dumps(goal_data),
                                              content_type='application/json'))
         assert code == 201
+
+        # get the shot again now that there's a goal on it it should return
+        #  scored=True
+        _, shot2 = get_result(testapp.get(shot['_links']['self'], content_type='application/json'))
+
+        assert shot2['scored'] is True
 
         assist_data = {"player_match": pm2, 'goal': goal}
         code, goal = get_result(testapp.post('/api/v1/assists/',
@@ -614,16 +680,15 @@ class TestViews:
         def assertShotAgainstEqual(base, result):
             assert base['x'] == result['x']
             assert base['y'] == result['y']
-            assert base['on_goal'] is result['on_goal']
-            assert base['scored'] is result['scored']
+            assert base['on_target'] is result['on_target']
             assert base['pk'] is result['pk']
             #assert base['player_match']['id'] == result['player_match']['id']
             assert base['by_opponent'] is result['by_opponent']
 
         pm = self._load_generic_playermatch(testapp)
         shotagainst_data_1 = {"player_match": pm, "x": 1, "y": 10,
-                              "on_goal": True, "pk": False,
-                              "by_opponent": True, "scored": False}
+                              "on_target": True, "pk": False,
+                              "by_opponent": True}
 
         code, shotagainst_1 = get_result(testapp.post('/api/v1/shots/',
                                                       data=json.dumps(
@@ -634,7 +699,7 @@ class TestViews:
 
         # POST another
         shotagainst_data_2 = {"player_match": pm, "x": 3, "y": 4,
-                              "on_goal": False, "scored": False, "pk": True,
+                              "on_target": False, "pk": True,
                               "by_opponent": True}
 
         code, shotagainst_2 = get_result(testapp.post('/api/v1/shots/',

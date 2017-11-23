@@ -35,13 +35,13 @@ export default {
         // get competition data
         axios.get(`/api/v1/competitions/` + this.$route.params.competition_id + `?expand=true`)
         .then(response => {
-            this.competition = response.data
+            this.competition = response.data;
         })
 
         // get all player matches for AggPlayerMatchTable
         axios.get(`/api/v1/playermatches/?competition_id=` + this.$route.params.competition_id + `&expand=true`)
         .then(response => {
-            this.player_matches = response.data
+            this.player_matches = _.orderBy(response.data, "player.name");
         })
     },
     computed: {

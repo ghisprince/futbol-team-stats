@@ -1,13 +1,28 @@
 <template id="match-edit">
     <div>
-        <h2>Edit match</h2>
-        <form v-on:submit="updateMatch">
+        <h2>Edit match info</h2>
+        <form>
 
             <match :match.sync="match"></match>
-            <button type="submit" class="btn btn-primary">Save</button>
-            <router-link class="btn btn-default" v-bind:to="'/match-list'">Cancel</router-link>
+            <a class="btn btn-primary" v-on:click="updateMatch">
+                Update Match Info
+            </a>
+
+            <hr/>
+
+            <h2>Edit match stats</h2>
+            <match-stats :match_stats.sync="match_stats"></match-stats>
+
+            <a class="btn btn-primary" v-on:click="updateMatchStats">
+                Update Match Stats
+            </a>
+
+            <hr/>
 
             <player-match-table :showActions=true></player-match-table>
+
+            <hr/>
+
             <shot-graph :enableEditing=true></shot-graph>
 
             <br/>
@@ -15,6 +30,7 @@
         <br/>
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         <router-link v-bind:to="'/match-list'">Back to match list</router-link>
+        <br/>
 
     </div>
 </template>
@@ -23,26 +39,32 @@
 <script>
 import axios from 'axios'
 import Match from './Match.vue'
+import MatchStats from './MatchStats.vue'
 import PlayerMatchTable from '../player_match/PlayerMatchTable.vue'
 import ShotGraph from '../player_match/ShotGraph.vue'
 
 
 export default {
     data () {
-        return {match: {}}
+        return {match: {},
+                match_stats:{}
+                }
     },
     components: {
         'match': Match,
+        'match-stats': MatchStats,
         'shot-graph': ShotGraph,
         'player-match-table': PlayerMatchTable
     },
     created() {
         axios.get(`/api/v1/matches/` + this.$route.params.match_id + `?expand=true`)
         .then(response => {
-            this.match = response.data
-        })
-        .catch(e => {
-            console.log(e)
+            this.match = response.data;
+            if ('match_stats' in response.data) {
+                this.match_stats = response.data.match_stats;
+            } else {
+                this.match_stats = {};
+            }
         })
     },
     methods: {
@@ -55,15 +77,14 @@ export default {
                          at_home: this.match.at_home
                          }
             )
-            .then(response => {
-                console.log("UPDATE match successful!")
-                //this.$router.go(-1)
-                this.$router.push({path: '/match-list'})
-            })
-            .catch(e => {
-                alert("UPDATE match failed")
-                console.log(e)
-            })
+        },
+        updateMatchStats: function() {
+            var ms = this.match_stats;
+            delete ms.id;
+            delete ms.match;
+            axios.patch(this.match_stats._links.self,
+                        this.match_stats
+            )
         }
     }
 }

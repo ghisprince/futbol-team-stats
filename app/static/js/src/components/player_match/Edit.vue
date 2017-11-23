@@ -38,18 +38,11 @@ export default {
         .then(response => {
             this.playermatch = response.data
         })
-        .catch(e => {
-            console.log(e)
-        })
 
         axios.get(`/api/v1/players/?expand=true`)
         .then(response => {
             this.players = response.data
         })
-        .catch(e => {
-            console.log(e)
-        })
-
     },
     methods: {
         goBack: function() {
@@ -68,19 +61,13 @@ export default {
 
             )
             .then(response => {
-                console.log("UPDATE playermatch successful!")
                 this.$router.go(-1)
-            })
-            .catch(e => {
-                alert("UPDATE playermatch failed")
-                console.log(e)
             })
         },
         playerChanged: function(e) {
             for (var i=0; i < this.players.length; i++) {
                 if (this.players[i].id == e.target.value) {
                  this.playermatch.player = this.players[i];
-                 console.log(this.players[i].name);
                 }
             }
             //this.$emit('opponentChanged', e.target.value);

@@ -54,7 +54,8 @@
                             <span class="glyphicon glyphicon-pencil"></span> Edit
                         </router-link>
                         <router-link v-if="match.player_matches.length == 0"
-                                     class="btn btn-danger btn-xs" v-bind:to="{name: 'match-delete', params: {match_id: match.id, type: 'match', name: match.name, uri: match._links.self}}">
+                                     class="btn btn-danger btn-xs"
+                                     v-bind:to="{name: 'match-delete', params: {match_id: match.id, type: 'match', name: match.name, uri: match._links.self}}">
                             <span class="glyphicon glyphicon-remove"></span> Delete
                         </router-link>
                     </td>

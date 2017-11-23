@@ -40,22 +40,9 @@ export default {
         .then(response => {
             this.matches = response.data
         })
-        .catch(e => {
-            console.log(e)
-        })
     },
     components: {
         'match-table': MatchTable
-    },
-    computed: {
-        filteredMatches: function () {
-            return this.orderedMatches.filter(function (match) {
-                return this.searchKey=='' || match.name.indexOf(this.searchKey) !== -1;
-            },this);
-        },
-        orderedMatches: function() {
-            return _.orderBy(this.matches, 'name')
-        }
     }
 }
 </script>

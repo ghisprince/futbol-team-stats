@@ -30,9 +30,6 @@ export default {
         .then(response => {
             this.opponent = response.data
         })
-        .catch(e => {
-            console.log(e)
-        })
     },
     methods: {
         updateOpponent: function() {
@@ -40,17 +37,10 @@ export default {
                         {name: this.opponent.name,
                          external_url: this.opponent.external_url
                         }
-
              )
             .then(response => {
-                console.log("UPDATE Opponent successfull!!")
-                //this.$router.go(-1)
                 this.$router.push({path: '/opponent-list'})
 
-            })
-            .catch(e => {
-                console.log("UPDATE Opponent failed!!")
-                console.log(e)
             })
         }
     }

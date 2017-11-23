@@ -73,6 +73,35 @@ class TestModels:
         assert match.opponent.name == "Lil' Real Madrid"
         assert match.competition is None
 
+    def test_matchstats(self, testapp):
+        match = Match("2017-01-02T03:40:50",
+                      Team("Lil' Barca"),
+                      Opponent("Lil' Real Madrid"),)
+
+        assert match.match_stats is None
+
+        matchstats = MatchStats(match, passes=99, pass_strings=10, pass_pct=50,
+                                opponent_passes=55,
+                                opponent_pass_strings=5,
+                                opponent_pass_pct=25)
+
+        assert match.match_stats.passes == 99
+        assert matchstats.match.opponent.name == "Lil' Real Madrid"
+
+    def test_matchstats_delete(self, testapp):
+        match = Match("2017-01-02T03:40:50",
+                      Team("Lil' Barca"),
+                      Opponent("Lil' Real Madrid"),)
+
+        matchstats = MatchStats(match, passes=99, pass_strings=10, pass_pct=50,
+                                opponent_passes=55,
+                                opponent_pass_strings=5,
+                                opponent_pass_pct=25)
+
+        assert match.match_stats.passes == 99
+        assert matchstats.match.opponent.name == "Lil' Real Madrid"
+
+
     def test_match_competition(self, testapp):
         match = Match("2017-11-12T08:00:00",
                       Team("Lil' Barca"),
@@ -102,9 +131,9 @@ class TestModels:
                                     match,
                                     False, 60, False,)
 
-        shot1 = Shot(player_match1, 30, 30, on_goal=True)
-        shot2 = Shot(player_match2, 40, 10, on_goal=False)
-        shot3 = Shot(player_match2, 10, 10, on_goal=True)
+        shot1 = Shot(player_match1, 30, 30, on_target=True)
+        shot2 = Shot(player_match2, 40, 10, on_target=False)
+        shot3 = Shot(player_match2, 10, 10, on_target=True)
 
         goal1 = Goal(shot1)
         assist = Assist(player_match3, goal1)

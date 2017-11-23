@@ -30,13 +30,8 @@ export default {
         createPlayer: function() {
             axios.post(`/api/v1/players/`, this.player)
             .then(response => {
-                this.player = response.data
-                //this.$router.go(-1)
+                this.player = response.data;
                 this.$router.push({path: '/player-list'})
-
-            })
-            .catch(e => {
-                console.log(e)
             })
         }
     }

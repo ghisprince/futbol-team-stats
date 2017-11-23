@@ -25,8 +25,6 @@
                                      v-bind:to="{name: 'playermatch-add', params: {match_id: $route.params.match_id }}">
                             <span class="glyphicon glyphicon-plus"></span> Add
                         </router-link>
-
-
                     </td>
                 </tr>
             </tfoot>
@@ -106,9 +104,9 @@ export default {
     },
     created() {
         var parent = this;
-        axios.get(`http://127.0.0.1:5000/api/v1/playermatches/?match_id=` + this.$route.params.match_id + `&expand=true`)
+        axios.get(`/api/v1/playermatches/?match_id=` + this.$route.params.match_id + `&expand=true`)
         .then(response => {
-            this.player_matches = response.data;
+            this.player_matches = _.orderBy(response.data, "player.name");
         })
     },
     computed: {
@@ -132,20 +130,25 @@ export default {
     methods: {
         deletePlayerMatch: function(pm) {
 
-            axios.delete(pm._links.self)
+            // remove all assists joined to this playermatch first
+            axios.get(`/api/v1/assists/?playermatch_id=` + pm.id)
             .then(response => {
-                alert("Success!");
-                this.player_matches = _.filter(this.player_matches, function(i) {
-                        return i.id != pm.id;
-                    }
-                );
+                var assists = response.data;
+                for (var i=0; i < assists.length; i++){
+                    axios.delete(assists[i]._links.self)
+                    .then(response => {console.log("delete assist succeeded")})
+                    .catch(response => {console.log("delete assist failed")})
+
+                    // then delete
+                    axios.delete(pm._links.self)
+                    .then(response => {
+                        // update this.player_matches to excluded pm just deleted
+                        this.player_matches = _.filter(this.player_matches, function(i) {
+                                return i.id != pm.id;
+                            })
+                    })
+                }
             })
-            .catch(e => {
-                this.alertMessage = e.response.data.error;
-            })
-        },
-        addPlayerMatch: function() {
-            alert("ADD");
         }
     }
 }

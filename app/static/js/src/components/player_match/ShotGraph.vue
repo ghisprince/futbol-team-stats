@@ -4,7 +4,7 @@
 
         <div class="row">
             <div class="col-sm-6" id="convas-container">
-                <canvas id="canvas" width=350 height=260></canvas>
+                <canvas id="canvas" width=452 height=352></canvas>
                 <p id="sub-table-note">
                     <i>Grey: not on goal, Blue: on goal, Red: scored.</i>
                 </p>
@@ -35,6 +35,19 @@
                                 </div>
                             </div>
 
+                            <div class="form-group" v-if="enableEditing">
+                                <label for="byOpponent"
+                                       class="col-sm-4 control-label">By Opponent :
+                                </label>
+                                <div class="col-sm-2">
+                                    <input v-on:change="updateShotByOpponent"
+                                           type="checkbox"
+                                           class="form-control"
+                                           id="shotByOpponent"
+                                           v-model="selectedShot.by_opponent">
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="shotOnGoal"
                                        class="col-sm-4 control-label">On Goal :
@@ -44,7 +57,7 @@
                                            type="checkbox"
                                            class="form-control"
                                            id="shotOnGoal"
-                                           v-model="selectedShot.on_goal"
+                                           v-model="selectedShot.on_target"
                                            :disabled="enableEditing == 0">
                                 </div>
                             </div>
@@ -54,7 +67,8 @@
                                        class="col-sm-4 control-label">Penalty Kick :
                                 </label>
                                 <div class="col-sm-2">
-                                    <input type="checkbox"
+                                    <input v-on:change="updateShotIsPK"
+                                           type="checkbox"
                                            class="form-control"
                                            id="shotIsPk"
                                            v-model="selectedShot.pk"
@@ -171,14 +185,20 @@ export default {
     },
     created() {
         //var parent = this; // delete this
-        axios.get(`/api/v1/shots/?match_id=` + this.$route.params.match_id + `&by_opponent=false&expand=true`)
+        var by_opponent_arg = "&by_opponent=false";
+        if (this.enableEditing) {
+            by_opponent_arg = "";
+        }
+        axios.get(`/api/v1/shots/?match_id=` + this.$route.params.match_id
+                                             + by_opponent_arg
+                                             + `&expand=true`)
         .then(response => {
             this.shots = response.data;
             this.drawShotsOnCanvas()
         })
         axios.get(`/api/v1/playermatches/?match_id=` + this.$route.params.match_id + `&expand=true`)
         .then(response => {
-            this.player_matches = response.data;
+            this.player_matches = _.orderBy(response.data, "player.name");
         })
 
     },
@@ -202,10 +222,6 @@ export default {
 
     },
     computed: {
-        selectedShotData: function () {
-            return _.find(this.shots, {id: this.selectedShot})
-        }
-
     },
     methods: {
         drawShotsOnCanvas: function(event){
@@ -215,20 +231,26 @@ export default {
             canvas.clear()
             for (var iii = 0; iii < this.shots.length; iii++) {
                 var shot = this.shots[iii];
-                var color = 'black';
+
+                var color = '';
                 if (shot.scored) {
                     color = 'rgb(250,15,15)'; //red
-                } else if (shot.on_goal) {
+                } else if (shot.on_target) {
                     color = 'rgb(15,100,200)'; //blue
                 } else {
                     color = 'grey'; //grey
+                }
+
+                var stroke_color = 'rgb(5,5,5)';
+                if (shot.by_opponent) {
+                    stroke_color = 'rgb(240,240,240)';
                 }
 
                 var circle = new fabric.Circle({
                                     radius: 7,
                                     fill: color,
                                     opacity: 0.9,
-                                    stroke: 'rgb(10,10,10)',
+                                    stroke: stroke_color,
                                     strokeWidth: 2,
                                     originX: 'center',
                                     originY: 'center',
@@ -321,7 +343,23 @@ export default {
         },
         updateShotOnTarget: function(e){
             axios.patch(this.selectedShot._links.self,
-                    {on_goal:e.target.checked}
+                    {on_target:e.target.checked}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+        },
+        updateShotByOpponent: function(e){
+            axios.patch(this.selectedShot._links.self,
+                    {by_opponent:e.target.checked}
+            )
+            .then(response => {
+                this.refreshShot(this.selectedShot._links.self);
+            })
+        },
+        updateShotIsPK: function(e){
+            axios.patch(this.selectedShot._links.self,
+                    {pk:e.target.checked}
             )
             .then(response => {
                 this.refreshShot(this.selectedShot._links.self);
@@ -336,9 +374,9 @@ export default {
             })
         },
         addGoal: function(event){
-            if (!this.selectedShot.on_goal) {
+            if (!this.selectedShot.on_target) {
                 axios.patch(this.selectedShot._links.self,
-                        {on_goal:true}
+                        {on_target:true}
                 )
             }
             axios.post(`/api/v1/goals/`,

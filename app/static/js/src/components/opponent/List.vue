@@ -76,20 +76,14 @@ export default {
     created() {
         axios.get(`/api/v1/opponents`)
         .then(response => {
-            this.opponents = response.data
-        })
-        .catch(e => {
-            console.log(e)
+            this.opponents = _.sortBy(response.data, "name");
         })
     },
     computed: {
         filteredOpponents: function () {
-            return this.orderedOpponents.filter(function (opponent) {
+            return this.opponents.filter(function (opponent) {
                 return this.searchKey=='' || opponent.name.indexOf(this.searchKey) !== -1;
             },this);
-        },
-        orderedOpponents: function() {
-            return _.orderBy(this.opponents, 'name')
         }
     }
 }

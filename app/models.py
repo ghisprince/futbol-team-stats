@@ -73,12 +73,13 @@ class User(db.Model, CRUD_MixIn, UserMixin):
         return self.id
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {} (id={})>'.format(self.id, self.username)
 
 
 class Team(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+    team_crest_uri = db.Column(db.String())
 
     # relationships
     matches = db.relationship('Match', back_populates="team")
@@ -88,7 +89,7 @@ class Team(db.Model, CRUD_MixIn):
         self.name = name
 
     def __repr__(self):
-        return "Team (name={})".format(self.name)
+        return "Team (id={}, name={})".format(self.id, self.name)
 
 
 class Opponent(db.Model, CRUD_MixIn):
@@ -129,7 +130,7 @@ class Opponent(db.Model, CRUD_MixIn):
         self.external_url = external_url
 
     def __repr__(self):
-        return "Opponent (name={})".format(self.name)
+        return "Opponent (id={}, name={})".format(self.id, self.name)
 
 
 class Competition(db.Model, CRUD_MixIn):
@@ -140,6 +141,13 @@ class Competition(db.Model, CRUD_MixIn):
 
     # relationships
     matches = db.relationship("Match", back_populates="competition")
+
+    @hybrid_property
+    def start_date(self):
+        """ return competition result in W-D-L format """
+        if len(self.matches) == 0:
+            return None
+        return min([i.date_time for i in self.matches])
 
     @hybrid_property
     def num_match_won(self):
@@ -169,7 +177,7 @@ class Competition(db.Model, CRUD_MixIn):
         self.external_url = external_url
 
     def __repr__(self):
-        return "Competition (name={})".format(self.name)
+        return "Competition (id={}, name={})".format(self.id, self.name)
 
 
 class Match(db.Model, CRUD_MixIn):
@@ -184,15 +192,21 @@ class Match(db.Model, CRUD_MixIn):
 
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'),
                         nullable=False, index=True)
-    team = db.relationship("Team", back_populates="matches")
+    team = db.relationship("Team",
+                           uselist=False,
+                           back_populates="matches")
 
     opponent_id = db.Column(db.Integer, db.ForeignKey('opponent.id'),
                             nullable=False, index=True)
-    opponent = db.relationship("Opponent", back_populates="matches")
+    opponent = db.relationship("Opponent",
+                               uselist=False,
+                               back_populates="matches")
 
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'),
                                index=True)
-    competition = db.relationship("Competition", back_populates="matches")
+    competition = db.relationship("Competition",
+                                  uselist=False,
+                                  back_populates="matches")
 
     match_stats = db.relationship("MatchStats",
                                   uselist=False,
@@ -231,9 +245,19 @@ class Match(db.Model, CRUD_MixIn):
     def num_goals_against(self):
         return sum([i.num_goals_against for i in self.player_matches])
 
+    def _goals_timeline(self, by_opponent):
+        goals = db.session.query(Goal).join(Shot).join(PlayerMatch).join(Match)\
+            .filter(Match.id == self.id).filter(Shot.by_opponent==by_opponent).all()
+
+        return [i.label for i in sorted(goals, key=lambda x: x.time if x.time else 0)]
+
     @hybrid_property
     def goals_timeline(self):
-        return ["1' Ghis (Joe)", "33' Ghis (Jim)"]
+        return self._goals_timeline(by_opponent=False)
+
+    @hybrid_property
+    def goals_against_timeline(self):
+        return self._goals_timeline(by_opponent=True)
 
     @hybrid_property
     def num_shots(self):
@@ -352,45 +376,65 @@ class Match(db.Model, CRUD_MixIn):
         self.duration = duration
 
     def __repr__(self):
-        return "Match (team={}, opponent={}, date_time={})".format(
-                                self.team, self.opponent, self.date_time)
+        return "Match (id={}, team={}, opponent={}, date_time={})".format(
+            self.id, self.team, self.opponent, self.date_time)
 
 
 class MatchStats(db.Model, CRUD_MixIn):
+    """ match statistics beyond what's derived from player_match """
     id = db.Column(db.Integer(), primary_key=True)
 
-    passes = db.Column(db.Integer())
-    pass_strings = db.Column(db.Integer())
-    pass_pct = db.Column(db.Integer())
-    possession = db.Column(db.Integer())
-
-    opponent_passes = db.Column(db.Integer())
-    opponent_pass_strings = db.Column(db.Integer())
-    opponent_pass_pct = db.Column(db.Integer())
-
+    # high level opponent stats
     opponent_yellow_cards = db.Column(db.Integer())
     opponent_red_cards = db.Column(db.Integer())
     opponent_corners = db.Column(db.Integer())
+    opponent_fouls = db.Column(db.Integer())
+
+    # team pass numbers
+    passes = db.Column(db.Integer())
+    pass_strings = db.Column(db.Integer())
+    pass_pct = db.Column(db.Float())
+
+    # opponent pass numbers
+    opponent_passes = db.Column(db.Integer())
+    opponent_pass_strings = db.Column(db.Integer())
+    opponent_pass_pct = db.Column(db.Float())
+
+    # possession split
+    possession = db.Column(db.Float())
 
     # relationships
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'),
                          nullable=False, index=True)
-    match = db.relationship("Match", back_populates="match_stats")
+    match = db.relationship("Match",
+                            uselist=False,
+                            back_populates="match_stats")
 
     def __init__(self, match, passes=None, pass_strings=None, pass_pct=None,
-                 opponent_passes=None, opponent_pass_strings=None,
-                 opponent_pass_pct=None, opponent_yellow_cards=None,
-                 opponent_red_cards=None, opponent_corners=None):
+                 possession=None,
+                 opponent_passes=None,
+                 opponent_pass_strings=None,
+                 opponent_pass_pct=None,
+                 opponent_yellow_cards=None,
+                 opponent_red_cards=None,
+                 opponent_corners=None,
+                 opponent_fouls=None):
         self.match = match
         self.passes = passes
         self.pass_strings = pass_strings
         self.pass_pct = pass_pct
+        self.possession = possession
         self.opponent_passes = opponent_passes
         self.opponent_pass_strings = opponent_pass_strings
         self.opponent_pass_pct = opponent_pass_pct
         self.opponent_yellow_cards = opponent_yellow_cards
         self.opponent_red_cards = opponent_red_cards
         self.opponent_corners = opponent_corners
+        self.opponent_fouls = opponent_fouls
+
+    def __repr__(self):
+        return "MatchStats (id={}, passes={}, opponent_passes={})".format(
+            self.id, self.passes, self.opponent_passes)
 
 
 class Player(db.Model, CRUD_MixIn):
@@ -402,7 +446,8 @@ class Player(db.Model, CRUD_MixIn):
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="player")
 
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True,
+                        index=True)
     team = db.relationship("Team", back_populates="players")
 
     def __init__(self, name, number=None, team=None, active=True):
@@ -412,7 +457,8 @@ class Player(db.Model, CRUD_MixIn):
         self.active = active
 
     def __repr__(self):
-        return "Player (number={}, name={})".format(self.number, self.name)
+        return "Player (id={}, number={}, name={})".format(
+            self.id, self.number, self.name)
 
 
 class PlayerMatch(db.Model, CRUD_MixIn):
@@ -425,15 +471,20 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     yellow_cards = db.Column(db.Integer(), default=0)
     red_cards = db.Column(db.Integer(), default=0)
     corners = db.Column(db.Integer(), default=0)
+    fouls = db.Column(db.Integer(), default=0)
 
     # relationships
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'),
                           nullable=False, index=True)
-    player = db.relationship("Player", back_populates="player_matches")
+    player = db.relationship("Player",
+                             uselist=False,
+                             back_populates="player_matches")
 
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'),
                          nullable=False, index=True)
-    match = db.relationship("Match", back_populates="player_matches")
+    match = db.relationship("Match",
+                            uselist=False,
+                            back_populates="player_matches")
 
     shots = db.relationship("Shot", back_populates="player_match",
                             cascade="all, delete-orphan")
@@ -451,11 +502,11 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def num_shots_on_target(self):
-        return len([i for i in self.shots if (not i.by_opponent and i.on_goal)])
+        return len([i for i in self.shots if (not i.by_opponent and i.on_target)])
 
     @hybrid_property
     def num_shots_against_on_target(self):
-        return len([i for i in self.shots if (i.by_opponent and i.on_goal)])
+        return len([i for i in self.shots if (i.by_opponent and i.on_target)])
 
     @hybrid_property
     def num_goals(self):
@@ -486,62 +537,91 @@ class PlayerMatch(db.Model, CRUD_MixIn):
         self.corners = corners
 
     def __repr__(self):
-        return "PlayerMatch (player={}, starter={}, minutes={})".format(
-            self.player.name, self.starter, self.minutes,)
+        return "PlayerMatch (id={}, player={}, starter={}, minutes={})".format(
+            self.id, self.player.name, self.starter, self.minutes,)
 
 
 class Shot(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     x = db.Column(db.Integer(),)
     y = db.Column(db.Integer(),)
-    on_goal = db.Column(db.Boolean(), default=False, nullable=False)
-    scored = db.Column(db.Boolean(), default=False, nullable=False)
+    on_target = db.Column(db.Boolean(), default=False, nullable=False)
     pk = db.Column(db.Boolean(), default=False)
     by_opponent = db.Column(db.Boolean(), default=False)
 
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
                                 nullable=False, index=True)
-    player_match = db.relationship("PlayerMatch", back_populates="shots")
+    player_match = db.relationship("PlayerMatch",
+                                   uselist=False,
+                                   back_populates="shots")
 
     goal = db.relationship("Goal", uselist=False, back_populates="shot",
                            cascade="all, delete-orphan")
 
-    def __init__(self, player_match, x=None, y=None, on_goal=None, scored=None,
+    @hybrid_property
+    def scored(self):
+        return self.goal is not None
+
+    def __init__(self, player_match, x=None, y=None, on_target=None,
                  pk=None, by_opponent=None):
         self.player_match = player_match
         self.x = x
         self.y = y
-        self.on_goal = on_goal
-        self.scored = scored
+        self.on_target = on_target
         self.pk = pk
         self.by_opponent = by_opponent
 
     def __repr__(self):
-        return "Shot (player={}, x={}, y={}, on_goal={}, pk={})".format(
+        return "Shot (id={}, player={}, x={}, y={}, on_target={})".format(
+                        self.id,
                         self.player_match.player.name,
-                        self.x, self.y, self.on_goal,
+                        self.x, self.y, self.on_target,
                         self.pk, self.by_opponent)
 
 
 class Goal(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     time = db.Column(db.Integer(), nullable=True)
+    own_goal = db.Column(db.Boolean(), default=False)
 
     # relationships
     shot_id = db.Column(db.Integer, db.ForeignKey('shot.id'),
                         nullable=False, index=True)
-    shot = db.relationship("Shot", back_populates="goal")
+    shot = db.relationship("Shot", uselist=False, back_populates="goal")
 
     assist = db.relationship("Assist", back_populates="goal", uselist=False,
                              cascade="all, delete-orphan")
+
+    @hybrid_property
+    def label(self):
+        if self.time is not None:
+            time = str(self.time) + "'"
+        else:
+            time = "?'"
+
+        if self.assist:
+            assist = " ({})".format(self.assist.player_match.player.name)
+        else:
+            assist = ""
+
+        if self.own_goal:
+            player = "OG"
+        elif self.shot.by_opponent:
+            player = ""
+        else:
+            player = self.shot.player_match.player.name
+
+
+        return "{}{} {}".format(player, assist, time)
 
     def __init__(self, shot, time=None):
         self.shot = shot
         self.time = time
 
     def __repr__(self):
-        return "Goal (player={}, )".format(self.shot.player_match.player.name)
+        return "Goal (id={}, player={}, )".format(
+            self.id, self.shot.player_match.player.name)
 
 
 class Assist(db.Model, CRUD_MixIn):
@@ -550,17 +630,20 @@ class Assist(db.Model, CRUD_MixIn):
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
                                 nullable=False, index=True)
-    player_match = db.relationship("PlayerMatch", back_populates="assists")
+    player_match = db.relationship("PlayerMatch",
+                                   uselist=False,
+                                   back_populates="assists")
 
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'),
                         nullable=False, index=True)
-    goal = db.relationship("Goal", back_populates="assist")
+    goal = db.relationship("Goal", uselist=False, back_populates="assist")
 
     def __init__(self, player_match, goal):
         self.player_match = player_match
         self.goal = goal
 
     def __repr__(self):
-        return "Assist (player={}, Goal.player={})".format(
+        return "Assist (id={}, player={}, Goal.player={})".format(
+                    self.id,
                     self.player_match.player.name,
                     self.goal.shot.player_match.player.name)

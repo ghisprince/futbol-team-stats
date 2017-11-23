@@ -21,7 +21,7 @@
                 Opponent :
             </label>
             <div class="col-sm-4">
-                <select class="form-control col-sm-4" v-on:change="opponentChanged">
+                <select class="form-control col-sm-4" v-on:change="updateOpponent">
                     <option v-for="opponent in opponents"
                             v-bind:value="opponent.id"
                             :selected="opponent.name == match.opponent.name"
@@ -38,7 +38,7 @@
                 Competition :
             </label>
             <div class="col-sm-4">
-                <select class="form-control col-sm-4" v-on:change="competitionChanged">
+                <select class="form-control col-sm-4" v-on:change="updateCompetition">
                     <option v-for="competition in competitions"
                             v-bind:value="competition.id"
                             :selected="competition.name == match.competition.name"
@@ -65,6 +65,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
     props: ['match'],
@@ -77,14 +78,14 @@ export default {
     created() {
         axios.get(`/api/v1/opponents/`)
         .then(response => {
-            this.opponents = response.data;
+            this.opponents = _.sortBy(response.data, "name");
             if (_.has(this.match.opponent, 'id') == false) {
                 this.match.opponent = response.data[0];
             }
         })
         axios.get(`/api/v1/competitions/`)
         .then(response => {
-            this.competitions = response.data;
+            this.competitions = _.sortBy(response.data, "name");
             if (_.has(this.match.competition, 'id') == false) {
                 this.match.competition = response.data[0];
             }
@@ -92,22 +93,19 @@ export default {
 
     },
     methods: {
-        opponentChanged: function(e) {
+        updateOpponent: function(e) {
             for (var i=0; i<this.opponents.length; i++) {
                 if (this.opponents[i].id == e.target.value) {
                  this.match.opponent = this.opponents[i];
-                 console.log(e.target.value);
-                 console.log(this.opponents[i].name);
                 }
             }
-            //this.$emit('opponentChanged', e.target.value);
+            //this.$emit('updateOpponent', e.target.value);
         },
 
-        competitionChanged: function(e) {
+        updateCompetition: function(e) {
             for (var i=0; i<this.competitions.length; i++) {
                 if (this.competitions[i].id == e.target.value) {
                      this.match.competition = this.competitions[i];
-                     console.log(this.competitions[i].name);
                 }
             }
         }

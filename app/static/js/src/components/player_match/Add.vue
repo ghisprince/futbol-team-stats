@@ -52,14 +52,9 @@ export default {
 
             )
             .then(response => {
-                console.log("UPDATE playermatch successful!")
                 this.$router.go(-1)
             })
-            .catch(e => {
-                alert("UPDATE playermatch failed")
-                console.log(e)
-            })
-        },
+        }
     }
 }
 </script>

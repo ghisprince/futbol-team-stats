@@ -71,9 +71,6 @@ export default {
         .then(response => {
             this.players = response.data
         })
-        .catch(e => {
-            console.log(e)
-        })
     },
     computed: {
         filteredPlayers: function () {
