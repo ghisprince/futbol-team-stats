@@ -6,6 +6,7 @@ from webargs.flaskparser import use_kwargs
 
 from app.models import *
 from app.schemas import *
+from app.shared import auth
 
 import marshmallow
 from marshmallow import ValidationError
@@ -61,6 +62,8 @@ requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
+from flask_httpauth import HTTPBasicAuth
+from app.shared import auth
 
 class CreateListResourceBase(Resource):
 
@@ -171,6 +174,7 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema_ex = match_schema_ex
 
 
+    @auth.login_required
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False),
                  'expand': webargs.fields.Bool(required=False)
@@ -500,6 +504,7 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
+    @auth.login_required
     @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, match_id, expand=False):
         return super().get(match_id, expand)

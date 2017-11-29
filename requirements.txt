@@ -9,6 +9,7 @@ Flask-Script==2.0.5
 Flask-SQLAlchemy==2.2
 Flask-WTF==0.14
 Flask-restful==0.3
+flask-httpauth==3.2
 
 # Other
 itsdangerous==0.24

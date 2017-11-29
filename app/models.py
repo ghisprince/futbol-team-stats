@@ -1,8 +1,11 @@
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from app.shared import db
+from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as Serializer
 import datetime
+
+from app.settings import Config
+from app.shared import db
 
 
 class CRUD_MixIn():
@@ -39,6 +42,7 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(), nullable=False)
     password = db.Column(db.String(), nullable=False)
+    token = db.Column(db.String())
     email = db.Column(db.String())
     team = db.relationship('Team', secondary=association,
                            backref=db.backref('teams', lazy='dynamic'))
@@ -71,6 +75,25 @@ class User(db.Model, CRUD_MixIn, UserMixin):
 
     def get_id(self):
         return self.id
+
+    def generate_auth_token(self, expiration = 600):
+        s = Serializer(Config.SECRET_KEY, expires_in = expiration)
+        return s.dumps({ 'id': self.id })
+
+    @staticmethod
+    def verify_auth_token(token):
+
+        s = Serializer(Config.SECRET_KEY)
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None # valid token, but expired
+        except BadSignature:
+            return None # invalid token
+        user = User.query.get(data['id'])
+        return user
+
+
 
     def __repr__(self):
         return '<User {} (id={})>'.format(self.id, self.username)
