@@ -1,4 +1,4 @@
-from flask_restful import Resource
+import flask_restful
 
 from flask import jsonify, make_response, request
 from sqlalchemy.exc import SQLAlchemyError
@@ -6,7 +6,7 @@ from webargs.flaskparser import use_kwargs
 
 from app.models import *
 from app.schemas import *
-from app.shared import auth
+from flask_login import login_required
 
 import marshmallow
 from marshmallow import ValidationError
@@ -61,9 +61,9 @@ If a POST request did not include a Client-Generated ID and the
 requested resource has been created successfully, the server MUST 
 return a 201 Created status code"""
 
-
-from flask_httpauth import HTTPBasicAuth
-from app.shared import auth
+# decorate all with end points with login_required
+class Resource(flask_restful.Resource):
+    method_decorators = [login_required]
 
 class CreateListResourceBase(Resource):
 
@@ -173,8 +173,6 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
-
-    @auth.login_required
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False),
                  'expand': webargs.fields.Bool(required=False)
@@ -504,7 +502,6 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
-    @auth.login_required
     @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, match_id, expand=False):
         return super().get(match_id, expand)

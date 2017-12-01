@@ -1,11 +1,17 @@
 from flask_login import UserMixin, AnonymousUserMixin
+from app.shared import login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import BadSignature, SignatureExpired, \
+        TimedJSONWebSignatureSerializer as Serializer
 import datetime
 
 from app.settings import Config
 from app.shared import db
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.get(userid)
 
 
 class CRUD_MixIn():

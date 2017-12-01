@@ -6,7 +6,7 @@
             <thead>
                 <tr>
                     <th title="Player">Player</th>
-                    <th title="Apps">Apps</th>
+                    <th title="Appearances by player">Apps</th>
                     <th title="Started the match">Starter</th>
                     <th title="Minutes played">Min</th>
                     <th title="Goals">G</th>

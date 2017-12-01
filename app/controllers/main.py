@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, send_file
+from flask import Blueprint, render_template, flash, redirect, url_for, send_file, session
 from flask_login import login_user, logout_user, login_required
 
 from app.extensions import cache
 from app.forms import LoginForm
 from app.models import *
 from app.api import *
-from app.shared import auth
+#from app.shared import auth
 
 
 main = Blueprint('main', __name__)
@@ -30,26 +30,6 @@ def login():
         return redirect(request.args.get("next") or url_for(".home"))
 
     return render_template("login.html", form=form)
-
-'''
-@app.route('/api/v1/token')
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii') })
-'''
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # first try to authenticate by token
-
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username = username_or_token).first()
-        if not user or not user.check_password(password):
-            return False
-    login_user(user)
-    return True
 
 
 @main.route("/logout")

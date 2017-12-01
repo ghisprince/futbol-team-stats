@@ -8,13 +8,12 @@ from app.controllers.main import main
 from app.shared import api
 from app.shared import db
 from app.shared import ma
-
+from app.shared import login_manager
 
 from app.extensions import (
     cache,
     assets_env,
     debug_toolbar,
-    login_manager
 )
 
 
