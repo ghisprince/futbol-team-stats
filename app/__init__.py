@@ -73,4 +73,16 @@ def create_app(object_name):
     # register our blueprints
     app.register_blueprint(main)
 
+    if not app.debug:
+        import logging
+
+        event_handler = logging.FileHandler("logfile.txt")
+        event_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s '
+            '[in %(pathname)s:%(lineno)d]'
+        ))
+
+        event_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(event_handler)
+
     return app
