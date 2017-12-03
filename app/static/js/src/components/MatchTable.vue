@@ -1,67 +1,72 @@
 <template id="match-table">
     <div>
+        <div v-show="!showTable">
+            <vue-simple-spinner></vue-simple-spinner>
+        </div>
+        <div v-show="showTable">
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Match Date</th>
-                    <th v-if="showCompetition">Competition</th>
-                    <th v-if="showOpponent">Opponent</th>
-                    <th>Result</th>
-                    <th title="Goals For">GF</th>
-                    <th title="Goals Against">GA</th>
-                    <th title="Shots For">SF</th>
-                    <th title="Shots Against">SA</th>
-                    <th v-if="showActions">Actions</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <td v-for="footSum in footSums"> {{ footSum }}</td>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr v-for="match in orderedMatches">
-                    <td>
-                        <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
-                            {{ match.date_time | formatDate }}
-                        </router-link>
-                    </td>
-                    <td v-if="showCompetition === true">
-                        {{ match.competition.name }}
-                    </td>
-                    <td v-if="showOpponent">
-                        {{ match.opponent.name }}
-                    </td>
-                    <td>
-                        {{ match.result }}
-                    </td>
-                    <td>
-                        {{ match.num_goals }}
-                    </td>
-                    <td>
-                        {{ match.num_goals_against }}
-                    </td>
-                    <td>
-                        {{ match.num_shots }}
-                    </td>
-                    <td>
-                        {{ match.num_shots_against }}
-                    </td>
-                    <td v-if="showActions">
-                        <router-link class="btn btn-warning btn-xs"
-                                     v-bind:to="{name: 'match-edit', params: {match_id: match.id, uri: match._links.self}}">
-                            <span class="glyphicon glyphicon-pencil"></span> Edit
-                        </router-link>
-                        <router-link v-if="match.player_matches.length == 0"
-                                     class="btn btn-danger btn-xs"
-                                     v-bind:to="{name: 'match-delete', params: {match_id: match.id, type: 'match', name: match.name, uri: match._links.self}}">
-                            <span class="glyphicon glyphicon-remove"></span> Delete
-                        </router-link>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Match Date</th>
+                        <th v-if="showCompetition">Competition</th>
+                        <th v-if="showOpponent">Opponent</th>
+                        <th>Result</th>
+                        <th title="Goals For">GF</th>
+                        <th title="Goals Against">GA</th>
+                        <th title="Shots For">SF</th>
+                        <th title="Shots Against">SA</th>
+                        <th v-if="showActions">Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr v-for="match in orderedMatches">
+                        <td>
+                            <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
+                                {{ match.date_time | formatDate }}
+                            </router-link>
+                        </td>
+                        <td v-if="showCompetition === true">
+                            {{ match.competition.name }}
+                        </td>
+                        <td v-if="showOpponent">
+                            {{ match.opponent.name }}
+                        </td>
+                        <td>
+                            {{ match.result }}
+                        </td>
+                        <td>
+                            {{ match.num_goals }}
+                        </td>
+                        <td>
+                            {{ match.num_goals_against }}
+                        </td>
+                        <td>
+                            {{ match.num_shots }}
+                        </td>
+                        <td>
+                            {{ match.num_shots_against }}
+                        </td>
+                        <td v-if="showActions">
+                            <router-link class="btn btn-warning btn-xs"
+                                         v-bind:to="{name: 'match-edit', params: {match_id: match.id, uri: match._links.self}}">
+                                <span class="glyphicon glyphicon-pencil"></span> Edit
+                            </router-link>
+                            <router-link v-if="match.player_matches.length == 0"
+                                         class="btn btn-danger btn-xs"
+                                         v-bind:to="{name: 'match-delete', params: {match_id: match.id, type: 'match', name: match.name, uri: match._links.self}}">
+                                <span class="glyphicon glyphicon-remove"></span> Delete
+                            </router-link>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -69,6 +74,8 @@
 <script>
 
 import _ from 'lodash'
+import Spinner from 'vue-simple-spinner'
+
 
 export default {
     props: {matches: {},
@@ -76,10 +83,15 @@ export default {
             showOpponent: {default: true},
             showActions: {default: false}
     },
-    data () {
-        return {}
+    data() {
+        return {
+            showTable: false
+        }
     },
     created() {
+    },
+    components: {
+        'vue-simple-spinner': Spinner
     },
     computed: {
         orderedMatches: function() {
@@ -90,6 +102,10 @@ export default {
             //  gives this.player.player_match is undefined, clearly
             //  lodash does it right though
             var tds = ["Count: " + _(this.matches).size()];
+
+            if (_(this.matches).size() > 0) {
+                this.showTable=true;
+            }
 
             if (this.showCompetition){
                 var tds = tds.concat(["-"]);

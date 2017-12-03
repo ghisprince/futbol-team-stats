@@ -1,62 +1,66 @@
 <template id="agg-player-match-table">
     <div>
         <h2 id="section">Aggregated Player data</h2>
-
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th title="Player">Player</th>
-                    <th title="Appearances by player">Apps</th>
-                    <th title="Started the match">Starter</th>
-                    <th title="Minutes played">Min</th>
-                    <th title="Goals">G</th>
-                    <th title="Assists">A</th>
-                    <th title="Shots">S</th>
-                    <th title="Yellow Cards">YC</th>
-                    <th title="Red Cards">RC</th>
-                    <th title="Subbed out due to injury">injury</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <td v-for="footSum in footSums"> {{ footSum }}</td>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr v-for="pms in aggregatedPlayerMatches">
-                    <td>
-                        {{ pms.player }}
-                    </td>
-                    <td>
-                        {{ pms.apps }}
-                    </td>
-                    <td>
-                        {{ pms.starter }}
-                    </td>
-                    <td>
-                        {{ pms.minutes }}
-                    </td>
-                    <td>
-                        {{ pms.num_goals ? pms.num_goals : '' }}
-                    </td>
-                    <td>
-                        {{ pms.assists ? pms.assists : '' }}
-                    </td>
-                    <td>
-                        {{ pms.shots ? pms.shots : '' }}
-                    </td>
-                    <td>
-                        {{ pms.yellow_cards ? pms.yellow_cards : '' }}
-                    </td>
-                    <td>
-                        {{ pms.red_cards ? pms.red_cards : '' }}
-                    </td>
-                    <td>
-                        {{ pms.subbed_due_to_injury ? pms.subbed_due_to_injury : '' }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-show="!showTable">
+            <vue-simple-spinner></vue-simple-spinner>
+        </div>
+        <div v-show="showTable">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th title="Player">Player</th>
+                        <th title="Appearances by player">Apps</th>
+                        <th title="Started the match">Starter</th>
+                        <th title="Minutes played">Min</th>
+                        <th title="Goals">G</th>
+                        <th title="Assists">A</th>
+                        <th title="Shots">S</th>
+                        <th title="Yellow Cards">YC</th>
+                        <th title="Red Cards">RC</th>
+                        <th title="Subbed out due to injury">injury</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr v-for="pms in aggregatedPlayerMatches">
+                        <td>
+                            {{ pms.player }}
+                        </td>
+                        <td>
+                            {{ pms.apps }}
+                        </td>
+                        <td>
+                            {{ pms.starter }}
+                        </td>
+                        <td>
+                            {{ pms.minutes }}
+                        </td>
+                        <td>
+                            {{ pms.num_goals ? pms.num_goals : '' }}
+                        </td>
+                        <td>
+                            {{ pms.assists ? pms.assists : '' }}
+                        </td>
+                        <td>
+                            {{ pms.shots ? pms.shots : '' }}
+                        </td>
+                        <td>
+                            {{ pms.yellow_cards ? pms.yellow_cards : '' }}
+                        </td>
+                        <td>
+                            {{ pms.red_cards ? pms.red_cards : '' }}
+                        </td>
+                        <td>
+                            {{ pms.subbed_due_to_injury ? pms.subbed_due_to_injury : '' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <p id="sub-table-note"><i>Bottom most row is summary of each column</i></p>
 
     </div>
@@ -66,6 +70,7 @@
 <script>
 
 import _ from 'lodash'
+import Spinner from 'vue-simple-spinner'
 
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
@@ -98,12 +103,15 @@ export default {
     props: {
         player_matches: {}
     },
-    data () {
-        return {}
+    data() {
+        return {
+            showTable: false
+        }
     },
-    created() {
+    created() {},
+    components: {
+        'vue-simple-spinner': Spinner
     },
-
     computed: {
         aggregatedPlayerMatches: function() {
             // https://stackoverflow.com/questions/22954066/group-by-and-aggregation-on-json-array-using-underscore-js
@@ -143,6 +151,10 @@ export default {
                     _.sum(_.map(this.player_matches, 'subbed_due_to_injury')),
                     ];
 
+            // show the table once all values are computed
+            if (_(this.aggregatedPlayerMatches).size() > 0) {
+                this.showTable=true;
+            }
             return tds;
         }
     }
