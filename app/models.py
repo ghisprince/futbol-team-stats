@@ -39,10 +39,29 @@ def get_or_create(session, model, **kwargs):
 
 
 # many to many relationship between User and Team
-association = db.Table('association',
-                  db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                  db.Column('team_id', db.Integer, db.ForeignKey('team.id')))
+class TeamsUsers(db.Model):
+    __tablename__ = 'teams_users'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+    team_id = db.Column('team_id', db.Integer, db.ForeignKey('team.id'))
 
+
+class RolesUsers(db.Model):
+    __tablename__ = 'roles_users'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column('user_id', db.Integer(), db.ForeignKey('user.id'))
+    role_id = db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+
+
+class Role(db.Model):#, RoleMixin):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+    def __init__(self, name=None, description=None):
+        self.name = name
+        self.description = description
 
 class User(db.Model, CRUD_MixIn, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -50,11 +69,16 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     password = db.Column(db.String(), nullable=False)
     token = db.Column(db.String())
     email = db.Column(db.String())
-    team = db.relationship('Team', secondary=association,
-                           backref=db.backref('teams', lazy='dynamic'))
 
-    def __init__(self, username, password):
+    roles = db.relationship('Role', secondary='roles_users',
+                         backref=db.backref('users', lazy='dynamic'))
+
+    teams = db.relationship('Team', secondary='teams_users',
+                            backref=db.backref('teams', lazy='dynamic'))
+
+    def __init__(self, username, password, email=None):
         self.username = username
+        self.email = email
         self.set_password(password)
 
     def set_password(self, password):
@@ -99,7 +123,10 @@ class User(db.Model, CRUD_MixIn, UserMixin):
         user = User.query.get(data['id'])
         return user
 
-
+    @hybrid_property
+    def is_editor(self):
+        """ return True if editor is in roles"""
+        return "editor" in [i.name for i in self.roles]
 
     def __repr__(self):
         return '<User {} (id={})>'.format(self.id, self.username)
@@ -640,7 +667,6 @@ class Goal(db.Model, CRUD_MixIn):
             player = ""
         else:
             player = self.shot.player_match.player.name
-
 
         return "{}{} {}".format(player, assist, time)
 

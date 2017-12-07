@@ -1,12 +1,13 @@
 <template id="match">
     <div>
-
         <h5 id="section">{{ match.competition.name }}, {{ match.date_time | formatDate }}</h5>
 
         <h2 id="section">Team Stats</h2>
+
         <div v-show="!showTable">
             <vue-simple-spinner></vue-simple-spinner>
         </div>
+
         <div v-show="showTable">
             <table class="table table-striped" align="center">
                 <thead>
@@ -109,7 +110,6 @@ import Spinner from 'vue-simple-spinner'
 
 import PlayerMatchTable from '../player_match/PlayerMatchTable.vue'
 import ShotGraph from '../player_match/ShotGraph.vue'
-
 
 //  https://jsfiddle.net/n5osgpkg/
 export default {

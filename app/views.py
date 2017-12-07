@@ -1,4 +1,5 @@
 import flask_restful
+import flask_login
 
 from flask import jsonify, make_response, request
 from sqlalchemy.exc import SQLAlchemyError
@@ -13,6 +14,7 @@ from marshmallow import ValidationError
 import webargs
 from pprint import pprint
 
+user_schema = UserSchema()
 
 team_schema = TeamSchema()
 team_schema_ex = TeamSchemaEx()
@@ -459,6 +461,14 @@ class GetUpdateDeleteResourceBase(Resource):
             resp = jsonify({"error": str(e)})
             resp.status_code = 401
             return resp
+
+
+class GetCurrentUser(GetUpdateDeleteResourceBase):
+    mm_schema = user_schema
+
+    def get(self,):
+        query = User.query.get_or_404(flask_login.current_user.get_id())
+        return self.mm_schema.dump(query).data
 
 
 class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):

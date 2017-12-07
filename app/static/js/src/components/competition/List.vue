@@ -1,6 +1,6 @@
 <template id="competition-list">
     <div>
-        <div class="actions">
+        <div class="actions" v-show="$root.current_user.is_editor">
             <router-link class="btn btn-success" v-bind:to="{path: '/add-competition'}">
                 <span class="glyphicon glyphicon-plus"></span>
                 Add competition
@@ -16,7 +16,6 @@
             <vue-simple-spinner></vue-simple-spinner>
         </div>
         <div v-show="showTable">
-
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -26,7 +25,7 @@
                     <th title="Matches Won">W</th>
                     <th title="Matches Tied">D</th>
                     <th title="Matches Lost">L</th>
-                    <th>Actions</th>
+                    <th v-show="$root.current_user.is_editor">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +51,7 @@
                         {{ competition.num_match_lost }}
                     </td>
 
-                    <td>
+                    <td v-show="$root.current_user.is_editor">
                         <router-link class="btn btn-warning btn-xs"
                                      v-bind:to="{name: 'competition-edit', params: {competition_id: competition.id}}">
                             <span class="glyphicon glyphicon-pencil"></span> Edit
@@ -66,8 +65,6 @@
                 </tbody>
             </table>
         </div>
-        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-        <router-link v-bind:to="'/'">Back to editing options</router-link>
 
     </div>
 </template>

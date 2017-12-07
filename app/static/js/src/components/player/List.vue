@@ -1,6 +1,6 @@
 <template id="player-list">
     <div>
-        <div class="actions">
+        <div class="actions" v-show="$root.current_user.is_editor">
             <router-link class="btn btn-success" v-bind:to="{path: '/add-player'}">
                 <span class="glyphicon glyphicon-plus"></span>
                 Add player
@@ -18,14 +18,13 @@
         </div>
 
         <div v-show="showTable">
-
             <table class="table">
                 <thead>
                     <tr>
                     <th>Name</th>
                     <th>Active</th>
                     <th>Matches</th>
-                    <th>Actions</th>
+                    <th v-show="$root.current_user.is_editor">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +40,7 @@
                             {{ player.player_matches.length }} matches
                         </router-link>
                     </td>
-                    <td>
+                    <td v-show="$root.current_user.is_editor">
                         <router-link class="btn btn-warning btn-xs"
                                      v-bind:to="{name: 'player-edit', params: {player_id: player.id}}">
                             <span class="glyphicon glyphicon-pencil"></span> Edit
@@ -55,10 +54,6 @@
                 </tbody>
             </table>
         </div>
-
-        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-        <router-link v-bind:to="'/'">Back to editing options</router-link>
-
     </div>
 </template>
 

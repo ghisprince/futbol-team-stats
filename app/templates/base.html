@@ -27,30 +27,36 @@
     </head>
 
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Flask Foundation</a>
+        <div class="container">
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/">Futbol Team Stats</a>
+                    </div>
+                    <ul class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-right">
+
+                            {% if not current_user.is_authenticated %}
+                                <li><a href="(( url_for('.login') ))">Login</a></li>
+                            {% else %}
+
+                                <li class="nav-item dropdown">
+                                    <a class="dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/stats#/match-list">Matches</a></li>
+                                        <li><a href="/stats#/opponent-list">Opponents</a></li>
+                                        <li><a href="/stats#/competition-list">Competitions</a></li>
+                                        <li><a href="/stats#/player-list">Players</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="(( url_for('.logout') ))">Logout ( (( current_user.username )) ) </a></li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div><!--/.nav-collapse -->
             </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="(( url_for('.home') ))">Home</a></li>
-                    <li><a href="(( url_for('.stats') ))">Stats</a></li>
-
-                    {% if not current_user.is_authenticated %}
-                        <li><a href="(( url_for('.login') ))">Login</a></li>
-                    {% else %}
-                        <li><a href="(( url_for('.logout') ))">Logout</a></li>
-                    {% endif %}
-
-                    <li><a href="(( url_for('.restricted') ))">Login Restricted Page</a></li>
-                    <li>username?</li>
-                </ul>
-            </div><!--/.nav-collapse -->
         </div>
 
         <div class="container">

@@ -1,6 +1,6 @@
 <template id="opponent-list">
     <div>
-        <div class="actions">
+        <div class="actions" v-show="$root.current_user.is_editor">
             <router-link class="btn btn-success" v-bind:to="{path: '/add-opponent'}">
                 <span class="glyphicon glyphicon-plus"></span>
                 Add opponent
@@ -27,7 +27,7 @@
                     <th title="Matches Won">W</th>
                     <th title="Matches Tied">D</th>
                     <th title="Matches Lost">L</th>
-                    <th>Actions</th>
+                    <th v-show="$root.current_user.is_editor">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,7 +49,7 @@
                     <td>
                         {{ opponent.num_match_lost }}
                     </td>
-                    <td>
+                    <td v-show="$root.current_user.is_editor">
                         <router-link class="btn btn-warning btn-xs"
                                      v-bind:to="{name: 'opponent-edit', params: {opponent_id: opponent.id}}">
                             <span class="glyphicon glyphicon-pencil"></span> Edit
@@ -64,8 +64,6 @@
                 </tbody>
             </table>
         </div>
-        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-        <router-link v-bind:to="'/'">Back to editing options</router-link>
     </div>
 </template>
 

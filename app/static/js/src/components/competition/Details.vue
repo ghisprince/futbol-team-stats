@@ -25,7 +25,9 @@ import AggPlayerMatchTable from '../player_match/AggPlayerMatchTable.vue'
 
 export default {
     data () {
-        return {competition: {name: ''}, player_matches: []}
+        return {competition: {name: ''},
+                player_matches: [],
+                matches: []}
     },
     components: {
         'match-table': MatchTable,

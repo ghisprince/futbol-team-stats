@@ -19,7 +19,7 @@
 
             <hr/>
 
-            <player-match-table :showActions=true></player-match-table>
+            <player-match-table :showActions=true&&user.is_editor></player-match-table>
 
             <hr/>
 
@@ -47,7 +47,8 @@ import ShotGraph from '../player_match/ShotGraph.vue'
 export default {
     data () {
         return {match: {},
-                match_stats:{}
+                match_stats:{},
+                user: {is_editor:false}
                 }
     },
     components: {
@@ -66,6 +67,11 @@ export default {
                 this.match_stats = {};
             }
         })
+        axios.get(`/api/v1/user`)
+        .then(response => {
+            this.user = response.data;
+        })
+
     },
     methods: {
         updateMatch: function() {

@@ -5,6 +5,16 @@ from app.shared import api
 from app.models import *
 
 
+class UserSchema(ModelSchema):
+    is_editor = fields.Boolean(dump_only=True)
+
+    class Meta:
+        strict = True
+        model = User
+        fields = ('username', 'is_editor', 'token', 'teams')
+        sqla_session = db.session
+
+
 class TeamSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteTeam'.lower(), team_id="<id>"),
@@ -69,7 +79,7 @@ class CompetitionSchemaEx(CompetitionSchema):
 class OpponentSchema(ModelSchema):
     _links = ma.Hyperlinks(
         {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), opponent_id="<id>"),
-         'collection': ma.URLFor('CreateListOpponent'.lower()) })
+         'collection': ma.URLFor('CreateListOpponent'.lower())})
 
     num_match_won = fields.String(dump_only=True)
     num_match_tied = fields.String(dump_only=True)

@@ -24,7 +24,7 @@ def login():
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).one()
-        login_user(user)
+        login_user(user, remember=True)
 
         flash("Logged in successfully.", "success")
         return redirect(request.args.get("next") or url_for(".home"))

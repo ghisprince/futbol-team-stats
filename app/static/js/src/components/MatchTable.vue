@@ -1,5 +1,12 @@
 <template id="match-table">
     <div>
+        <div class="filters row" v-show="showCompetition && showOpponent">
+            <div class="form-group col-sm-3">
+                <label for="search-element">Name filter</label>
+                <input v-model="searchKey" class="form-control" id="search-element" required/>
+            </div>
+        </div>
+
         <div v-show="!showTable">
             <vue-simple-spinner></vue-simple-spinner>
         </div>
@@ -85,7 +92,8 @@ export default {
     },
     data() {
         return {
-            showTable: false
+            showTable: false,
+            searchKey: ''
         }
     },
     created() {
@@ -95,7 +103,14 @@ export default {
     },
     computed: {
         orderedMatches: function() {
-            return _.orderBy(this.matches, 'date_time', 'desc')
+            if (!this.matches) {
+                return [];
+            }
+            var matches = this.matches.filter(function (match) {
+                return this.searchKey=='' || match.opponent.name.indexOf(this.searchKey) !== -1 || match.competition.name.indexOf(this.searchKey) !== -1;
+            }, this);
+
+            return _.orderBy(matches, 'date_time', 'desc')
         },
         footSums: function () {
             // why not "match: this.player.player_match.length? because vue

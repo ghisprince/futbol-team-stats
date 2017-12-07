@@ -4,21 +4,13 @@
 
 {% block body %}
     <div class="jumbotron">
-        <h1>Flask Foundation</h1>
-        <p>The unopinionated flask framework</p>
+        <h1>((current_user.teams[0].name ))</h1>
+        <p>Team Stats</p>
     </div>
 
 
-    <div class="row">
-        <div class="col-md-4">
-            <h3>What do you want to do?</h3>
-            <p>
-            <ul>
-                <li><a href="/stats">Team statistics</a></li>
-            </ul>
-            </p>
-        </div>
+{% endblock %}
 
-    </div>
 
- {% endblock %}
+{% block js %}
+{% endblock %}

@@ -21,7 +21,6 @@
 <script>
 
 import axios from 'axios'
-import alert from 'vue-strap/src/alert.vue'
 
 export default {
     props: ['name', 'uri', 'type', 'canDelete'],
