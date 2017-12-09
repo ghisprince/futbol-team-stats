@@ -140,6 +140,8 @@ class Team(db.Model, CRUD_MixIn):
     # relationships
     matches = db.relationship('Match', back_populates="team")
     players = db.relationship("Player", back_populates="team")
+    opponents = db.relationship("Opponent", back_populates="team")
+    competitions = db.relationship("Competition", back_populates="team")
 
     def __init__(self, name=None):
         self.name = name
@@ -151,12 +153,16 @@ class Team(db.Model, CRUD_MixIn):
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
-    coach_name = db.Column(db.String())
     team_crest_uri = db.Column(db.String())
     external_url = db.Column(db.String())
 
     # relationships
     matches = db.relationship("Match", back_populates="opponent")
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'),
+                        nullable=False, index=True)
+    team = db.relationship("Team",
+                           uselist=False,
+                           back_populates="opponents")
 
     @hybrid_property
     def num_match_won(self):
@@ -180,9 +186,9 @@ class Opponent(db.Model, CRUD_MixIn):
                                  self.num_match_tied,
                                  self.num_match_lost)
 
-    def __init__(self, name, coach_name=None, external_url=None):
+    def __init__(self, name, team, external_url=None):
         self.name = name
-        self.coach_name = coach_name
+        self.team = team
         self.external_url = external_url
 
     def __repr__(self):
@@ -197,6 +203,12 @@ class Competition(db.Model, CRUD_MixIn):
 
     # relationships
     matches = db.relationship("Match", back_populates="competition")
+
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'),
+                        nullable=False, index=True)
+    team = db.relationship("Team",
+                           uselist=False,
+                           back_populates="competitions")
 
     @hybrid_property
     def start_date(self):
@@ -227,8 +239,9 @@ class Competition(db.Model, CRUD_MixIn):
                                  self.num_match_tied,
                                  self.num_match_lost)
 
-    def __init__(self, name, result=None, external_url=None):
+    def __init__(self, name, team, result=None, external_url=None):
         self.name = name
+        self.team = team
         self.result = result
         self.external_url = external_url
 
@@ -270,6 +283,15 @@ class Match(db.Model, CRUD_MixIn):
                                   cascade="all, delete-orphan")
 
     @hybrid_property
+    def opponent_name(self):
+        return self.opponent.name
+
+    @hybrid_property
+    def competition_name(self):
+        if self.competition:
+            return self.competition.name
+
+    @hybrid_property
     def result(self):
         goals_for = self.num_goals
         goals_against = self.num_goals_against
@@ -291,7 +313,7 @@ class Match(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def label(self):
-        return "match 2 of tourney X (2017/11/5), - or something like that"
+        return "match 2 of tourney X (2017/11/5), - or something"
 
     @hybrid_property
     def num_goals(self):
@@ -303,7 +325,7 @@ class Match(db.Model, CRUD_MixIn):
 
     def _goals_timeline(self, by_opponent):
         goals = db.session.query(Goal).join(Shot).join(PlayerMatch).join(Match)\
-            .filter(Match.id == self.id).filter(Shot.by_opponent==by_opponent).all()
+            .filter(Match.id == self.id).filter(Shot.by_opponent == by_opponent).all()
 
         return [i.label for i in sorted(goals, key=lambda x: x.time if x.time else 0)]
 

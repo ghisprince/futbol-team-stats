@@ -21,7 +21,10 @@ export default {
     data () {
         return {player: {name: '',
                          number: null,
-                         active: true}}
+                         active: true,
+                         team: {id: this.$root.current_team}
+                         }
+                }
     },
     components: {
         'player': Player

@@ -7,7 +7,7 @@
             </router-link>
         </div>
 
-        <match-table v-bind:matches="matches" v-bind:showActions=true&&user.is_editor>
+        <match-table v-bind:matches="matches" v-bind:showActions=true&&$root.current_user.is_editor>
         </match-table>
     </div>
 </template>
@@ -27,13 +27,9 @@ export default {
         }
     },
     created() {
-        axios.get(`/api/v1/matches?expand=true`)
+        axios.get(`/api/v1/matches`)
         .then(response => {
             this.matches = response.data
-        })
-        axios.get(`/api/v1/user`)
-        .then(response => {
-            this.user = response.data;
         })
     },
     components: {

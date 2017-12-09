@@ -19,7 +19,7 @@
 
             <hr/>
 
-            <player-match-table :showActions=true&&user.is_editor></player-match-table>
+            <player-match-table :showActions=true&&$root.current_user.is_editor></player-match-table>
 
             <hr/>
 
@@ -67,11 +67,6 @@ export default {
                 this.match_stats = {};
             }
         })
-        axios.get(`/api/v1/user`)
-        .then(response => {
-            this.user = response.data;
-        })
-
     },
     methods: {
         updateMatch: function() {

@@ -2,6 +2,7 @@ import flask_restful
 import flask_login
 
 from flask import jsonify, make_response, request
+from flask import session as flask_session
 from sqlalchemy.exc import SQLAlchemyError
 from webargs.flaskparser import use_kwargs
 
@@ -13,6 +14,15 @@ import marshmallow
 from marshmallow import ValidationError
 import webargs
 from pprint import pprint
+import json
+
+"""
+This module servers views of the model as REST api
+
+This module should be refactored to be DRY-er.
+  
+"""
+
 
 user_schema = UserSchema()
 
@@ -63,12 +73,13 @@ If a POST request did not include a Client-Generated ID and the
 requested resource has been created successfully, the server MUST 
 return a 201 Created status code"""
 
+
 # decorate all with end points with login_required
 class Resource(flask_restful.Resource):
     method_decorators = [login_required]
 
-class CreateListResourceBase(Resource):
 
+class CreateListResourceBase(Resource):
     def post(self, request_dict=None):
         if not request_dict:
             request_dict = request.get_json(force=True)
@@ -129,9 +140,8 @@ class CreateListPlayer(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
-        if request_dict.get('team'):
-            request_dict['team'] = Team.query.get_or_404(
-                request_dict.get('team', None))
+        request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
+
         return self.ModelClass(**request_dict)
 
 
@@ -151,7 +161,30 @@ class CreateListCompetition(CreateListResourceBase):
             return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
+    def post(self):
+        request_dict = request.get_json(force=True)
+        try:
+            self.mm_schema.validate(request_dict)
+            modelInst = self.InstanceFromDict(request_dict)
+            modelInst.add(modelInst)
+            query = self.ModelClass.query.get(modelInst.id)
+            results = self.mm_schema.dump(query).data
+            return results, 201
+
+        except ValidationError as err:
+            resp = jsonify({"error": err.messages})
+            resp.status_code = 403
+            return resp
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            resp = jsonify({"error": str(e)})
+            resp.status_code = 403
+            return resp
+
     def InstanceFromDict(self, request_dict):
+        request_dict['team'] = db.session.query(Team).filter_by(
+            id=request_dict['team']['id']).one()
         return self.ModelClass(**request_dict)
 
 
@@ -167,6 +200,8 @@ class CreateListOpponent(CreateListResourceBase):
         return self.mm_schema.dump(query.all(), many=True).data
 
     def InstanceFromDict(self, request_dict):
+        request_dict['team'] = db.session.query(Team).filter_by(
+            id=request_dict['team']['id']).one()
         return self.ModelClass(**request_dict)
 
 
@@ -384,28 +419,6 @@ class CreateListAssist(CreateListResourceBase):
         return self.ModelClass(**request_dict)
 
 
-"""
-# collections within relationships
-class AddRemoveListTeamPlayer(Resource):
-    ModelClass = Player
-    mm_schema = player_schema
-
-    def get(self, team_id=None):
-        query = self.ModelClass.query.join(Team).filter(Team.id == team_id)
-        return self.mm_schema.dump(query.all(), many=True).data
-
-
-class AddRemoveListTeamMatch(Resource):
-    ModelClass = Match
-    mm_schema = match_schema
-
-    def get(self, team_id):
-        query = self.ModelClass.query.filter(Match.team_id == team_id)
-        return self.mm_schema.dump(query.all(), many=True).data
-"""
-
-
-#
 class GetUpdateDeleteResourceBase(Resource):
     """ base class that adds
         - get(id)
@@ -463,12 +476,38 @@ class GetUpdateDeleteResourceBase(Resource):
             return resp
 
 
-class GetCurrentUser(GetUpdateDeleteResourceBase):
+class GetCurrentUserID(Resource): # not GetUpdateDeleteResourceBase
     mm_schema = user_schema
 
     def get(self,):
         query = User.query.get_or_404(flask_login.current_user.get_id())
         return self.mm_schema.dump(query).data
+
+
+class GetCurrentTeamID(Resource): # not GetUpdateDeleteResourceBase
+    mm_schema = team_schema
+
+    def get(self,):
+        team_id = flask_session.get('current_team', None)
+        if team_id is None:
+            # if no current_team, then get first from current_user
+            current_user = User.query.get_or_404(flask_login.current_user.get_id())
+            try:
+                team_id = current_user.teams[0].id
+            except:
+                raise ValueError("Need an active team")
+
+        return json.dumps(team_id)
+
+    def post(self):
+        request_dict = request.get_json(force=True)
+
+        if not request_dict in [i.id for i in User.query.get_or_404(flask_login.current_user.get_id()).teams]:
+            raise ValueError("User not associated with this team")
+
+        team = Team.query.get_or_404(request_dict)
+        flask_session['current_team'] = team.id
+        return json.dumps(team.id)
 
 
 class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):

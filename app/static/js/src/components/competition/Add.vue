@@ -21,8 +21,9 @@ export default {
     data () {
         return {competition: {name: null,
                               result: null,
-                              external_url: null}
-                              }
+                              external_url: null,
+                              team: {id: this.$root.current_team}
+                              }}
     },
     components: {
         'competition': Competition

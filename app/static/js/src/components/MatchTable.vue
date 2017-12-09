@@ -39,10 +39,10 @@
                             </router-link>
                         </td>
                         <td v-if="showCompetition === true">
-                            {{ match.competition.name }}
+                            {{ match.competition_name }}
                         </td>
                         <td v-if="showOpponent">
-                            {{ match.opponent.name }}
+                            {{ match.opponent_name }}
                         </td>
                         <td>
                             {{ match.result }}
@@ -107,7 +107,7 @@ export default {
                 return [];
             }
             var matches = this.matches.filter(function (match) {
-                return this.searchKey=='' || match.opponent.name.indexOf(this.searchKey) !== -1 || match.competition.name.indexOf(this.searchKey) !== -1;
+                return this.searchKey=='' || match.opponent_name.indexOf(this.searchKey) !== -1 || match.competition.name.indexOf(this.searchKey) !== -1;
             }, this);
 
             return _.orderBy(matches, 'date_time', 'desc')

@@ -20,7 +20,10 @@ import Opponent from './Opponent.vue'
 export default {
     data () {
         return {opponent: {name: '',
-                           external_url: null}}
+                           external_url: null,
+                           team: {id: this.$root.current_team}
+                           }
+                }
     },
     components: {
         'opponent': Opponent

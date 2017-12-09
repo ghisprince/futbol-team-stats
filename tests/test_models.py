@@ -58,25 +58,40 @@ class TestModels:
         player = Player("Lil' Ronaldhino", 11, team)
         assert player.team.name == "Barca"
 
-    def test_competition(self, testapp):
-        camp = Competition("Spring 2017")
-        assert camp.name == "Spring 2017"
+    def test_opponent(self, testapp):
+        opp = Opponent("Team Z", Team("Man U"))
+        assert opp.name == "Team Z"
+        assert opp.team.name == "Man U"
 
-        camp.result = "2nd place"
-        assert camp.result == "2nd place"
+    def test_opponent_err(self, testapp):
+        with pytest.raises(TypeError):
+            Opponent("Team Z")
+
+    def test_competition(self, testapp):
+        comp = Competition("Spring 2017", Team("Team 99"), result="2nd place")
+
+        assert comp.name == "Spring 2017"
+        assert comp.team.name == "Team 99"
+        assert comp.result == "2nd place"
+
+    def test_competition_err(self, testapp):
+        with pytest.raises(TypeError):
+            Competition("Spring 2017")
 
     def test_match(self, testapp):
+        team = Team("Lil' Barca")
         match = Match("2017-01-02T08:00:00",
-                      Team("Lil' Barca"),
-                      Opponent("Lil' Real Madrid"),)
+                      team,
+                      Opponent("Lil' Real Madrid", team))
         assert match.team.name == "Lil' Barca"
         assert match.opponent.name == "Lil' Real Madrid"
         assert match.competition is None
 
     def test_matchstats(self, testapp):
+        team = Team("Lil' Barca")
         match = Match("2017-01-02T03:40:50",
-                      Team("Lil' Barca"),
-                      Opponent("Lil' Real Madrid"),)
+                      team,
+                      Opponent("Lil' Real Madrid", team))
 
         assert match.match_stats is None
 
@@ -89,9 +104,10 @@ class TestModels:
         assert matchstats.match.opponent.name == "Lil' Real Madrid"
 
     def test_matchstats_delete(self, testapp):
+        team = Team("Lil' Barca")
         match = Match("2017-01-02T03:40:50",
-                      Team("Lil' Barca"),
-                      Opponent("Lil' Real Madrid"),)
+                      team,
+                      Opponent("Lil' Real Madrid", team))
 
         matchstats = MatchStats(match, passes=99, pass_strings=10, pass_pct=50,
                                 opponent_passes=55,
@@ -103,21 +119,22 @@ class TestModels:
 
 
     def test_match_competition(self, testapp):
+        team = Team("Lil' Barca")
         match = Match("2017-11-12T08:00:00",
-                      Team("Lil' Barca"),
-                      Opponent("Lil' Real Madrid"),
-                      Competition("Fall 2017"))
+                      team,
+                      Opponent("Lil' Real Madrid", team),
+                      Competition("Fall 2017", team))
 
         assert match.competition.name == "Fall 2017"
 
     def test_complete(self, testapp):
 
         team = Team("Lil' Barca")
-        opponent = Opponent("Lil' Real Madrid")
+        opponent = Opponent("Lil' Real Madrid", team)
         match = Match("2017-11-12T08:00:00",
                       team,
                       opponent,
-                      Competition("Fall 2017"))
+                      Competition("Fall 2017", team))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
                                     match,
@@ -188,14 +205,13 @@ class TestModels:
         assert(len(Assist.query.all()) == 0)
         assert(len(Shot.query.all()) == 0)
 
-
     def test_goal(self, testapp):
         team = Team("Lil' Barca")
-        opponent = Opponent("Lil' Real Madrid")
+        opponent = Opponent("Lil' Real Madrid", team)
         match = Match("2017-11-12T08:00:00",
                       team,
                       opponent,
-                      Competition("Fall 2017"))
+                      Competition("Fall 2017", team))
 
         player_match1 = PlayerMatch(Player("Lil' Messi", 10),
                                     match, True, 60, True, 1, 0, 1)
@@ -216,7 +232,7 @@ class TestModels:
 
     def test_assist(self, testapp):
         team = Team("A Team")
-        opponent = Opponent("B Team")
+        opponent = Opponent("B Team", team)
         match = Match("2017-11-12T08:00:00",
                       team,
                       opponent,)

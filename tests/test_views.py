@@ -8,8 +8,8 @@ import os
 from pprint import pprint
 import pdb
 
-create_user = False
-
+create_user = True
+login_user = True
 
 def get_result(req):
     code = req.status_code
@@ -37,13 +37,14 @@ class TestViews:
                                                  match_data['team']),
                                              content_type='application/json'))
         team_id = resp['id']
+        match_data['opponent']['team'] = resp
 
         code, resp = get_result(testapp.post('/api/v1/opponents/',
                                              data=json.dumps(
                                                  match_data['opponent']),
                                              content_type='application/json'))
         opponent_id = resp['id']
-
+        match_data['competition']['team'] = resp
         code, resp = get_result(testapp.post('/api/v1/competitions/',
                                              data=json.dumps(
                                                  match_data['competition']),
@@ -88,6 +89,38 @@ class TestViews:
         return resp
 
 
+    def test_current_user(self, testapp):
+        code, resp = get_result(testapp.get('/api/v1/currentuser'))
+        assert code == 200
+
+        # this is coming from the fixture (conftest.py)
+        assert resp['username'] == "admin"
+
+
+    def test_current_team(self, testapp):
+        _, user = get_result(testapp.get('/api/v1/currentuser'))
+
+        code, active_team = get_result(testapp.post('/api/v1/currentteam',
+                                                    data='1',
+                                                    content_type='application/json'))
+
+        assert active_team['name'] == "a team"
+
+    def test_current_team_update(self, testapp):
+        _, current_user = get_result(testapp.get('/api/v1/currentuser'))
+        _, current_team = get_result(testapp.get('/api/v1/currentteam'))
+
+        assert int(current_team) in current_user['teams']
+
+        alternate_team_id = (set(current_user['teams']) - {int(current_team)}).pop()
+        _, alternate_team = get_result(testapp.get('/api/v1/teams/{}'.format(alternate_team_id)))
+        code, current_team = get_result(testapp.post('/api/v1/currentteam',
+                                                     data=str(alternate_team['id']),
+                                                     content_type='application/json'))
+        assert code == 200
+        assert int(current_team) == alternate_team_id
+
+
     def test_team_post(self, testapp):
         code, resp = get_result(testapp.get('/api/v1/teams/'))
         assert code == 200
@@ -108,9 +141,8 @@ class TestViews:
         _, team = get_result(testapp.get(team_t['_links']['self'],
                                           data='{"name":"Team T"}',
                                           content_type='application/json'))
-        assert sorted(list(team)) == sorted(['_links', 'id', 'matches', 'name',
-                                             'players', 'teams',
-                                             'team_crest_uri'])
+        assert sorted(list(team)) == sorted(['_links', 'competitions', 'id', 'matches', 'name',
+                                             'opponents', 'players', 'teams', 'team_crest_uri'])
         assert team['name'] == "Team T"
         assert sorted(list(team['_links'])) == ['collection', 'self']
 
@@ -139,8 +171,8 @@ class TestViews:
                           content_type='application/json')
 
         resp = json.loads(rv.data.decode('utf-8'))
+
         team_id = resp['id']
-        assert team_id == 2
 
         rv = testapp.post('/api/v1/teams/',
                           data='{"name":"Team Z"}',
@@ -155,9 +187,8 @@ class TestViews:
 
     def test_team_delete(self, testapp):
         code, resp = get_result(testapp.get('/api/v1/teams/'))
-
         assert code == 200
-        assert resp == []
+        count = len(resp)
 
         # POST
         code, resp = get_result(testapp.post('/api/v1/teams/',
@@ -165,13 +196,14 @@ class TestViews:
                                              content_type='application/json'))
         assert code == 201
 
-        # DELETE
-        code, resp = get_result(testapp.delete('/api/v1/teams/1'))
+        # DELETE is forbidden
+        code, resp = get_result(testapp.delete(resp['_links']['self']))
         assert code == 403
 
         code, resp = get_result(testapp.get('/api/v1/teams/'))
         assert code == 200
-        assert len(resp) == 1
+
+        assert len(resp) == count+1
 
     def test_team_error(self, testapp):
         # now post a new team
@@ -201,12 +233,6 @@ class TestViews:
             "at_home": True,
         }
 
-        code, resp = get_result(testapp.post('/api/v1/opponents/',
-                                             data=json.dumps(
-                                                 match_data['opponent']),
-                                             content_type='application/json'))
-        assert code == 201
-        opponent_id = resp['id']
 
         code, resp = get_result(testapp.post('/api/v1/teams/',
                                              data=json.dumps(
@@ -216,9 +242,18 @@ class TestViews:
         assert code == 201
         team_id = resp['id']
 
+        opponent_data = match_data['opponent']
+        opponent_data['team'] = {"id": team_id}
+        code, resp = get_result(testapp.post('/api/v1/opponents/',
+                                             data=json.dumps(opponent_data),
+                                             content_type='application/json'))
+        assert code == 201
+        opponent_id = resp['id']
+
+        competition_data = match_data['competition']
+        competition_data['team'] = {"id": team_id}
         code, resp = get_result(testapp.post('/api/v1/competitions/',
-                                             data=json.dumps(
-                                                 match_data['competition']),
+                                             data=json.dumps(competition_data),
                                              content_type='application/json'))
         assert code == 201
         competition_id = resp['id']
@@ -308,41 +343,54 @@ class TestViews:
 
     def test_competition_post(self, testapp):
         # POST
+        code, team1 = get_result(testapp.post('/api/v1/teams/',
+                                             data='{"name":"T1"}',
+                                             content_type='application/json'))
+
+        competition_data = {"name": "S1", "team": team1}
         code, resp = get_result(testapp.post('/api/v1/competitions/',
-                                             data='{"name":"S1"}',
+                                             data=json.dumps(competition_data),
                                              content_type='application/json'))
         assert code == 201
         assert resp['name'] == "S1"
 
-        # POST 2 more
+        # POST 2
+        competition_data = {"name": "S2", "team": {"id": team1['id']}}
         testapp.post('/api/v1/competitions/',
-                     data='{"name":"S2"}',
+                     data=json.dumps(competition_data),
                      content_type='application/json')
 
+        # POST 3 with a different team
+        code, team2 = get_result(testapp.post('/api/v1/teams/',
+                                             data='{"name":"T2"}',
+                                             content_type='application/json'))
+
+        competition_data = {"name": "S3", "team": team2}
         testapp.post('/api/v1/competitions/',
-                     data='{"name":"S3"}',
+                     data=json.dumps(competition_data),
                      content_type='application/json')
 
         # GET all 3
-        code, resp = get_result(testapp.get('/api/v1/competitions/'))
+        code, resp = get_result(testapp.get('/api/v1/competitions/?expand=true'))
 
         # fully test the team data
         assert len(resp) == 3
-        assert sorted([i['name'] for i in resp]) == \
-               ["S1", "S2", "S3"]
+        assert sorted([i['name'] for i in resp]) == ["S1", "S2", "S3"]
 
     def test_competition_delete(self, testapp):
         def get_competitions_name(resp):
-            return {i['name']: i['_links']['self']
-                    for i in resp}
+            return {i['name']: i['_links']['self'] for i in resp}
+
+        _, team = get_result(testapp.post('/api/v1/teams/',
+                               data=json.dumps({"name": "Team G"}),
+                               content_type='application/json'))
 
         # POST
-        content_type = 'application/json'
-        data = {"name": None}
+        data = {"name": None, "team": team}
         for i in ['A', 'B', 'C', 'D', 'E']:
             data['name'] = i
             testapp.post('/api/v1/competitions/', data=json.dumps(data),
-                         content_type=content_type)
+                         content_type='application/json')
 
         code, resp = get_result(testapp.get('/api/v1/competitions/'))
         camps = get_competitions_name(resp)
@@ -358,17 +406,25 @@ class TestViews:
         assert sorted(camps.keys()) == ['A', 'C', 'E']
 
     def test_competition_query(self, testapp):
-        # POST TEAMS
+        # POST competitions
+
+        _, team = get_result(testapp.post('/api/v1/teams/',
+                               data=json.dumps({"name": "Team Z"}),
+                               content_type='application/json'))
+
+        data = {"name": "2016 Season", "team": team}
         testapp.post('/api/v1/competitions/',
-                     data='{"name":"2016 Season"}',
+                     data=json.dumps(data),
                      content_type='application/json')
 
+        data = {"name": "2017 Season", "team": team}
         testapp.post('/api/v1/competitions/',
-                     data='{"name":"2017 Season"}',
+                     data=json.dumps(data),
                      content_type='application/json')
 
+        data = {"name": "State Cup 2016", "team": team}
         testapp.post('/api/v1/competitions/',
-                     data='{"name":"State Cup 2016"}',
+                     data=json.dumps(data),
                      content_type='application/json')
 
         code, resp = get_result(testapp.get('/api/v1/competitions/'))

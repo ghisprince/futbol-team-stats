@@ -14,20 +14,21 @@ new Vue({
     },
     data: {
         "current_user": {"username": "Ghis"},
-        "current_team": {"name": "Ghis Team"},
+        "current_team": {"id": 1},
     },
     created() {
         // get match data
-        axios.get(`/api/v1/user` )
+        axios.get(`/api/v1/currentuser`)
         .then(response => {
             this.current_user = response.data;
-
-            // hard coding currentTeam pending support for multiple
-            axios.get(`/api/v1/teams/` + response.data.teams[0])
-            .then(response => {
-                    this.current_team = response.data;
-            })
         })
+        axios.get(`/api/v1/currentteam`)
+        .then(response => {
+            // TODO if want to support multiple teams on one site
+            this.current_team = response.data;
+
+        })
+
     },
     render: h => h(App)
 })

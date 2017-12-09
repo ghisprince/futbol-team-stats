@@ -18,14 +18,13 @@ api.add_resource(CreateListGoal, '/api/v1/goals/')
 api.add_resource(CreateListAssist, '/api/v1/assists/')
 
 
-api.add_resource(GetCurrentUser, '/api/v1/user')
+api.add_resource(GetCurrentUserID, '/api/v1/currentuser')
+api.add_resource(GetCurrentTeamID, '/api/v1/currentteam')
 api.add_resource(GetUpdateDeleteTeam, '/api/v1/teams/<int:team_id>')
 api.add_resource(GetUpdateDeletePlayer, '/api/v1/players/<int:player_id>')
 api.add_resource(GetUpdateDeleteMatch, '/api/v1/matches/<int:match_id>')
-api.add_resource(GetUpdateDeleteMatchStats,
-                 '/api/v1/matchstats/<int:matchstats_id>')
-api.add_resource(GetUpdateDeletePlayerMatch,
-                 '/api/v1/playermatches/<int:playermatch_id>')
+api.add_resource(GetUpdateDeleteMatchStats, '/api/v1/matchstats/<int:matchstats_id>')
+api.add_resource(GetUpdateDeletePlayerMatch, '/api/v1/playermatches/<int:playermatch_id>')
 api.add_resource(GetUpdateDeleteCompetition, '/api/v1/competitions/<int:competition_id>')
 api.add_resource(GetUpdateDeleteOpponent, '/api/v1/opponents/<int:opponent_id>')
 api.add_resource(GetUpdateDeleteShot, '/api/v1/shots/<int:shot_id>')

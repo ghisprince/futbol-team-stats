@@ -26,7 +26,7 @@ export default {
                      opponent: {name: null},
                      competition: {name: null},
                      at_home: null,
-                     team:{id: 1}
+                     team: {id: this.$root.current_team}
                      },
                  opponents: [],
                  competitions: []

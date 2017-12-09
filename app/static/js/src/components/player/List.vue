@@ -72,7 +72,9 @@ export default {
         }
     },
     created() {
-        axios.get(`/api/v1/players`)
+
+        //axios.get(`/api/v1/players/?team_id=` + this.$root.current_team.id)
+        axios.get(`/api/v1/players/`)
         .then(response => {
             this.players = response.data;
             this.showTable=true;
