@@ -1,39 +1,63 @@
 # soccer-player-stats
-Web-site to collect and report soccer team and player's stats.
+Web-app to capture and report a team and player's stats.
 
-### Statistics tracked
+
+### Statistics
  * by team
-   * matches
    * players
-   * competitions (tournaments, seasons)
+   * matches
+   * opponent
+   * competitions (tournaments & seasons)
  * by player
-   * starter
+   * starts
    * minutes played
-   * cards
-   * corners
    * shots
-    * goals
-    * assists
-   * goal
-   * assist
+   * goals
+   * assists
+   * yellow and red cards
+   * corners
+   * injury
 
 
-## Deploying
-To setup and run get repo, then do
-```cmd
+## Deploying app
+
+### Python
+Install requirements
+```
 pip install -r requirements
+```
 
-# loads toy data to play with
-python scripts\load_data.py
-
-# run flask local server
+### run flask local server
+```
 python manage.py server
+```
 
+### Javascript
+Using webpack to compile js & vue files
+
+```
+cd ./app/static/js
+npm install
+npm install webpack -g
+webpack
+```
+
+### Tests
+To run python test code
+```
+py.test -s test
+```
+
+### Toy data
+Data is included to play/dev with. To load it
+
+```
+python scripts\load_data.py
 ```
 
 
 ## Stack
- * client side: TBD (reactjs, vue ?), Bootstrap
+ * client side: VueJS, webpack
  * server side: python, flask, sqlalchemy, marshmallow, flask-restful
 
 ### Code foundation

@@ -258,8 +258,15 @@ export default {
                                     lockMovementY: this.enableEditing == false
                                     })
 
-                //
-                var text = new fabric.Text(shot.player_match.player.number.toString(),
+                // use player's # to label shot, else use "?"
+                try {
+                    var player_number = shot.player_match.player.number.toString();
+                }
+                catch (err) {
+                    var player_number = "?";
+                }
+
+                var text = new fabric.Text(player_number,
                                            {fontSize: 10,
                                             originX: 'center',
                                             originY: 'center'

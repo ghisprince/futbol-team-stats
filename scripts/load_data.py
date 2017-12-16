@@ -26,12 +26,42 @@ def get_player_match_by_name(match, name):
         if i.player.name == name:
             return i
 
+def load_users(team):
+    # create some roles
+    admin_role = get_or_create(db.session, Role, name='admin')
+    edit_role = get_or_create(db.session, Role, name='editor')
+
+    # create some users
+    parent = db.session.query(User).filter_by(username="gp")
+    if not parent.first():
+        parent = User("gp", "gp")
+        parent.teams.append(team)
+        parent.roles.append(edit_role)
+        parent.roles.append(admin_role)
+        db.session.add(parent)
+
+    historian = db.session.query(User).filter_by(username="historian")
+    if not historian.first():
+        historian = User("historian", "historian")
+        historian.teams.append(team)
+        historian.roles.append(edit_role)
+        db.session.add(historian)
+
+    stranger = db.session.query(User).filter_by(username="stranger")
+    if not stranger.first():
+        stranger = User("stranger", "stranger")
+        db.session.add(stranger)
+
+    db.session.commit()
+
 
 def load_match(match_data):
     match_data_date_time = datetime.datetime.strptime(match_data["date_time"],
                                                       "%Y-%m-%dT%H:%M:%S")
 
+    team = get_or_create(db.session, Team, name=match_data['team'])
 
+    load_users(team)
     if db.session.query(Match).filter_by(date_time=match_data_date_time).first():
         print("Already loaded {} vs '{}' on {}".format(match_data["team"],
                                                        match_data["opponent"],
@@ -39,7 +69,9 @@ def load_match(match_data):
         return
 
     if match_data["competition"]:
-        competition = get_or_create(db.session, Competition, name=match_data["competition"])
+        competition = get_or_create(db.session, Competition,
+                                    name=match_data["competition"],
+                                    team=team)
     else:
         competition = None
 
@@ -53,7 +85,8 @@ def load_match(match_data):
                   duration=match_data["duration"],
                   team=get_or_create(db.session, Team, name=match_data["team"]),
                   opponent=get_or_create(db.session, Opponent,
-                                         name=match_data["opponent"]),
+                                         name=match_data["opponent"],
+                                         team=team),
                   competition=competition)
 
     if "match_stats" in match_data:
@@ -98,9 +131,8 @@ def load_match(match_data):
         shot = Shot(playerMatch,
                     x=shot_data.get('x', None),
                     y=shot_data.get('y', None),
-                    on_goal=shot_data.get('on_goal', False),
+                    on_target=shot_data.get('on_target', False),
                     pk=shot_data.get('pk', False),
-                    scored=shot_data.get('scored', False),
                     by_opponent=shot_data.get('by_opponent', False), )
 
         if shot_data.get('scored', False):
@@ -117,34 +149,11 @@ def load_match(match_data):
         db.session.add(shot)
 
     db.session.commit()
-    print("match_stats")
 
 
-def pprint():
-    print("PLAYER")
-    for p in db.session.query(Player).all():
-        print(p)
+f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
+d = json.load(open(f, "r"))
+for i in d:
+    load_match(i)
 
-    print("MATCH")
-    for m in db.session.query(Match).all():
-        print(m)
-
-    print("PM")
-    for pm in db.session.query(PlayerMatch).all():
-        print(pm)
-
-
-if True:
-    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
-    d = json.load(open(f, "r"))
-    for i in d:
-        load_match(i)
-else:
-    import glob
-    for f in glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                    "bu_all_stats\\*.json")):
-        print("Loading {}".format(f))
-        d = json.load(open(f, "r"))
-        for i in d:
-            load_match(i)
 print("FIN")
