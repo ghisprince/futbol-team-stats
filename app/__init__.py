@@ -20,14 +20,13 @@ from app.extensions import (
 class CustomFlask(Flask):
     jinja_options = Flask.jinja_options.copy()
     jinja_options.update(dict(
-      block_start_string='{%',
-      block_end_string='%}',
-      variable_start_string='((', # instead of jinja2 default of {{
-      variable_end_string='))',   # instead of }}
-      comment_start_string='{#',
-      comment_end_string='#}',
+        block_start_string='{%',
+        block_end_string='%}',
+        variable_start_string='((',  # instead of jinja2 default of {{
+        variable_end_string='))',  # instead of }}
+        comment_start_string='{#',
+        comment_end_string='#}',
     ))
-
 
 
 def create_app(object_name):
@@ -40,7 +39,7 @@ def create_app(object_name):
                      e.g. app.settings.ProdConfig
     """
 
-    #app = Flask(__name__)
+    # app = Flask(__name__)
     app = CustomFlask(__name__)
 
     app.config.from_object(object_name)
@@ -68,7 +67,6 @@ def create_app(object_name):
     assets_loader = PythonAssetsLoader(assets)
     for name, bundle in assets_loader.load_bundles().items():
         assets_env.register(name, bundle)
-
 
     # register our blueprints
     app.register_blueprint(main)

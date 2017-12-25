@@ -7,6 +7,10 @@
         </div>
         <h3>Team record: {{competition.match_results}}</h3>
 
+        <div v-show="competition.note" align="left">
+            Note: {{competition.note}}
+        </div>
+
         <match-table v-bind:matches="competition.matches" v-bind:showCompetition=false> </match-table>
 
         <agg-player-match-table v-bind:player_matches="player_matches"> </agg-player-match-table>

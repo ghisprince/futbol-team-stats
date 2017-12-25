@@ -36,7 +36,8 @@ export default {
             axios.patch(this.competition._links.self,
                         {name: this.competition.name,
                          result: this.competition.result,
-                         external_url: this.competition.external_url
+                         external_url: this.competition.external_url,
+                         note: this.competition.note
                          }
             )
             .then(response => {

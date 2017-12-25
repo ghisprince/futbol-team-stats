@@ -23,7 +23,6 @@ This module should be refactored to be DRY-er.
   
 """
 
-
 user_schema = UserSchema()
 
 team_schema = TeamSchema()
@@ -80,9 +79,8 @@ class Resource(flask_restful.Resource):
 
 
 class CreateListResourceBase(Resource):
-    def post(self, request_dict=None):
-        if not request_dict:
-            request_dict = request.get_json(force=True)
+    def post(self):
+        request_dict = request.get_json(force=True)
         try:
             self.mm_schema.validate(request_dict)
             modelInst = self.InstanceFromDict(request_dict)
@@ -141,7 +139,6 @@ class CreateListPlayer(CreateListResourceBase):
 
     def InstanceFromDict(self, request_dict):
         request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
-
         return self.ModelClass(**request_dict)
 
 
@@ -160,27 +157,6 @@ class CreateListCompetition(CreateListResourceBase):
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
-
-    def post(self):
-        request_dict = request.get_json(force=True)
-        try:
-            self.mm_schema.validate(request_dict)
-            modelInst = self.InstanceFromDict(request_dict)
-            modelInst.add(modelInst)
-            query = self.ModelClass.query.get(modelInst.id)
-            results = self.mm_schema.dump(query).data
-            return results, 201
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 403
-            return resp
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 403
-            return resp
 
     def InstanceFromDict(self, request_dict):
         request_dict['team'] = db.session.query(Team).filter_by(
@@ -212,8 +188,7 @@ class CreateListMatch(CreateListResourceBase):
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False),
-                 'expand': webargs.fields.Bool(required=False)
-                 })
+                 'expand': webargs.fields.Bool(required=False) })
     def get(self, opponent_id, competition_id, expand=False):
         query = self.ModelClass.query
 
@@ -250,9 +225,9 @@ class CreateListMatch(CreateListResourceBase):
             resp.status_code = 403
             return resp
 
-
     def InstanceFromDict(self, request_dict):
         request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
+
         request_dict['opponent'] = Opponent.query.get_or_404(
             request_dict['opponent']['id'])
 
@@ -306,14 +281,13 @@ class CreateListMatchStats(CreateListResourceBase):
     mm_schema = matchstats_schema
 
     @use_kwargs({'match_id': webargs.fields.Int(required=False)})
-    def get(self, match_id, expand=False):
+    def get(self, match_id):
         query = self.ModelClass.query
 
         if match_id:
             query = query.filter(self.ModelClass.match_id == match_id)
 
         return self.mm_schema.dump(query.all(), many=True).data
-
 
     def InstanceFromDict(self, request_dict):
         request_dict['match'] = Match.query.get_or_404(request_dict['match']['id'])
@@ -361,21 +335,21 @@ class CreateListGoal(CreateListResourceBase):
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
-                 'playermatch_id': webargs.fields.Int(required=False),})
+                 'playermatch_id': webargs.fields.Int(required=False), })
     def get(self, player_id, match_id, playermatch_id):
         query = self.ModelClass.query
 
         if player_id:
             query = query.join(Shot).join(PlayerMatch).join(Player).filter(
-                            Player.id == player_id)
+                Player.id == player_id)
 
         if playermatch_id:
             query = query.join(Shot).join(PlayerMatch).filter(
-                            PlayerMatch.id == playermatch_id)
+                PlayerMatch.id == playermatch_id)
 
         if match_id:
             query = query.join(Shot).join(PlayerMatch).join(Match).filter(
-                            Match.id == match_id)
+                Match.id == match_id)
 
         return self.mm_schema.dump(query.all(), many=True).data
 
@@ -476,18 +450,18 @@ class GetUpdateDeleteResourceBase(Resource):
             return resp
 
 
-class GetCurrentUserID(Resource): # not GetUpdateDeleteResourceBase
+class GetCurrentUserID(Resource):  # not GetUpdateDeleteResourceBase
     mm_schema = user_schema
 
-    def get(self,):
+    def get(self, ):
         query = User.query.get_or_404(flask_login.current_user.get_id())
         return self.mm_schema.dump(query).data
 
 
-class GetCurrentTeamID(Resource): # not GetUpdateDeleteResourceBase
+class GetCurrentTeamID(Resource):  # not GetUpdateDeleteResourceBase
     mm_schema = team_schema
 
-    def get(self,):
+    def get(self, ):
         team_id = flask_session.get('current_team', None)
         if team_id is None:
             # if no current_team, then get first from current_user
@@ -520,7 +494,7 @@ class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
         return super().get(team_id, expand)
 
     def patch(self, team_id):
-        return super().delete(team_id)
+        return super().patch(team_id)
 
     def delete(self, team_id):
         resp = jsonify({"error": "Deleting of team not allowed!"})
@@ -542,8 +516,7 @@ class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
 
     def delete(self, player_id):
         resp = jsonify({"error": "Deleting of player not allowed!"})
-        resp.status_code = 403
-        return resp
+        return super().delete(player_id)
 
 
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
@@ -726,7 +699,6 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     def get(self, goal_id, expand=False):
         return super().get(goal_id, expand)
 
-
     def patch(self, goal_id):
         return super().patch(goal_id)
 
@@ -761,7 +733,6 @@ class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
             resp = jsonify({"error": err.messages})
             resp.status_code = 401
             return resp
-
 
     def delete(self, assist_id):
         return super().delete(assist_id)

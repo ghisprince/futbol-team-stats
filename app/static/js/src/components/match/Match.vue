@@ -51,6 +51,18 @@
 
         <div class="form-group row">
             <div class="col-sm-2"/>
+            <label for="edit-duration" class="col-sm-3 col-form-label">Duration (min) :</label>
+            <div class="col-sm-4">
+                <input type="number"
+                       class="form-control col-sm-4"
+                       id="edit-duration"
+                       v-model="match.duration"/>
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
             <label for="edit-at-home" class="col-sm-3 col-form-label">Home Game :</label>
             <div class="col-sm-4">
                 <input type="checkbox"
@@ -60,6 +72,16 @@
             </div>
 
         </div>
+
+        <div class="form-group row">
+            <div class="col-sm-2"/>
+            <label for="edit-note" class="col-sm-3 col-form-label">Note :</label>
+            <div class="col-sm-4">
+                <input class="form-control" id="edit-note" v-model="match.note"/>
+            </div>
+        </div>
+
+
     </div>
 </template>
 

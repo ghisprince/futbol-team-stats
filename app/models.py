@@ -3,11 +3,12 @@ from app.shared import login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from itsdangerous import BadSignature, SignatureExpired, \
-        TimedJSONWebSignatureSerializer as Serializer
+    TimedJSONWebSignatureSerializer as Serializer
 import datetime
 
 from app.settings import Config
 from app.shared import db
+
 
 @login_manager.user_loader
 def load_user(userid):
@@ -53,7 +54,7 @@ class RolesUsers(db.Model):
     role_id = db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 
 
-class Role(db.Model):#, RoleMixin):
+class Role(db.Model):  # , RoleMixin):
     __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -63,6 +64,7 @@ class Role(db.Model):#, RoleMixin):
         self.name = name
         self.description = description
 
+
 class User(db.Model, CRUD_MixIn, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(), nullable=False)
@@ -71,7 +73,7 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     email = db.Column(db.String())
 
     roles = db.relationship('Role', secondary='roles_users',
-                         backref=db.backref('users', lazy='dynamic'))
+                            backref=db.backref('users', lazy='dynamic'))
 
     teams = db.relationship('Team', secondary='teams_users',
                             backref=db.backref('teams', lazy='dynamic'))
@@ -106,9 +108,9 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     def get_id(self):
         return self.id
 
-    def generate_auth_token(self, expiration = 600):
-        s = Serializer(Config.SECRET_KEY, expires_in = expiration)
-        return s.dumps({ 'id': self.id })
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(Config.SECRET_KEY, expires_in=expiration)
+        return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
@@ -117,9 +119,9 @@ class User(db.Model, CRUD_MixIn, UserMixin):
         try:
             data = s.loads(token)
         except SignatureExpired:
-            return None # valid token, but expired
+            return None  # valid token, but expired
         except BadSignature:
-            return None # invalid token
+            return None  # invalid token
         user = User.query.get(data['id'])
         return user
 
@@ -153,6 +155,7 @@ class Team(db.Model, CRUD_MixIn):
 class Opponent(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
+    note = db.Column(db.String())
     team_crest_uri = db.Column(db.String())
     external_url = db.Column(db.String())
 
@@ -199,6 +202,7 @@ class Competition(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     result = db.Column(db.String())
+    note = db.Column(db.String())
     external_url = db.Column(db.String())
 
     # relationships
@@ -239,11 +243,12 @@ class Competition(db.Model, CRUD_MixIn):
                                  self.num_match_tied,
                                  self.num_match_lost)
 
-    def __init__(self, name, team, result=None, external_url=None):
+    def __init__(self, name, team, result=None, external_url=None, note=None):
         self.name = name
         self.team = team
         self.result = result
         self.external_url = external_url
+        self.note = note
 
     def __repr__(self):
         return "Competition (id={}, name={})".format(self.id, self.name)
@@ -254,6 +259,7 @@ class Match(db.Model, CRUD_MixIn):
     date_time = db.Column(db.DateTime(), nullable=False, index=True)
     at_home = db.Column(db.Boolean())
     duration = db.Column(db.Integer())  # match duration in minutes
+    note = db.Column(db.String())
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -324,7 +330,7 @@ class Match(db.Model, CRUD_MixIn):
         return sum([i.num_goals_against for i in self.player_matches])
 
     def _goals_timeline(self, by_opponent):
-        goals = db.session.query(Goal).join(Shot).join(PlayerMatch).join(Match)\
+        goals = db.session.query(Goal).join(Shot).join(PlayerMatch).join(Match) \
             .filter(Match.id == self.id).filter(Shot.by_opponent == by_opponent).all()
 
         return [i.label for i in sorted(goals, key=lambda x: x.time if x.time else 0)]
@@ -444,14 +450,15 @@ class Match(db.Model, CRUD_MixIn):
             return
 
     def __init__(self, date_time, team, opponent, competition=None,
-                 at_home=True, duration=None):
+                 at_home=True, duration=None, note=None):
         self.date_time = datetime.datetime.strptime(date_time.split(".")[0],
-                                                    "%Y-%m-%dT%H:%M:%S",)
+                                                    "%Y-%m-%dT%H:%M:%S", )
         self.team = team
         self.opponent = opponent
         self.competition = competition
         self.at_home = at_home
         self.duration = duration
+        self.note = note
 
     def __repr__(self):
         return "Match (id={}, team={}, opponent={}, date_time={})".format(
@@ -604,7 +611,7 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     def __init__(self, player, match, starter=True, minutes=0,
                  subbed_due_to_injury=None,
-                 yellow_cards=None, red_cards=None, corners=None,):
+                 yellow_cards=None, red_cards=None, corners=None, ):
         self.player = player
         self.match = match
         self.starter = starter
@@ -616,13 +623,13 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     def __repr__(self):
         return "PlayerMatch (id={}, player={}, starter={}, minutes={})".format(
-            self.id, self.player.name, self.starter, self.minutes,)
+            self.id, self.player.name, self.starter, self.minutes, )
 
 
 class Shot(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
-    x = db.Column(db.Integer(),)
-    y = db.Column(db.Integer(),)
+    x = db.Column(db.Integer(), )
+    y = db.Column(db.Integer(), )
     on_target = db.Column(db.Boolean(), default=False, nullable=False)
     pk = db.Column(db.Boolean(), default=False)
     by_opponent = db.Column(db.Boolean(), default=False)
@@ -652,10 +659,10 @@ class Shot(db.Model, CRUD_MixIn):
 
     def __repr__(self):
         return "Shot (id={}, player={}, x={}, y={}, on_target={})".format(
-                        self.id,
-                        self.player_match.player.name,
-                        self.x, self.y, self.on_target,
-                        self.pk, self.by_opponent)
+            self.id,
+            self.player_match.player.name,
+            self.x, self.y, self.on_target,
+            self.pk, self.by_opponent)
 
 
 class Goal(db.Model, CRUD_MixIn):
@@ -721,6 +728,6 @@ class Assist(db.Model, CRUD_MixIn):
 
     def __repr__(self):
         return "Assist (id={}, player={}, Goal.player={})".format(
-                    self.id,
-                    self.player_match.player.name,
-                    self.goal.shot.player_match.player.name)
+            self.id,
+            self.player_match.player.name,
+            self.goal.shot.player_match.player.name)

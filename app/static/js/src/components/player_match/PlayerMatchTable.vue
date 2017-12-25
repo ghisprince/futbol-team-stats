@@ -141,7 +141,6 @@ export default {
     },
     methods: {
         deletePlayerMatch: function(pm) {
-
             // remove all assists joined to this playermatch first
             axios.get(`/api/v1/assists/?playermatch_id=` + pm.id)
             .then(response => {
@@ -151,15 +150,15 @@ export default {
                     .then(response => {console.log("delete assist succeeded")})
                     .catch(response => {console.log("delete assist failed")})
 
-                    // then delete
-                    axios.delete(pm._links.self)
-                    .then(response => {
-                        // update this.player_matches to excluded pm just deleted
-                        this.player_matches = _.filter(this.player_matches, function(i) {
-                                return i.id != pm.id;
-                            })
-                    })
                 }
+                // then delete the playermatch
+                axios.delete(pm._links.self)
+                .then(response => {
+                    // update this.player_matches to excluded pm just deleted
+                    this.player_matches = _.filter(this.player_matches, function(i) {
+                            return i.id != pm.id;
+                        })
+                })
             })
         }
     }

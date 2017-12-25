@@ -10,8 +10,13 @@
 
             <hr/>
 
-            <h2>Edit match stats</h2>
-            <match-stats :match_stats.sync="match_stats"></match-stats>
+            <h2>Additional Match stats</h2>
+            <div v-if="!match_stats">
+                <a class="btn btn-primary" v-on:click="addMatchStats">Additional Match Info</a>
+            </div>
+            <div v-else>
+                <match-stats :match_stats.sync="match_stats"></match-stats>
+            </div>
 
             <a class="btn btn-primary" v-on:click="updateMatchStats">
                 Update Match Stats
@@ -75,7 +80,9 @@ export default {
                          date_time: this.match.date_time,
                          opponent: this.match.opponent,
                          competition: this.match.competition,
-                         at_home: this.match.at_home
+                         at_home: this.match.at_home,
+                         note: this.match.note,
+                         duration: this.match.duration
                          }
             )
         },
@@ -86,6 +93,15 @@ export default {
             axios.patch(this.match_stats._links.self,
                         this.match_stats
             )
+        },
+        addMatchStats: function (){
+            axios.post(`/api/v1/matchstats`,
+                       {match: {id: this.$route.params.match_id}}
+            )
+            .then(response => {
+                this.match_stats = response.data;
+            })
+
         }
     }
 }

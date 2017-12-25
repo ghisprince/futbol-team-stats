@@ -109,7 +109,6 @@ export default {
                 selected_player: null};
     },
     created() {
-        //axios.get(`/api/v1/players/?team_id=` + this.$root.current_team.id)
         axios.get(`/api/v1/players/`)
         .then(response => {
             this.players = _.orderBy(response.data, "name");

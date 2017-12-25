@@ -92,7 +92,6 @@ export default {
     },
     created() {
         // get player data
-        //axios.get(`/api/v1/players/` + this.$route.params.player_id + `?expand=true&team_id=` + this.$root.current_team.id)
         axios.get(`/api/v1/players/` + this.$route.params.player_id + `?expand=true`)
         .then(response => {
             this.player = response.data

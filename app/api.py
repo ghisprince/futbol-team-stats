@@ -17,7 +17,6 @@ api.add_resource(CreateListShot, '/api/v1/shots/')
 api.add_resource(CreateListGoal, '/api/v1/goals/')
 api.add_resource(CreateListAssist, '/api/v1/assists/')
 
-
 api.add_resource(GetCurrentUserID, '/api/v1/currentuser')
 api.add_resource(GetCurrentTeamID, '/api/v1/currentteam')
 api.add_resource(GetUpdateDeleteTeam, '/api/v1/teams/<int:team_id>')

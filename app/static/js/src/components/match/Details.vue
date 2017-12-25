@@ -90,6 +90,10 @@
             </table>
         </div>
 
+        <div v-show="match.note" align="left">
+            Note: {{match.note}}
+        </div>
+
         <player-match-table :showActions=false></player-match-table>
 
         <shot-graph :enableEditing=false></shot-graph>

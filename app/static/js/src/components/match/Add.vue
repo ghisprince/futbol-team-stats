@@ -26,6 +26,7 @@ export default {
                      opponent: {name: null},
                      competition: {name: null},
                      at_home: null,
+                     duration: null,
                      team: {id: this.$root.current_team}
                      },
                  opponents: [],
@@ -45,7 +46,6 @@ export default {
                 axios.post(`/api/v1/matchstats/`,
                            {match: {id: response.data.id}}
                 )
-
                 this.$router.push({path: '/match-list'})
             })
         }

@@ -155,23 +155,9 @@
 <script>
 
 export default {
-    props: ['match_stats'],
+    props: ['match', 'match_stats'],
     data () {
-        return {opponent_corners: null,
-                opponent_yellow_cards: null,
-                opponent_red_cards: null,
-                opponent_fouls: null,
-
-                passes: null,
-                pass_strings: null,
-                pass_pct: null,
-                possession: null,
-
-                opponent_passes: null,
-                opponent_pass_strings: null,
-                opponent_pass_pct: null
-
-                }
+        return {}
     }
 }
 

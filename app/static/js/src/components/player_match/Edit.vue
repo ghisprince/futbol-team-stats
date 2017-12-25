@@ -39,7 +39,6 @@ export default {
             this.playermatch = response.data
         })
 
-        //axios.get(`/api/v1/players/?expand=true&team_id=` + this.$root.current_team.id)
         axios.get(`/api/v1/players/?expand=true`)
         .then(response => {
             this.players = response.data

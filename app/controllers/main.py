@@ -5,8 +5,6 @@ from app.extensions import cache
 from app.forms import LoginForm
 from app.models import *
 from app.api import *
-#from app.shared import auth
-
 
 main = Blueprint('main', __name__)
 

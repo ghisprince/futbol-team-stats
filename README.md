@@ -24,7 +24,9 @@ Web-app to capture and report a team and player's stats.
 ### Python
 Install requirements
 ```
-pip install -r requirements
+virtualenv env --python=python3.4
+source env/bin/activate
+pip3 install -r requirements.txt
 ```
 
 ### run flask local server
