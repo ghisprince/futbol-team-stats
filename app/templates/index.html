@@ -8,11 +8,20 @@
         <p>Team Stats</p>
     </div>
 
-    <p>Logged in as (( current_user.username )).
+    <div>
+        View stats by
+            <ul>
+                <li><a href="/stats#/match-list">Matches</a></li>
+                <li><a href="/stats#/opponent-list">Opponents</a></li>
+                <li><a href="/stats#/competition-list">Competitions</a></li>
+                <li><a href="/stats#/player-list">Players</a></li>
+            </ul>
+    </div>
+    <div>
         <a class="btn btn-warning" href="(( url_for('.logout') ))">
-                Logout!
+                Sign out!
         </a>
-    </p>
+    </div>
 
 {% endblock %}
 
