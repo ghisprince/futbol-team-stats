@@ -107,7 +107,7 @@ export default {
                 return [];
             }
             var matches = this.matches.filter(function (match) {
-                return this.searchKey=='' || match.opponent_name.indexOf(this.searchKey) !== -1 || match.competition.name.indexOf(this.searchKey) !== -1;
+                return this.searchKey=='' || match.opponent_name.indexOf(this.searchKey) !== -1 || match.competition_name.indexOf(this.searchKey) !== -1;
             }, this);
 
             return _.orderBy(matches, 'date_time', 'desc')
