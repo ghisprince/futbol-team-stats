@@ -96,4 +96,8 @@ ENV/
 
 # backup folders
 bu_*/
-app/static/public/
+
+# built files and byproducts of app
+app/static/public/css
+app/static/public/js
+logfile.txt
