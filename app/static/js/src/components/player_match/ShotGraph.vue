@@ -6,7 +6,7 @@
             <div class="col-sm-6" id="convas-container">
                 <canvas id="canvas" width=452 height=352></canvas>
                 <p id="sub-table-note">
-                    <i>Grey: not on goal, Blue: on goal, Red: scored.</i>
+                    <i>Grey: off target, Blue: on target, Red: scored.</i>
                 </p>
             </div>
 
@@ -247,15 +247,13 @@ export default {
                 }
 
                 var circle = new fabric.Circle({
-                                    radius: 7,
+                                    radius: 9,
                                     fill: color,
                                     opacity: 0.9,
                                     stroke: stroke_color,
                                     strokeWidth: 2,
                                     originX: 'center',
-                                    originY: 'center',
-                                    lockMovementX: this.enableEditing == false,
-                                    lockMovementY: this.enableEditing == false
+                                    originY: 'center'
                                     })
 
                 // use player's # to label shot, else use "?"
@@ -267,7 +265,7 @@ export default {
                 }
 
                 var text = new fabric.Text(player_number,
-                                           {fontSize: 10,
+                                           {fontSize: 12,
                                             originX: 'center',
                                             originY: 'center'
                                            }
@@ -277,7 +275,9 @@ export default {
                                              {hasControls: false,
                                               left: shot.x,
                                               top: shot.y,
-                                              angle: 0
+                                              angle: 0,
+                                              lockMovementX: this.enableEditing == false,
+                                              lockMovementY: this.enableEditing == false
                                               }
                 );
 
