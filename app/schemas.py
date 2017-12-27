@@ -58,7 +58,7 @@ class CompetitionSchema(ModelSchema):
                            competition_id="<id>"),
          'collection': ma.URLFor('CreateListCompetition'.lower())})
 
-    start_date = fields.Date(dump_only=True)
+    start_date = fields.String(dump_only=True)
     num_match_won = fields.String(dump_only=True)
     num_match_tied = fields.String(dump_only=True)
     num_match_lost = fields.String(dump_only=True)

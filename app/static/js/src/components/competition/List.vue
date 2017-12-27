@@ -19,7 +19,8 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                    <th>Name </th>
+                    <th>Name</th>
+                    <th>Start Date</th>
                     <th>Result</th>
                     <th title="Matches Played">MP</th>
                     <th title="Matches Won">W</th>
@@ -34,6 +35,9 @@
                         <router-link v-bind:to="{name: 'competition', params: {competition_id: competition.id}}">
                             {{ competition.name }}
                         </router-link>
+                    </td>
+                    <td>
+                        {{ competition.start_date }}
                     </td>
                     <td>
                         {{ competition.result }}
@@ -87,7 +91,7 @@ export default {
     created() {
         axios.get(`/api/v1/competitions`)
         .then(response => {
-            this.competitions = _.orderBy(response.data, 'name');
+            this.competitions = _.orderBy(response.data, 'start_date', 'desc');
             this.showTable=true;
         })
     },

@@ -216,24 +216,25 @@ class Competition(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def start_date(self):
-        """ return competition result in W-D-L format """
+        """ date of first match """
         if len(self.matches) == 0:
             return None
-        return min([i.date_time for i in self.matches])
+        min_date = min([i.date_time for i in self.matches])
+        return min_date.strftime("%Y-%m-%d")
 
     @hybrid_property
     def num_match_won(self):
-        """ return competition result in W-D-L format """
+        """ number of matches won """
         return len([i for i in self.matches if (i.result == "win")])
 
     @hybrid_property
     def num_match_tied(self):
-        """ return competition result in W-D-L format """
+        """ number of matches tied """
         return len([i for i in self.matches if (i.result == "tie")])
 
     @hybrid_property
     def num_match_lost(self):
-        """ return competition result in W-D-L format """
+        """ number of matches lost """
         return len([i for i in self.matches if (i.result == "loss")])
 
     @hybrid_property

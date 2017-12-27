@@ -27,7 +27,7 @@
 
         <div class="form-group row">
             <div class="col-sm-2"/>
-            <label for="edit-note" class="col-sm-3 col-form-label">Note :</label>
+            <label for="edit-note" class="col-sm-3 col-form-label">Note</label>
             <div class="col-sm-4">
                 <input class="form-control" id="edit-note" v-model="competition.note"/>
             </div>
