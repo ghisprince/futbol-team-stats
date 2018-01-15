@@ -31,7 +31,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="opponent in filteredOpponents">
+                    <tr v-for="opponent in filteredOpponents" v-bind:key="opponent.id">
                     <td>
                         <router-link v-bind:to="{name: 'opponent', params: {opponent_id: opponent.id}}">
                             {{ opponent.name }}

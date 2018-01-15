@@ -24,6 +24,7 @@
                 <select class="form-control col-sm-4" v-on:change="updateOpponent">
                     <option v-for="opponent in opponents"
                             v-bind:value="opponent.id"
+                            v-bind:key="opponent.id"
                             :selected="opponent.name == match.opponent.name"
                             >
                             {{opponent.name}}
@@ -41,6 +42,7 @@
                 <select class="form-control col-sm-4" v-on:change="updateCompetition">
                     <option v-for="competition in competitions"
                             v-bind:value="competition.id"
+                            v-bind:key="competition.id"
                             :selected="competition.name == match.competition.name"
                             >
                             {{competition.name}}

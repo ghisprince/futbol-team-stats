@@ -28,12 +28,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="player in filteredPlayers">
+                    <tr v-for="player in filteredPlayers" v-bind:key="player.id">
                     <td>
                         {{ player.name }} #{{player.number}}
                     </td>
                     <td>
-                        {{ player.active }}
+                        <div v-if="player.active"><span class="glyphicon glyphicon-ok"></span></div>
+                        <div v-else></div>
                     </td>
                     <td>
                         <router-link v-bind:to="{name: 'player', params: {player_id: player.id}}">

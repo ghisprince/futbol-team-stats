@@ -23,26 +23,29 @@
                         <th title="Goals Against">GA</th>
                         <th title="Shots For">SF</th>
                         <th title="Shots Against">SA</th>
+                        <th title="Detailed Match Report">Match Report</th>
                         <th v-if="showActions">Actions</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
                     </tr>
                 </tfoot>
                 <tbody>
-                    <tr v-for="match in orderedMatches">
+                    <tr v-for="match in orderedMatches" v-bind:key="match.id">
                         <td>
-                            <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
-                                {{ match.date_time | formatDate }}
-                            </router-link>
+                            {{ match.date_time | formatDate }}
                         </td>
                         <td v-if="showCompetition === true">
-                            {{ match.competition_name }}
+                            <router-link v-bind:to="{name: 'competition', params: {competition_id: (Number.isInteger(match.competition) ? match.competition :  match.competition.id ) }}">
+                                {{ match.competition_name }}
+                            </router-link>
                         </td>
                         <td v-if="showOpponent">
-                            {{ match.opponent_name }}
+                            <router-link v-bind:to="{name: 'opponent', params: {opponent_id: (Number.isInteger(match.opponent) ? match.opponent :  match.opponent.id ) }}">
+                                {{ match.opponent_name }}
+                            </router-link>
                         </td>
                         <td>
                             {{ match.result }}
@@ -58,6 +61,11 @@
                         </td>
                         <td>
                             {{ match.num_shots_against }}
+                        </td>
+                        <td>
+                            <router-link v-bind:to="{name: 'match', params: {match_id: match.id, uri: match._links.self}}">
+                                Match Report <span class="glyphicon glyphicon-stats"></span>
+                            </router-link>
                         </td>
                         <td v-if="showActions">
                             <router-link class="btn btn-warning btn-xs"
@@ -116,7 +124,7 @@ export default {
             // why not "match: this.player.player_match.length? because vue
             //  gives this.player.player_match is undefined, clearly
             //  lodash does it right though
-            var tds = ["Count: " + _(this.matches).size()];
+            var tds = [{id: 0, value: "Count: " + _(this.matches).size()}];
 
             if (_(this.matches).size() > 0) {
                 this.showTable=true;
@@ -127,15 +135,16 @@ export default {
             }
 
             if (this.showOpponent){
-                var tds = tds.concat(["-"]);
+                var tds = tds.concat([{id: 1, value: "-"}]);
             }
 
              var tds = tds.concat(
-                   ["-",
-                    _.sum(_.map(this.matches, 'num_goals')),
-                    _.sum(_.map(this.matches, 'num_goals_against')),
-                    _.sum(_.map(this.matches, 'num_shots')),
-                    _.sum(_.map(this.matches, 'num_shots_against')),
+                   [{id: 2, value: "-"},
+                    {id: 3, value: _.sum(_.map(this.matches, 'num_goals'))},
+                    {id: 4, value: _.sum(_.map(this.matches, 'num_goals_against'))},
+                    {id: 5, value: _.sum(_.map(this.matches, 'num_shots'))},
+                    {id: 6, value: _.sum(_.map(this.matches, 'num_shots_against'))},
+                    {id: 7, value: "-"}
                     ]);
              return tds;
         }

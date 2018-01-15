@@ -3,158 +3,161 @@
         <h2 id="section">Shot data</h2>
 
         <div class="row">
-            <div class="col-sm-6" id="convas-container">
-                <canvas id="canvas" width=452 height=352></canvas>
-                <p id="sub-table-note">
-                    <i>Grey: off target, Blue: on target, Red: scored.</i>
-                </p>
+            <div v-show="!showCanvas">
+                <vue-simple-spinner></vue-simple-spinner>
             </div>
+            <div v-show="showCanvas">
+                <div class="col-sm-6" id="convas-container">
+                    <canvas id="canvas" width=452 height=352></canvas>
+                    <p id="sub-table-note">
+                        <i>Grey: off target, Blue: on target, Red: scored.</i>
+                    </p>
+                </div>
 
-            <div class="col-sm-6">
-                <div class="cliente">
+                <div class="col-sm-6">
+                    <div class="cliente">
 
-                    <h4 style="text-decoration: underline">Shot details</h4>
-                    <div v-if="selectedShot">
-                        <form class="form-horizontal">
+                        <h4 style="text-decoration: underline">Shot details</h4>
+                        <div v-if="selectedShot">
+                            <form class="form-horizontal">
 
-                            <div class="form-group">
-                                <label for="shotPlayer" class="col-sm-4 control-label">
-                                       Player :
-                                </label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" v-on:change="updateShotPlayerMatch">
-                                        <option
-                                            v-for="player_match in player_matches"
-                                            v-bind:value="player_match.id"
-                                            :selected="player_match.player.name == selectedShot.player_match.player.name"
-                                            :disabled="enableEditing == 0"
-                                            >
-                                            {{ player_match.player.name }}
-                                        </option>
-                                     </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group" v-if="enableEditing">
-                                <label for="byOpponent"
-                                       class="col-sm-4 control-label">By Opponent :
-                                </label>
-                                <div class="col-sm-2">
-                                    <input v-on:change="updateShotByOpponent"
-                                           type="checkbox"
-                                           class="form-control"
-                                           id="shotByOpponent"
-                                           v-model="selectedShot.by_opponent">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="shotOnGoal"
-                                       class="col-sm-4 control-label">On Goal :
-                                </label>
-                                <div class="col-sm-2">
-                                    <input v-on:change="updateShotOnTarget"
-                                           type="checkbox"
-                                           class="form-control"
-                                           id="shotOnGoal"
-                                           v-model="selectedShot.on_target"
-                                           :disabled="enableEditing == 0">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="shotIsPk"
-                                       class="col-sm-4 control-label">Penalty Kick :
-                                </label>
-                                <div class="col-sm-2">
-                                    <input v-on:change="updateShotIsPK"
-                                           type="checkbox"
-                                           class="form-control"
-                                           id="shotIsPk"
-                                           v-model="selectedShot.pk"
-                                           :disabled="enableEditing == 0">
-                                </div>
-                                <div class="col-sm-6"></div>
-                            </div>
-
-
-                            <div v-if="selectedShot.goal">
-                                <h4 style="text-decoration: underline">Goal info</h4>
-
-                                <div class="form-group" >
-                                    <label for="goalTime"
-                                           class="col-sm-4 control-label">Time :
+                                <div class="form-group">
+                                    <label for="shotPlayer" class="col-sm-4 control-label">
+                                        Player :
                                     </label>
                                     <div class="col-sm-4">
-                                        <input v-on:change="updateGoalTime"
-                                               type="number disabled"
-                                               class="form-control"
-                                               id="goalTime"
-                                               v-model="selectedShot.goal.time"
-                                               :disabled="enableEditing == 0">
+                                        <select class="form-control" v-on:change="updateShotPlayerMatch">
+                                            <option
+                                                v-for="player_match in player_matches"
+                                                v-bind:value="player_match.id"
+                                                v-bind:key="player_match.id"
+                                                :selected="player_match.player.name == selectedShot.player_match.player.name"
+                                                :disabled="enableEditing == 0"
+                                                >
+                                                {{ player_match.player.name }}
+                                            </option>
+                                        </select>
                                     </div>
-                                    <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteGoal">
-                                        <span class="glyphicon glyphicon-remove"></span> Goal
+                                </div>
+
+                                <div class="form-group" v-if="enableEditing">
+                                    <label for="byOpponent"
+                                        class="col-sm-4 control-label">By Opponent :
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <input v-on:change="updateShotByOpponent"
+                                            type="checkbox"
+                                            class="form-control"
+                                            id="shotByOpponent"
+                                            v-model="selectedShot.by_opponent">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="shotOnGoal"
+                                        class="col-sm-4 control-label">On Goal :
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <input v-on:change="updateShotOnTarget"
+                                            type="checkbox"
+                                            class="form-control"
+                                            id="shotOnGoal"
+                                            v-model="selectedShot.on_target"
+                                            :disabled="enableEditing == 0">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="shotIsPk"
+                                        class="col-sm-4 control-label">Penalty Kick :
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <input v-on:change="updateShotIsPK"
+                                            type="checkbox"
+                                            class="form-control"
+                                            id="shotIsPk"
+                                            v-model="selectedShot.pk"
+                                            :disabled="enableEditing == 0">
+                                    </div>
+                                    <div class="col-sm-6"></div>
+                                </div>
+
+                                <div v-if="selectedShot.goal">
+                                    <h4 style="text-decoration: underline">Goal info</h4>
+
+                                    <div class="form-group" >
+                                        <label for="goalTime"
+                                            class="col-sm-4 control-label">Time :
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <input v-on:change="updateGoalTime"
+                                                type="number disabled"
+                                                class="form-control"
+                                                id="goalTime"
+                                                v-model="selectedShot.goal.time"
+                                                :disabled="enableEditing == 0">
+                                        </div>
+                                        <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteGoal">
+                                            <span class="glyphicon glyphicon-remove"></span> Goal
+                                        </a>
+                                    </div>
+
+                                    <div class="form-group">
+                                            <label for="assist"
+                                                class="col-sm-4 control-label">Assist :
+                                            </label>
+
+                                        <div v-if="selectedShot.goal.assist">
+                                            <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteAssist">
+                                                <span class="glyphicon glyphicon-remove"></span> Assist
+                                            </a>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" v-on:change="updateAssist">
+                                                    <option
+                                                        v-for="player_match in player_matches"
+                                                        v-bind:value="player_match.id"
+                                                        v-bind:key="player_match.id"
+                                                        :selected="player_match.player.name == selectedShot.goal.assist.player_match.player.name"
+                                                        :disabled="enableEditing == 0"
+                                                        >
+                                                        {{ player_match.player.name }}
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                        <div v-if="enableEditing && !selectedShot.goal.assist">
+                                            <div class="col-sm-4"> - </div>
+                                            <div>
+                                                <a class="btn btn-success" v-on:click="addAssist">
+                                                    <span class="glyphicon glyphicon-plus"></span> Assist
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div v-else-if="enableEditing">
+                                    <a class="btn btn-success" v-on:click="addGoal">
+                                        <span class="glyphicon glyphicon-plus"></span> Goal
                                     </a>
                                 </div>
 
-
-                                <div class="form-group">
-                                        <label for="assist"
-                                               class="col-sm-4 control-label">Assist :
-                                        </label>
-
-                                    <div v-if="selectedShot.goal.assist">
-                                        <a class="btn btn-danger" v-if="enableEditing" v-on:click="deleteAssist">
-                                            <span class="glyphicon glyphicon-remove"></span> Assist
-                                        </a>
-                                        <div class="col-sm-4">
-                                            <select class="form-control" v-on:change="updateAssist">
-                                                <option
-                                                    v-for="player_match in player_matches"
-                                                    v-bind:value="player_match.id"
-                                                    :selected="player_match.player.name == selectedShot.goal.assist.player_match.player.name"
-                                                    :disabled="enableEditing == 0"
-                                                    >
-                                                    {{ player_match.player.name }}
-                                                </option>
-                                             </select>
-                                        </div>
-
-
-                                    </div>
-                                    <div v-if="enableEditing && !selectedShot.goal.assist">
-                                        <div class="col-sm-4"> - </div>
-                                        <div>
-                                            <a class="btn btn-success" v-on:click="addAssist">
-                                                <span class="glyphicon glyphicon-plus"></span> Assist
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-
+                            </form>
+                            <hr>
+                            <div v-if="enableEditing">
+                                <a class="btn btn-danger" v-on:click="deleteShot">Delete Shot</a>
                             </div>
-                            <div v-else-if="enableEditing">
-                                <a class="btn btn-success" v-on:click="addGoal">
-                                    <span class="glyphicon glyphicon-plus"></span> Goal
-                                </a>
-                            </div>
-
-                        </form>
-                        <hr>
-                        <div v-if="enableEditing">
-                            <a class="btn btn-danger" v-on:click="deleteShot">Delete Shot</a>
                         </div>
-                    </div>
-                    <div v-else-if="enableEditing">
-                            Click on shot to modify <br/> or <br/>
-                            <a class="btn btn-primary" v-on:click="addShot">Add a Shot</a><br/>
-                    </div>
-                    <div v-else="enableEditing">
-                            Click on shot for details.
-                    </div>
+                        <div v-else-if="enableEditing">
+                                Click on shot to modify <br/> or <br/>
+                                <a class="btn btn-primary" v-on:click="addShot">Add a Shot</a><br/>
+                        </div>
+                        <div v-else>
+                                Click on shot for details.
+                        </div>
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -166,7 +169,7 @@
 import axios from 'axios'
 import { fabric } from 'fabric'
 import _ from 'lodash'
-
+import Spinner from 'vue-simple-spinner'
 
 export default {
     props: {enableEditing: {default: false}
@@ -178,8 +181,12 @@ export default {
             circles: [],
             canvas: null,
             selectedShot: "",
-            selectedShotIsModified: false
+            selectedShotIsModified: false,
+            showCanvas: false
             }
+    },
+    components: {
+        'vue-simple-spinner': Spinner
     },
     ready (){
     },
@@ -195,12 +202,12 @@ export default {
         .then(response => {
             this.shots = response.data;
             this.drawShotsOnCanvas()
+            this.showCanvas=true;
         })
         axios.get(`/api/v1/playermatches/?match_id=` + this.$route.params.match_id + `&expand=true`)
         .then(response => {
             this.player_matches = _.orderBy(response.data, "player.name");
         })
-
     },
     mounted() {
         var parent = this;

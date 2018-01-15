@@ -22,19 +22,18 @@
                         <th title="Yellow Cards">YC</th>
                         <th title="Red Cards">RC</th>
                         <th title="Subbed out due to injury">injury</th>
+                        <th title="Detailed Match Report">Match Report</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
                     </tr>
                 </tfoot>
                 <tbody>
-                    <tr v-for="pm in orderedPlayerMatches">
+                    <tr v-for="pm in orderedPlayerMatches" v-bind:key="pm.id">
                         <td>
-                            <router-link v-bind:to="{name: 'match', params: {match_id: pm.match.id}}">
-                                {{ pm.match.date_time | formatDate }}
-                            </router-link>
+                            {{ pm.match.date_time | formatDate }}
                         </td>
                         <td>
                             {{ pm.match.competition.name }}
@@ -46,7 +45,8 @@
                             {{ pm.match.result }}
                         </td>
                         <td>
-                            {{ pm.starter ? 'Y' : '' }}
+                            <div v-if="pm.starter"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-else></div>
                         </td>
                         <td>
                             {{ pm.minutes }}
@@ -67,8 +67,16 @@
                             {{ pm.red_cards }}
                         </td>
                         <td>
-                            {{ pm.subbed_due_to_injury ? 'Y' : '' }}
+                            <div v-if="pm.subbed_due_to_injury"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-else></div>
                         </td>
+                        <td>
+                            <router-link v-bind:to="{name: 'match', params: {match_id: pm.match.id}}">
+                                Match Report <span class="glyphicon glyphicon-stats"></span>
+                            </router-link>
+                        </td>
+
+
                     </tr>
                 </tbody>
             </table>
@@ -115,20 +123,20 @@ export default {
         },
         footSums: function () {
 
-            return ["Apps: " + _(this.player.player_matches).size(),
-                    "-",
-                    "-",
-                    "-",
-                    _.sum(_.map(this.player.player_matches, 'starter')),
-                    _.sum(_.map(this.player.player_matches, 'minutes')),
-                    _.sum(_.map(this.player.player_matches, 'num_goals')),
-                    _.sum(_.map(this.player.player_matches, 'assists.length')),
-                    _.sum(_.map(this.player.player_matches, 'shots.length')),
-                    _.sum(_.map(this.player.player_matches, 'yellow_cards')),
-                    _.sum(_.map(this.player.player_matches, 'red_cards')),
-                    _.sum(_.map(this.player.player_matches, 'subbed_due_to_injury')),
+            return [{id: 0, value: "Apps: " + _(this.player.player_matches).size()},
+                    {id: 1, value: "-"},
+                    {id: 2, value: "-"},
+                    {id: 3, value: "-"},
+                    {id: 4, value: _.sum(_.map(this.player.player_matches, 'starter'))},
+                    {id: 5, value: _.sum(_.map(this.player.player_matches, 'minutes'))},
+                    {id: 6, value: _.sum(_.map(this.player.player_matches, 'num_goals'))},
+                    {id: 7, value: _.sum(_.map(this.player.player_matches, 'assists.length'))},
+                    {id: 8, value: _.sum(_.map(this.player.player_matches, 'shots.length'))},
+                    {id: 9, value: _.sum(_.map(this.player.player_matches, 'yellow_cards'))},
+                    {id: 10, value: _.sum(_.map(this.player.player_matches, 'red_cards'))},
+                    {id: 11, value: _.sum(_.map(this.player.player_matches, 'subbed_due_to_injury'))},
+                    {id: 12, value: "-"}
                     ]
-
 
         }
     }

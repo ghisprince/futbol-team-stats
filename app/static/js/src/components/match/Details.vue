@@ -37,7 +37,7 @@
                     </tr>
 
                     <tr>
-                        <td id="ra-col">{{ match.num_corners  }}</td>
+                        <td id="ra-col">{{ match.num_corners }}</td>
                         <td id="ca-col">Corners</td>
                         <td>{{ match.num_opponent_corners ? match.num_opponent_corners : 0 }}</td>
                     </tr>
@@ -56,13 +56,13 @@
 
                     <tr>
                         <td id="ra-col">
-                            <div v-for="goal_event in match.goals_timeline">
+                            <div v-for="goal_event in match.goals_timeline" v-bind:key="goal_event.id">
                                 {{ goal_event_format(goal_event) }}
                             </div>
                         </td>
                         <td id="ca-col">Goals timeline</td>
                         <td>
-                            <div v-for="goal_event in match.goals_against_timeline">
+                            <div v-for="goal_event in match.goals_against_timeline" v-bind:key="goal_event.id">
                                 {{ goal_event_format(goal_event) }}
                             </div>
                         </td>

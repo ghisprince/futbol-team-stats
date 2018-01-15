@@ -23,7 +23,7 @@
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
                         <td v-if="showActions">
                             <router-link class="btn btn-success btn-xs"
                                          v-bind:to="{name: 'playermatch-add', params: {match_id: $route.params.match_id }}">
@@ -33,14 +33,15 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                    <tr v-for="pm in player_matches">
+                    <tr v-for="pm in player_matches" v-bind:key="pm.id">
                         <td>
                             <router-link v-bind:to="{name: 'player', params: {player_id: pm.player.id}}">
                                 {{ pm.player.name }}
                             </router-link>
                         </td>
                         <td>
-                            {{ pm.starter ? 'Y' : '' }}
+                            <div v-if="pm.starter"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-else></div>
                         </td>
                         <td>
                             {{ pm.minutes }}
@@ -65,7 +66,8 @@
                             {{ pm.red_cards ? pm.red_cards : '' }}
                         </td>
                         <td>
-                            {{ pm.subbed_due_to_injury ? 'Y' : '' }}
+                            <div v-if="pm.subbed_due_to_injury"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-else></div>
                         </td>
                         <td v-if="showActions">
                             <router-link class="btn btn-warning btn-xs"
@@ -123,18 +125,17 @@ export default {
     },
     computed: {
         footSums: function () {
-            var tds = [
-                    "Players: " + _(this.player_matches).size(),
-                    _.sum(_.map(this.player_matches, 'starter')),
-                    _.sum(_.map(this.player_matches, 'minutes')),
-                    _.sum(_.map(this.player_matches, 'num_goals')),
-                    _.sum(_.map(this.player_matches, 'assists.length')),
-                    _.sum(_.map(this.player_matches, num_shots_not_by_opponent)),
-                    _.sum(_.map(this.player_matches, 'corners')),
-                    _.sum(_.map(this.player_matches, 'yellow_cards')),
-                    _.sum(_.map(this.player_matches, 'red_cards')),
-                    _.sum(_.map(this.player_matches, 'subbed_due_to_injury')),
-                    ];
+            var tds = [{id: 0, value: "Players: " + _(this.player_matches).size()},
+                       {id: 1, value: _.sum(_.map(this.player_matches, 'starter'))},
+                       {id: 2, value: _.sum(_.map(this.player_matches, 'minutes'))},
+                       {id: 3, value: _.sum(_.map(this.player_matches, 'num_goals'))},
+                       {id: 4, value: _.sum(_.map(this.player_matches, 'assists.length'))},
+                       {id: 5, value: _.sum(_.map(this.player_matches, num_shots_not_by_opponent))},
+                       {id: 6, value: _.sum(_.map(this.player_matches, 'corners'))},
+                       {id: 7, value: _.sum(_.map(this.player_matches, 'yellow_cards'))},
+                       {id: 8, value: _.sum(_.map(this.player_matches, 'red_cards'))},
+                       {id: 9, value: _.sum(_.map(this.player_matches, 'subbed_due_to_injury'))}
+                       ];
 
             return tds;
         }

@@ -5,7 +5,14 @@
         <div v-if="competition.external_url">
             <a v-bind:href="competition.external_url">Competition's web site</a>
         </div>
+
         <h3>Team record: {{competition.match_results}}</h3>
+
+        <div v-show="competition.result">
+            <h3>
+                Result: {{competition.result}}
+            </h3>
+        </div>
 
         <div v-show="competition.note" align="left">
             Note: {{competition.note}}

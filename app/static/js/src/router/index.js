@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-import EditChoices from '../components/EditChoices.vue'
 import DeleteItem from '../components/DeleteItem.vue'
 
 import Opponent from '../components/opponent/Details.vue'
@@ -29,8 +28,6 @@ import PlayerMatchEdit from '../components/player_match/Edit.vue'
 import PlayerMatchAdd from '../components/player_match/Add.vue'
 
 export default new VueRouter({routes:[
-  { path: '/', component: EditChoices},
-
   { path: '/opponent-list', component: OpponentList},
   { path: '/add-opponent', component: OpponentAdd},
   { path: '/opponent/:opponent_id/delete', component: DeleteItem, name: 'opponent-delete', props: true},

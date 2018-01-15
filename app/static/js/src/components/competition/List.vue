@@ -30,7 +30,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="competition in filteredCompetitions">
+                    <tr v-for="competition in filteredCompetitions" v-bind:key="competition.id">
                     <td>
                         <router-link v-bind:to="{name: 'competition', params: {competition_id: competition.id}}">
                             {{ competition.name }}
@@ -78,7 +78,6 @@
 import axios from 'axios'
 import _ from 'lodash'
 import Spinner from 'vue-simple-spinner'
-
 
 export default {
     data () {

@@ -9,6 +9,7 @@
                 <select class="form-control col-sm-4" v-on:change="playerChanged">
                     <option v-for="player in players"
                             v-bind:value="player.id"
+                            v-bind:key="player.id"
                             :selected="player.name == playermatch.player.name"
                             >
                             {{player.name}}

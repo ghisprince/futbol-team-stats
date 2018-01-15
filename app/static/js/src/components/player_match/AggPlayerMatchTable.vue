@@ -22,11 +22,11 @@
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums"> {{ footSum }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
                     </tr>
                 </tfoot>
                 <tbody>
-                    <tr v-for="pms in aggregatedPlayerMatches">
+                    <tr v-for="pms in aggregatedPlayerMatches" v-bind:key="pms.player.id">
                         <td>
                             {{ pms.player }}
                         </td>
@@ -138,18 +138,17 @@ export default {
         },
         footSums: function () {
 
-            var tds = [
-                    "Count: " + _(this.aggregatedPlayerMatches).size(),
-                    "-",
-                    "-",
-                    _.sum(_.map(this.player_matches, 'minutes')),
-                    _.sum(_.map(this.player_matches, 'num_goals')),
-                    _.sum(_.map(this.player_matches, 'assists.length')),
-                    _.sum(_.map(this.player_matches, countShotsfor)),
-                    _.sum(_.map(this.player_matches, 'yellow_cards')),
-                    _.sum(_.map(this.player_matches, 'red_cards')),
-                    _.sum(_.map(this.player_matches, 'subbed_due_to_injury')),
-                    ];
+            var tds = [{id: 0, value: "Count: " + _(this.aggregatedPlayerMatches).size()},
+                       {id: 1, value: "-"},
+                       {id: 2, value: "-"},
+                       {id: 3, value: _.sum(_.map(this.player_matches, 'minutes'))},
+                       {id: 4, value: _.sum(_.map(this.player_matches, 'num_goals'))},
+                       {id: 5, value: _.sum(_.map(this.player_matches, 'assists.length'))},
+                       {id: 6, value: _.sum(_.map(this.player_matches, countShotsfor))},
+                       {id: 7, value: _.sum(_.map(this.player_matches, 'yellow_cards'))},
+                       {id: 8, value: _.sum(_.map(this.player_matches, 'red_cards'))},
+                       {id: 9, value: _.sum(_.map(this.player_matches, 'subbed_due_to_injury'))}
+                       ];
 
             // show the table once all values are computed
             if (_(this.aggregatedPlayerMatches).size() > 0) {
