@@ -15,7 +15,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Match Date</th>
+                        <th>Date</th>
                         <th v-if="showCompetition">Competition</th>
                         <th v-if="showOpponent">Opponent</th>
                         <th>Result</th>
@@ -23,13 +23,15 @@
                         <th title="Goals Against">GA</th>
                         <th title="Shots For">SF</th>
                         <th title="Shots Against">SA</th>
-                        <th title="Detailed Match Report">Match Report</th>
+                        <th>Match Report</th>
                         <th v-if="showActions">Actions</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id">
+                            {{ footSum.value }}
+                        </td>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -104,8 +106,6 @@ export default {
             searchKey: ''
         }
     },
-    created() {
-    },
     components: {
         'vue-simple-spinner': Spinner
     },
@@ -138,7 +138,7 @@ export default {
                 var tds = tds.concat([{id: 1, value: "-"}]);
             }
 
-             var tds = tds.concat(
+            var tds = tds.concat(
                    [{id: 2, value: "-"},
                     {id: 3, value: _.sum(_.map(this.matches, 'num_goals'))},
                     {id: 4, value: _.sum(_.map(this.matches, 'num_goals_against'))},
@@ -146,7 +146,7 @@ export default {
                     {id: 6, value: _.sum(_.map(this.matches, 'num_shots_against'))},
                     {id: 7, value: "-"}
                     ]);
-             return tds;
+            return tds;
         }
     }
 }

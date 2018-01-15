@@ -109,7 +109,6 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
-import moment from 'moment'
 import Spinner from 'vue-simple-spinner'
 
 import PlayerMatchTable from '../player_match/PlayerMatchTable.vue'
@@ -126,7 +125,7 @@ export default {
                         competition: {name: ""},
                         player_matches: []
                         },
-                 showTable: false
+                showTable: false
                 }
     },
     components: {

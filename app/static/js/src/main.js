@@ -35,6 +35,6 @@ new Vue({
 
 Vue.filter('formatDate', function(value) {
     if (value) {
-        return moment.utc(String(value)).format('YYYY/MM/DD hh:mm a')
+        return moment.utc(String(value)).format('YYYY/MM/DD')
     }
 })

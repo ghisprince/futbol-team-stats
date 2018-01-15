@@ -21,13 +21,15 @@
                         <th title="Shots">S</th>
                         <th title="Yellow Cards">YC</th>
                         <th title="Red Cards">RC</th>
-                        <th title="Subbed out due to injury">injury</th>
-                        <th title="Detailed Match Report">Match Report</th>
+                        <th title="Subbed out due to injury">Injury</th>
+                        <th>Match Report</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> {{ footSum.value }}</td>
+                        <td v-for="footSum in footSums" v-bind:key="footSum.id"> 
+                            {{ footSum.value }}
+                        </td>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -45,7 +47,9 @@
                             {{ pm.match.result }}
                         </td>
                         <td>
-                            <div v-if="pm.starter"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-if="pm.starter">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </div>
                             <div v-else></div>
                         </td>
                         <td>
@@ -67,7 +71,9 @@
                             {{ pm.red_cards }}
                         </td>
                         <td>
-                            <div v-if="pm.subbed_due_to_injury"><span class="glyphicon glyphicon-ok"></span></div>
+                            <div v-if="pm.subbed_due_to_injury">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </div>
                             <div v-else></div>
                         </td>
                         <td>
@@ -75,7 +81,6 @@
                                 Match Report <span class="glyphicon glyphicon-stats"></span>
                             </router-link>
                         </td>
-
 
                     </tr>
                 </tbody>
@@ -94,7 +99,10 @@ import Spinner from 'vue-simple-spinner'
 
 export default {
     data () {
-        return {player: {name: null, number: null, player_matches: []},
+        return {player: {name: null, 
+                         number: null, 
+                         player_matches: []
+                         },
                 showTable: false
                 }
     },
@@ -108,11 +116,6 @@ export default {
     },
     components: {
         'vue-simple-spinner': Spinner
-    },
-    getSum(items, prop){
-        return items.reduce( function(a, b){
-            return a + b[prop];
-        }, 0);
     },
     computed: {
         player_num_matches : function() {
@@ -137,7 +140,6 @@ export default {
                     {id: 11, value: _.sum(_.map(this.player.player_matches, 'subbed_due_to_injury'))},
                     {id: 12, value: "-"}
                     ]
-
         }
     }
 }
