@@ -24,9 +24,9 @@ Web-app to capture and report a team and player's stats.
 ### Python
 Install requirements
 ```
-virtualenv env --python=python3.4
+virtualenv env --python=python3.6
 source env/bin/activate
-pip3 install -r requirements.txt
+pip3 install -r backend/requirements.txt
 ```
 
 ### run flask local server
@@ -38,14 +38,14 @@ python manage.py server
 Using webpack to compile js & vue files
 
 ```
-cd ./app/static/js
+cd client
 npm install
-npm install webpack -g
-webpack
+npm run serve
+npm build serve
 ```
 
 ### Tests
-To run python test code
+To run backend tests
 ```
 py.test -s test
 ```
@@ -63,5 +63,6 @@ python scripts\load_data.py
  * server side: python, flask, sqlalchemy, marshmallow, flask-restful
 
 ### Code foundation
+ * vue-cli3
  * [JackStouffer/Flask-Foundation](https://github.com/JackStouffer/Flask-Foundation)
  * [Leo-G/Flask-Scaffold](https://github.com/Leo-G/Flask-Scaffold)

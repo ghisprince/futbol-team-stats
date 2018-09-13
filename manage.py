@@ -4,13 +4,13 @@ import os
 
 from flask_script import Manager, Server
 from flask_script.commands import ShowUrls, Clean
-from app import create_app
-from app.models import db, User
+from backend import create_app
+from backend.models import db, User
 
 # default to dev config because no one should use this in
 # production anyway
-env = os.environ.get('APP_ENV', 'dev')
-app = create_app('app.settings.%sConfig' % env.capitalize())
+env = os.environ.get('APP_ENV', 'prod')
+app = create_app('backend.settings.%sConfig' % env.capitalize())
 
 manager = Manager(app)
 manager.add_command("server", Server())
@@ -21,7 +21,7 @@ manager.add_command("clean", Clean())
 @manager.shell
 def make_shell_context():
     """ Creates a python REPL with several default imports
-        in the context of the app
+        in the context of the backend
     """
 
     return dict(app=app, db=db, User=User)
