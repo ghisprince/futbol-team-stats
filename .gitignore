@@ -78,6 +78,7 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
+env/
 
 # Spyder project settings
 .spyderproject
@@ -100,11 +101,7 @@ app/static/public/css
 app/static/public/js
 logfile.txt
 *.xlsx
-
 *.pem
-
-
-
 .DS_Store
 node_modules
 /dist

@@ -17,6 +17,7 @@ import MatchEdit from '@/components/MatchEdit.vue'
 import MatchCreate from '@/components/MatchCreate.vue'
 import MatchStatsEdit from '@/components/MatchStatsEdit.vue'
 import PlayerMatchEdit from '@/components/PlayerMatchEdit.vue'
+import MatchShotsEdit from '@/components/MatchShotsEdit.vue'
 
 import Players from '@/components/Players.vue'
 import Player from '@/components/Player.vue'
@@ -102,6 +103,11 @@ export default new Router({
       path: '/playerMatches/:id/edit',
       name: 'PlayerMatchEdit',
       component: PlayerMatchEdit
+    },
+    {
+      path: '/matchShotsEdit/:id/edit',
+      name: 'MatchShotsEdit',
+      component: MatchShotsEdit
     },
     // Players
     {

@@ -1,18 +1,17 @@
 <template>
   <div>
-
     <v-card offset-sm3>
       <v-alert
         v-model="alert"
         dismissible
         color="warning"
         icon="priority_high"
-      >
+        >
         {{ alertMessage }}
       </v-alert>
 
       <v-card-title>
-        <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
         <v-btn
           :to="{
@@ -21,7 +20,9 @@
                 id: match.id
             }
           }"
-          color="primary">Edit</v-btn>
+          color="primary">
+          Edit
+        </v-btn>
         <v-btn @click="deleteMatch()" color="error">Delete</v-btn>
 
         <v-btn v-if="match.match_stats"
@@ -33,8 +34,8 @@
           }"
           color="primary">Edit Extra Stats</v-btn>
         <v-btn v-else @click="createMatchStats()">Add Extra Stats</v-btn>
-
       </v-card-title>
+
       <h2>
         <strong>Date :</strong> {{ match.date_time }} <br/>
         <strong>Competition :</strong> {{ match.competition_name }} <br/>
@@ -78,8 +79,6 @@
         </template>
       </v-data-table>
 
-
-
       <v-layout row>
         <v-spacer></v-spacer>
 
@@ -97,18 +96,20 @@
                             :match="match"
                             :showPlayer="true">
       </player-matches-table>
-
     </v-card>
+    <match-shots :shots="shots" :match_id="match.id"></match-shots>
+
   </div>
 </template>
 
 <script>
 import API from '@/lib/API'
 import PlayerMatchesTable from '@/components/PlayerMatchesTable'
+import MatchShots from '@/components/MatchShots'
 
 export default {
   components: {
-    PlayerMatchesTable
+    PlayerMatchesTable, MatchShots
   },
   data () {
     return {
@@ -120,6 +121,7 @@ export default {
         date_time: ''
       },
       player_matches: [],
+      shots: [],
       matchTableHeaders: [
         { text: 'Team', value: 'team_stat', sortable: false, align: 'right' },
         { text: '', value: 'stat', sortable: false, align: 'center' },
@@ -176,6 +178,10 @@ export default {
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
           this.player_matches = player_matches
+        })
+      API.getShotsByMatch(id)
+        .then((shots) => {
+          this.shots = shots
         })
     },
     createMatchStats () {

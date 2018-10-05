@@ -6,6 +6,8 @@ const opponentsURL = '/api/v1/opponents/'
 const playerMatchesURL = '/api/v1/playermatches/'
 const matchStatsURL = '/api/v1/matchstats/'
 const playersURL = '/api/v1/players/'
+const shotsURL = '/api/v1/shots/'
+
 
 export default {
   //  competitions
@@ -143,5 +145,11 @@ export default {
   deletePlayer (id) {
     return axios.delete(`${playersURL}/${id}`)
       .then(response => response.data)
-  }
+  },
+  // shots
+  getShotsByMatch (id) {
+    return axios.get(`${shotsURL}/?match_id=${id}&expand=true`)
+      .then(response => response.data)
+  },
+
 }
