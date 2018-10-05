@@ -45,7 +45,7 @@ export default {
   name: 'App',
   data () {
     return {
-      drawer: true,
+      drawer: false,
       fixed: true,
       miniVariant: false,
       right: true,

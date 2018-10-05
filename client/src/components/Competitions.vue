@@ -30,6 +30,7 @@
           <td>{{ props.item.start_date }}</td>
           <td>{{ props.item.result }}</td>
           <td>{{ props.item.match_results }}</td>
+          <td><span v-show="props.item.goal_differential > 0">+</span>{{ props.item.goal_differential}}</td>
           <td>
               <router-link :to="{
                 name: 'Competition',
@@ -64,6 +65,7 @@ export default {
         {text: 'Start Date', value: 'start_date'},
         {text: 'Result', value: 'result'},
         {text: 'W-D-L', value: 'match_results'},
+        {text: 'Goal Diff', value: 'goal_differential'},
         {text: 'Stats', value: 'id'}
       ]
     }

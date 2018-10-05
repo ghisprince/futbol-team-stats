@@ -67,6 +67,7 @@ class CompetitionSchema(ModelSchema):
     num_match_tied = fields.String(dump_only=True)
     num_match_lost = fields.String(dump_only=True)
     match_results = fields.String(dump_only=True)
+    goal_differential = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
@@ -89,6 +90,7 @@ class OpponentSchema(ModelSchema):
     num_match_tied = fields.String(dump_only=True)
     num_match_lost = fields.String(dump_only=True)
     match_results = fields.String(dump_only=True)
+    goal_differential = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
@@ -227,6 +229,7 @@ class MatchSchema(ModelSchema):
     result_long = fields.String(dump_only=True)
     num_goals = fields.Integer(dump_only=True)
     num_goals_against = fields.Integer(dump_only=True)
+    goal_differential = fields.Integer(dump_only=True)
 
     # add hybrid properties from MatchStats for convenient access
     opponent_name = fields.String(dump_only=True)

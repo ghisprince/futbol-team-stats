@@ -9,7 +9,7 @@
       </v-layout>
 
       <v-card-title>
-        <h2>Opponentsz</h2>
+        <h2>Opponents</h2>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -26,8 +26,9 @@
       >
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
-          <td class="text-xs">{{ props.item.match_results }}</td>
-          <td class="text-xs">
+          <td>{{ props.item.match_results }}</td>
+          <td><span v-show="props.item.goal_differential > 0">+</span>{{ props.item.goal_differential}}</td>
+          <td>
               <router-link :to="{
                 name: 'Opponent',
                 params: { id: props.item.id }
@@ -55,6 +56,7 @@ export default {
       headers: [
         {text: 'Name', value: 'name'},
         {text: 'W-D-L', value: 'match_results'},
+        {text: 'Goal Diff', value: 'goal_differential'},
         {text: 'Stats', value: 'id'}
       ]
     }

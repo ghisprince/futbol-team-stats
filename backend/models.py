@@ -191,6 +191,11 @@ class Opponent(db.Model, CRUD_MixIn):
                                  self.num_match_tied,
                                  self.num_match_lost)
 
+    @hybrid_property
+    def goal_differential(self):
+        """ team's goal differential vs this opponent """
+        return sum([i.goal_differerential for i in self.matches])
+
     def __init__(self, name, team, external_url=None, note=None):
         self.name = name
         self.team = team
@@ -246,6 +251,11 @@ class Competition(db.Model, CRUD_MixIn):
         return "{}-{}-{}".format(self.num_match_won,
                                  self.num_match_tied,
                                  self.num_match_lost)
+
+    @hybrid_property
+    def goal_differential(self):
+        """ team's goal differential vs this opponent """
+        return sum([i.goal_differerential for i in self.matches])
 
     def __init__(self, name, team, result=None, external_url=None, note=None):
         self.name = name
@@ -343,6 +353,10 @@ class Match(db.Model, CRUD_MixIn):
             .filter(Match.id == self.id).filter(Shot.by_opponent == by_opponent).all()
 
         return [i.label for i in sorted(goals, key=lambda x: x.time if x.time else 0)]
+
+    @hybrid_property
+    def goal_differerential(self):
+        return self.num_goals - self.num_goals_against
 
     @hybrid_property
     def goals_timeline(self):
