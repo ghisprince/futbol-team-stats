@@ -683,6 +683,12 @@ class Shot(db.Model, CRUD_MixIn):
     def scored(self):
         return self.goal is not None
 
+    @hybrid_property
+    def player_number(self):
+        return self.player_match.player.number
+
+        
+
     def __init__(self, player_match, x=None, y=None, on_target=None,
                  pk=None, by_opponent=None):
         self.player_match = player_match

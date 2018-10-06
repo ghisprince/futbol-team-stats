@@ -40,8 +40,10 @@
       <template slot="footer">
         <td v-if="showPlayer"><strong>Players: {{ aggregatePMs.length }} </strong></td>
         <td v-if="showCompetition"><strong>Competitions:  {{ aggregatePMs.length }} </strong></td>
-        <td><strong> - </strong></td>
-        <td><strong> {{ sum_starters }} </strong></td>
+        <td v-if="!showPlayer"><strong> {{ sum_apps }} </strong></td>
+        <td v-else>-</td>
+        <td v-if="!showPlayer"><strong> {{ sum_starters }} </strong></td>
+        <td v-else>-</td>
         <td><strong> {{ sum_minutes }} </strong></td>
         <td><strong> {{ sum_goals }} </strong></td>
         <td><strong> {{ sum_assist }} </strong></td>
@@ -101,6 +103,9 @@ export default {
       } else {
         return UTILS.aggregateByCompetition(this.player_matches)
       }
+    },
+    sum_apps: function () {
+      return (this.player_matches.length)
     },
     sum_starters: function () {
       return UTILS.sum(this.player_matches, 'starter')

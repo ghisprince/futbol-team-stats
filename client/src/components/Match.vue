@@ -54,25 +54,25 @@
         >
         <template slot="items" slot-scope="props">
           <tr>
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" class="text-xs-right">
+            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array">
               <div v-for="goal in props.item.team_stat" v-bind:key="goal">
               {{ goal }} <br/>
               </div>
             </td>
 
-            <td v-else class="text-xs-right">
+            <td v-else>
               {{ props.item.team_stat }}
             </td>
 
-            <td class="text-xs-center">{{ props.item.stat }}</td>
+            <td>{{ props.item.stat }}</td>
 
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" class="text-xs-left">
+            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array">
               <div v-for="goal in props.item.opponent_stat" v-bind:key="goal">
               {{ goal }} <br/>
               </div>
             </td>
 
-            <td v-else class="text-xs-left">
+            <td v-else>
               {{ props.item.opponent_stat }}
             </td>
           </tr>

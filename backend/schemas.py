@@ -110,6 +110,7 @@ class ShotSchema(ModelSchema):
          'collection': ma.URLFor('CreateListShot'.lower())})
 
     scored = fields.Boolean(dump_only=True)
+    player_number = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True

@@ -1,154 +1,143 @@
 <template>
-  <div class="container">
-    SHOTS
-    {{ _shots }}
-    <canvas id="canvas" width=452 height=352></canvas>
-    <p id="sub-table-note">
-      <i>Grey: off target, Blue: on target, Red: scored.</i>
-    </p>
-
+  <div>
+    <svg id="shots-chart"></svg>
+    <p>Grey: off target, Green on target, Red: scored.</p>
   </div>
 </template>
 
 <script>
+import * as d3 from 'd3';
+function handleMouseOver0 (d, i) {
+  console.log(d)
+  d3.select(this).attr({fill: "orange"})
+}
 
-import { fabric } from 'fabric'
 
 export default {
-  props: [ 'shots' ],
+  props: ['shots'],
   data () {
     return {
-      canvas: null
+      _svg: "",
+      width: 450,
+      height: 700
     }
   },
-  ready (){
-  },
-  created () {
-    //this.drawShotsOnCanvas()
-    //this._canvas = ""
-  },
-  mounted () {
-    
-    this.drawShotsOnCanvas()
-  },
-  computed: {
-    _shots: function () {
-      this.drawShotsOnCanvas()
-      return this.shots
-    }
+  mounted: function() {
+    this.$nextTick(this.load)
   },
   methods: {
-    drawShotsOnCanvas: function() {
-      console.log("shots " + this.shots.length + " " + this._canvas)
-      if (!this._canvas) {
-        this._canvas = new fabric.Canvas('canvas');
-      }
-      for (var iii = 0; iii < this.shots.length; iii++) {
-        var shot = this.shots[iii];
+    load () {
+    let fieldLinesRects = [
+      // top half
+      {x: 10, y:20, width: 430, height: 330},
+      {x: 100, y:20, width: 245, height: 100},
+      {x: 170, y:20, width: 115, height: 30},
 
-        var color = '';
-        if (shot.scored) {
-          color = 'rgb(250,15,15)'; //red
-        } else if (shot.on_target) {
-          color = 'rgb(15,100,200)'; //blue
-        } else {
-          color = 'grey'; //grey
+      // bottom half
+      {x: 10, y:350, width: 430, height: 330},
+      {x: 100, y:580, width: 245, height: 100},
+      {x: 170, y:650, width: 115, height: 30},
+      ]
+
+    let shotFillColor = { off_target: "grey", 
+                      on_target: "PaleGreen", 
+                      scored: "red" }
+
+    let shotStrokeColor = { by_opponent: "white", 
+                        by_team: "black"}
+
+    let svg  = d3.select('#shots-chart')
+      .attr("width", this.width)
+      .attr("height", this.height)
+      .style("background-color", "DarkGreen")
+      .style('border', '1px solid black')
+
+    svg.selectAll('rect')
+      .data(fieldLinesRects)
+      .enter()
+      .append('rect')
+      .attr("x", function (d) { return d.x } )
+      .attr("y", function (d) { return d.y })
+      .attr("width", function (d) { return d.width })
+      .attr("height", function (d) { return d.height })
+      .attr('stroke', 'green')
+      .attr('stroke-width', 3)
+      .attr("fill", "transparent")
+
+    let svgPoints = svg.selectAll("circleShot")
+      .data(this.shots)
+      .enter()
+      .append("circle")
+
+    let svgPointAtts = svgPoints
+      .attr("class", "dot")
+      .style("opacity", 0.75)
+      .style("stroke", function (pt) { 
+        return shotStrokeColor[pt.by_opponent ? 'by_opponent' : 'by_team']
+      })
+      .attr("fill", function(pt) {
+        if (pt.scored) {
+          return shotFillColor['scored']
         }
+        return (shotFillColor[pt.on_target ? 'on_target' : 'off_target' ] )
+      })
+      .attr("cx", function(pt) { return pt.x })
+      .attr("cy", function(pt) { return pt.y })
+      .attr("r", 10)
 
-        var stroke_color = 'rgb(5,5,5)';
-        if (shot.by_opponent) {
-          stroke_color = 'rgb(240,240,240)';
-        }
+      /*.attr("transform", function(d) { 
+        return "translate(" + d + ")"; 
+      })*/
+      // a
+      .on("mouseover", function(d, i) {
+        d3.select(this)
+          .attr("r", 20)
+      })
+      .on("mouseout", function(d,i) {
+        d3.select(this)
+          .attr("r", 10)
+      })
 
-        var circle = new fabric.Circle({
-                  radius: 9,
-                  fill: color,
-                  opacity: 0.9,
-                  stroke: stroke_color,
-                  strokeWidth: 2,
-                  originX: 'center',
-                  originY: 'center'
-                  })
+    let svgPointsText = svg.selectAll("text")
+      .data(this.shots)
+      .enter()
+      .append("text")
 
-        // use player's # to label shot, else use "?"
-        try {
-          var player_number = shot.player_match.player.number.toString();
-        }
-        catch (err) {
-          var player_number = "?";
-        }
+    let svgPointsTextAtts = svgPointsText
+      .attr("x", function(pt) { return pt.x })
+      .attr("y", function(pt) { return pt.y })
+      .attr("text-anchor", "middle") // set anchor y justification
+      .attr("dy", "5px")
+      .text(function(pt) { return pt.player_number.toString() })
 
-        var text = new fabric.Text(player_number,
-                       {fontSize: 12,
-                      originX: 'center',
-                      originY: 'center'
-                       }
-        );
+    // onclick
+    svg.on("click",function () {
+      let coords = d3.mouse(this)
+      console.log(coords)
+    }) 
 
-        var group = new fabric.Group([circle, text],
-                       {hasControls: false,
-                        left: shot.x,
-                        top: shot.y,
-                        angle: 0,
-                        lockMovementX: this.enableEditing == false,
-                        lockMovementY: this.enableEditing == false
-                        }
-        );
-
-        group.toObject = (function(toObject) {
-          return function () {
-          return fabric.util.object.extend(toObject.call(this), {
-            shot: this.shot
-          });
-          };
-        })(group.toObject);
-        group.shot = shot
-
-        group.on('modified', function(){
-          //console.log('moved ' + this.shot.player_match.player.name + '(' + this.left + ', ' + this.top + ')')
-          console.log("modified shot")
-          parent.selectedShot.x = this.left;
-          parent.selectedShot.y = this.top;
-          parent.selectedShotIsModified = true;
-          axios.patch(parent.selectedShot._links.self,
-                {x: this.left,
-                 y: this.top }
-          )
-          .then(response => {
-            parent.refreshShot(response.data._links.self);
-          })
-        })
-        this._canvas.add(group)
-      }
-
-      //this._canvas.setBackgroundImage("static/assets/soccer-pitch.png",
-      //              this._canvas.renderAll.bind(this._canvas),
-      //              {backgroundImageOpacity: 0.5,
-      //               backgroundImageStretch: false
-      //              }
-      //);
+    },
+    handleMouseOver (d, i) {
+      console.log("########")
+      console.log(d)
+      d3.select('circle')
+        .attr({"fill": "orange"})
+        .attr("r", 7)
     }
-
+  },
+  watch: {
+    shots: function dataChanged(n, o) {
+      console.log("changed")
+      this.load()
+    }
+  },
+  computed: {
+    cshots: function () {
+      var vertices = d3.range(100).map(function(d) {
+        return [Math.random() * 500, Math.random() * 300];
+      })
+      return vertices
+    }
   }
 }
-
 </script>
-
-<style>
-
-#canvas {
-  padding: 0;
-  margin: auto;
-  display: block;
-  width: 500px;
-}
-
-.cliente {
-	margin-top:10px;
-	border: #cdcdcd medium solid;
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-}
-
-</style>
