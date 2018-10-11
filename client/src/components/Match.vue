@@ -54,25 +54,26 @@
         >
         <template slot="items" slot-scope="props">
           <tr>
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array">
+            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" 
+                class="text-xs-right">
               <div v-for="goal in props.item.team_stat" v-bind:key="goal">
               {{ goal }} <br/>
               </div>
             </td>
 
-            <td v-else>
+            <td v-else class="text-xs-right">
               {{ props.item.team_stat }}
             </td>
 
-            <td>{{ props.item.stat }}</td>
+            <td class="text-xs-center">{{ props.item.stat }}</td>
 
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array">
+            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" class="text-xs-left">
               <div v-for="goal in props.item.opponent_stat" v-bind:key="goal">
               {{ goal }} <br/>
               </div>
             </td>
 
-            <td v-else>
+            <td v-else class="text-xs-left">
               {{ props.item.opponent_stat }}
             </td>
           </tr>
@@ -97,8 +98,22 @@
                             :showPlayer="true">
       </player-matches-table>
     </v-card>
-    <match-shots :shots="shots" :match_id="match.id"></match-shots>
+    <v-card>
+      <v-card-title>
+      <v-spacer></v-spacer>
+        <v-btn 
+          :to="{
+            name: 'MatchShotsEdit',
+            params: {
+                id: match.id
+            }
+          }"
+          color="primary">Edit Shots
+        </v-btn>
+      </v-card-title>
 
+      <match-shots :shots="shots"></match-shots>
+    </v-card>
   </div>
 </template>
 

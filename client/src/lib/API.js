@@ -148,8 +148,26 @@ export default {
   },
   // shots
   getShotsByMatch (id) {
+    return axios.get(`${shotsURL}/?match_id=${id}`)
+      .then(response => response.data)
+  },
+  // todo: is this even used?
+  getShotsByMatchEx (id) {
     return axios.get(`${shotsURL}/?match_id=${id}&expand=true`)
       .then(response => response.data)
   },
+  createShot (shot) {
+    return axios.post(shotsURL, shot)
+      .then(response => response.data)
+  },
+  updateShot (id, shot) {
+    return axios.patch(`${shotsURL}/${id}`, shot)
+      .then(response => response.data)
+  },
+  deleteShot (id) {
+    return axios.delete(`${shotsURL}/${id}`)
+      .then(response => response.data)
+  },
+
 
 }

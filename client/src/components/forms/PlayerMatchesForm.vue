@@ -38,7 +38,7 @@
                 </v-flex>
 
                 <v-flex>
-                  <v-text-field 
+                  <v-text-field
                     v-model="editedItem.minutes" 
                     label="Minutes Played"
                     mask="##">

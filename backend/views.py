@@ -317,6 +317,37 @@ class CreateListShot(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
+    def post(self):
+        shot_dict, _ = super().post()
+        request_dict = request.get_json(force=True)
+
+        query = self.ModelClass.query.get(shot_dict['id'])
+
+        goal_dict = request_dict.pop('goal', None)
+        if goal_dict:
+            goal_dict['shot'] = shot_dict['id']
+            goal_schema.validate(goal_dict)
+            goal = goal_schema.load(goal_dict).data
+            db.session.commit()
+
+            assist_dict = goal_dict.pop('assist', None)
+            if assist_dict and assist_dict['player_match']:
+                assist_dict.pop('id')
+                assist_dict['goal'] = goal.id
+                assist_schema.validate(assist_dict)
+                assist = assist_schema.load(assist_dict).data
+
+            query.goal = goal
+
+        # todo: add goal/assist?
+        db.session.commit()
+        
+        results = self.mm_schema.dump(query).data
+        return results, 201
+
+
+
+
     def InstanceFromDict(self, request_dict):
         request_dict['player_match'] = db.session.query(
             PlayerMatch).filter_by(id=request_dict['player_match']['id']).one()
@@ -405,6 +436,7 @@ class GetUpdateDeleteResourceBase(Resource):
         modelInst = self.ModelClass.query.get_or_404(id)
 
         request_dict = request.get_json(force=True)
+        pprint(request_dict)
         try:
             self.mm_schema.validate(request_dict, partial=True)
             modelInst = self.mm_schema.load(request_dict, partial=True)
@@ -651,26 +683,67 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
         return super().get(shot_id, expand)
 
     def patch(self, shot_id):
-        return super().patch(shot_id)
-        """ 
+        request_dict = request.get_json(force=True)        
         modelInst = self.ModelClass.query.get_or_404(shot_id)
+        print(">"*30)
+        goal_dict = request_dict.pop('goal', {})
+        if goal_dict:
+            assist_dict = goal_dict.pop('assist', {})
 
-        request_dict = request.get_json(force=True)
-        if 'player_match' in request_dict:
-            request_dict['player_match'] = db.session.query(
-                PlayerMatch).filter_by(id=request_dict['player_match']['id']).one()
-        try:
-            # self.mm_schema.validate(request_dict, partial=True)
-            for key, value in request_dict.items():
-                setattr(modelInst, key, value)
-            modelInst.update()
-            return self.get(shot_id)
+        if request_dict['scored'] == True and goal_dict:
+            goal_dict['shot'] = shot_id
+            goal_schema.validate(goal_dict, partial=True)
 
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
-        """
+            if modelInst.goal is None:
+                # add new Goal
+                goal = goal_schema.load(goal_dict, partial=True).data
+                print("Add Goal {}".format(goal))
+
+            else:
+                # update existing Goal
+                # TODO : isthis first get_or_404 needed?
+                print("#"*40)
+                pprint(goal_dict)
+                print("#"*40)
+                goal = Goal.query.get_or_404(goal_dict['id'])
+                goal = goal_schema.load(goal_dict, partial=True).data
+                #import pdb;pdb.set_trace()
+                print("Update Goal {}".format(goal))
+
+            if (goal_dict['assisted'] == True) and assist_dict:
+                assist_dict['goal'] = modelInst.goal.id
+                
+                if modelInst.goal.assist is None:
+                    # add new Assist
+                    # todo : this seemswrong
+                    assist_dict.pop('id')
+                    assist = assist_schema.load(assist_dict, partial=True).data
+                    print("Add Assist {}".format(assist))
+                else:
+                    # update existing Assist
+                    assist_schema.validate(assist_dict, partial=True)
+                    assist = assist_schema.load(assist_dict).data
+                    print("Update Assist {}".format(assist))
+            elif modelInst.goal and modelInst.goal.assist:
+                assist = modelInst.goal.assist
+                db.session.delete(assist)
+                print("Delete Assist")
+                
+        else:
+            if modelInst.goal:
+                goal = modelInst.goal
+                db.session.delete(goal)
+                print("Delete Goal")
+
+        db.session.commit()
+        print("<"*30)
+        print("now patch the shot")
+        print(">"*30)
+        # finally patch the shot's main properties
+        return super().patch(shot_id)
+        print("<"*30)
+
+
     def delete(self, shot_id):
         return super().delete(shot_id)
 
@@ -684,12 +757,6 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     def get(self, goal_id, expand=False):
         return super().get(goal_id, expand)
 
-    def patch(self, goal_id):
-        return super().patch(goal_id)
-
-    def delete(self, goal_id):
-        return super().delete(goal_id)
-
 
 class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     ModelClass = Assist
@@ -699,28 +766,3 @@ class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, assist_id, expand=False):
         return super().get(assist_id, expand)
-
-    def patch(self, assist_id):
-        return super().patch(assist_id)
-
-        """
-        modelInst = self.ModelClass.query.get_or_404(assist_id)
-
-        request_dict = request.get_json(force=True)
-        if 'player_match' in request_dict:
-            request_dict['player_match'] = db.session.query(
-                PlayerMatch).filter_by(id=request_dict['player_match']['id']).one()
-        try:
-            # self.mm_schema.validate(request_dict, partial=True)
-            for key, value in request_dict.items():
-                setattr(modelInst, key, value)
-            modelInst.update()
-            return self.get(assist_id)
-        
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
-        """
-    def delete(self, assist_id):
-        return super().delete(assist_id)

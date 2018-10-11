@@ -27,7 +27,7 @@
       >
         <template slot="items" slot-scope="props">
           <td>{{ props.item.label }}</td>
-          <td>{{ props.item.active }}</td>
+          <td><v-icon v-show="props.item.active">done</v-icon></td>
           <td>{{ props.item.num_apps }}</td>
           <td>
             <router-link :to="{

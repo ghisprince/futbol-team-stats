@@ -105,12 +105,21 @@ class OpponentSchemaEx(OpponentSchema):
 
 
 class ShotSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteShot'.lower(), shot_id="<id>"),
-         'collection': ma.URLFor('CreateListShot'.lower())})
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteShot'.lower(), shot_id="<id>"),
+    #     'collection': ma.URLFor('CreateListShot'.lower())})
 
     scored = fields.Boolean(dump_only=True)
     player_number = fields.Integer(dump_only=True)
+
+    # hybrid properties on model
+    player_label = fields.String(dump_only=True)
+
+    goal = fields.Nested('GoalSchemaEx', dump_only=True,
+                         exclude=["shot", "player_match"])
+
+    #player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
+    #                             exclude=["shots"])
 
     class Meta:
         strict = True
@@ -119,18 +128,14 @@ class ShotSchema(ModelSchema):
 
 
 class ShotSchemaEx(ShotSchema):
-    goal = fields.Nested('GoalSchemaEx', dump_only=True,
-                         exclude=["shot", "player_match"])
-
-    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
-                                 exclude=["shots"])
-
+    # todo: if don't do "all player shots, then no need for this for graphing"
+    pass
 
 class AssistSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteAssist'.lower(), assist_id="<id>"),
-         'collection': ma.URLFor('CreateListAssist'.lower())
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteAssist'.lower(), assist_id="<id>"),
+    #     'collection': ma.URLFor('CreateListAssist'.lower())
+    #     })
 
     class Meta:
         strict = True
@@ -139,18 +144,22 @@ class AssistSchema(ModelSchema):
 
 
 class AssistSchemaEx(AssistSchema):
-    player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
-                                 exclude=["assists"])
+    #player_match = fields.Nested('PlayerMatchSchemaEx', dump_only=True,
+    #                             exclude=["assists"])
 
+    player_label = fields.String(dump_only=True)
     goal = fields.Nested('GoalSchemaEx', dump_only=True,
                          exclude=["assist", "player_match"])
 
 
 class GoalSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteGoal'.lower(), goal_id="<id>"),
-         'collection': ma.URLFor('CreateListGoal'.lower())
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteGoal'.lower(), goal_id="<id>"),
+    #     'collection': ma.URLFor('CreateListGoal'.lower())
+    #     })
+
+    assisted = fields.Boolean(dump_only=True)
+    assist = fields.Nested('AssistSchemaEx', dump_only=True, exclude=["goal", ])
 
     class Meta:
         strict = True

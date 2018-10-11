@@ -1,22 +1,26 @@
 <template>
-    <player-matches-form
+  <div>
+    <shots-form
                :player_matches="player_matches"
                :onSubmit="submit"
                :onCancel="cancel"
-    ></player-matches-form>
+    ></shots-form>
+
+  </div>    
 </template>
 
 <script>
-import PlayerMatchesForm from '@/components/forms/PlayerMatchesForm'
+import ShotsForm from '@/components/forms/ShotsForm'
 import API from '@/lib/API'
 
 export default {
   components: {
-    PlayerMatchesForm
+     ShotsForm
   },
   data () {
     return {
-      player_matches: {}
+      player_matches: {},
+      shots: []
     }
   },
   mounted () {
@@ -25,6 +29,7 @@ export default {
   },
   methods: {
     submit () {
+      alert("BACK HERE!")
       API.updatePlayerMatches(this.player_matches.id, this.player_matches)
         .then(() => {
           this.$router.push({
@@ -41,6 +46,10 @@ export default {
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
           this.player_matches = player_matches
+        })
+      API.getShotsByMatch(id)
+        .then((shots) => {
+          this.shots = shots
         })
     }
   }

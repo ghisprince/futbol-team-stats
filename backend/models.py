@@ -610,7 +610,7 @@ class PlayerMatch(db.Model, CRUD_MixIn):
 
     @hybrid_property
     def player_label(self):
-        return "{}".format(self.player.label)
+        return self.player.label
 
     @hybrid_property
     def num_shots(self):
@@ -687,7 +687,10 @@ class Shot(db.Model, CRUD_MixIn):
     def player_number(self):
         return self.player_match.player.number
 
-        
+    @hybrid_property
+    def player_label(self):
+        return self.player_match.player_label
+
 
     def __init__(self, player_match, x=None, y=None, on_target=None,
                  pk=None, by_opponent=None):
@@ -710,6 +713,10 @@ class Goal(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     time = db.Column(db.Integer(), nullable=True)
     own_goal = db.Column(db.Boolean(), default=False)
+
+    @hybrid_property
+    def assisted(self):
+        return self.assist is not None
 
     # relationships
     shot_id = db.Column(db.Integer, db.ForeignKey('shot.id'),
@@ -762,6 +769,10 @@ class Assist(db.Model, CRUD_MixIn):
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'),
                         nullable=False, index=True)
     goal = db.relationship("Goal", uselist=False, back_populates="assist")
+
+    @hybrid_property
+    def player_label(self):
+        return self.player_match.player_label
 
     def __init__(self, player_match, goal):
         self.player_match = player_match

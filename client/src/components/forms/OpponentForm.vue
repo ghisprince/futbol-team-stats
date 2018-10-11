@@ -6,7 +6,7 @@
         <v-text-field
         v-model="opponent.name"
         :rules="nameRules"
-        :counter="30"
+        :counter="50"
         label="Name"
         required
         ></v-text-field>
@@ -38,7 +38,7 @@ export default {
     nameRules: [
       v => (v && v.trim().length !== 0) || 'Name is required yo',
       v => !!v || 'Name is required',
-      v => (v && v.length <= 30) || 'Name must be less than 40 characters'
+      v => (v && v.length <= 50) || 'Name must be less than 40 characters'
     ]
   }),
   methods: {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <svg id="shots-chart"></svg>
-    <p>Grey: off target, Green on target, Red: scored.</p>
+    <p>Grey: off target, Green: on target, Red: scored.</p>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ function handleMouseOver0 (d, i) {
 
 
 export default {
-  props: ['shots'],
+  props: ['shots', 'onClick'],
   data () {
     return {
       _svg: "",
@@ -28,16 +28,21 @@ export default {
   methods: {
     load () {
     let fieldLinesRects = [
-      // top half
-      {x: 10, y:20, width: 430, height: 330},
-      {x: 100, y:20, width: 245, height: 100},
-      {x: 170, y:20, width: 115, height: 30},
+      // rectangles in top half
+      { x: 10, y:20, width: 430, height: 330 },
+      { x: 100, y:20, width: 245, height: 100 },
+      { x: 170, y:20, width: 115, height: 30 },
 
       // bottom half
-      {x: 10, y:350, width: 430, height: 330},
-      {x: 100, y:580, width: 245, height: 100},
-      {x: 170, y:650, width: 115, height: 30},
+      { x: 10, y:350, width: 430, height: 330 },
+      { x: 100, y:580, width: 245, height: 100 },
+      { x: 170, y:650, width: 115, height: 30 }
       ]
+
+    let fieldLabels = [
+      { x: 225, y: 250, label: "Team's attempts"},
+      { x: 225, y: 450, label: "Opponent's attempts"},
+    ]
 
     let shotFillColor = { off_target: "grey", 
                       on_target: "PaleGreen", 
@@ -52,7 +57,9 @@ export default {
       .style("background-color", "DarkGreen")
       .style('border', '1px solid black')
 
-    svg.selectAll('rect')
+    let svgRect = svg.append("g")
+      .attr("id", "field-rect")
+      .selectAll('rect')
       .data(fieldLinesRects)
       .enter()
       .append('rect')
@@ -64,7 +71,24 @@ export default {
       .attr('stroke-width', 3)
       .attr("fill", "transparent")
 
-    let svgPoints = svg.selectAll("circleShot")
+    svg.append("g")
+      .attr("id", "field-text")
+      .selectAll("text")
+      .data(fieldLabels)
+      .enter()
+      .append("text")
+      .attr("x", function(d) { return d.x })
+      .attr("y", function(d) { return d.y })
+      .attr("text-anchor", "middle")
+      //.attr("style", "background-color:blue;color:red;font-size:30px;")
+      .style("font-size","30px")
+      .style("opacity", 0.5)
+      .text(function(d) { return d.label })
+      
+
+    let svgPoints = svg.append("g")
+      .attr("id", "shots-point")
+      .selectAll("circle")
       .data(this.shots)
       .enter()
       .append("circle")
@@ -91,14 +115,16 @@ export default {
       // a
       .on("mouseover", function(d, i) {
         d3.select(this)
-          .attr("r", 20)
+          .attr("r", 14)
       })
       .on("mouseout", function(d,i) {
         d3.select(this)
           .attr("r", 10)
       })
 
-    let svgPointsText = svg.selectAll("text")
+    let svgPointsText = svg.append("g")
+      .attr("id", "shots-text")
+      .selectAll("text")
       .data(this.shots)
       .enter()
       .append("text")
@@ -108,13 +134,16 @@ export default {
       .attr("y", function(pt) { return pt.y })
       .attr("text-anchor", "middle") // set anchor y justification
       .attr("dy", "5px")
-      .text(function(pt) { return pt.player_number.toString() })
+      .attr("style", "font-weight:bold")
+      .text(function(pt) { return pt.by_opponent ? "" :pt.player_number.toString() })
+
 
     // onclick
     svg.on("click",function () {
       let coords = d3.mouse(this)
+      //this.click(coords)
       console.log(coords)
-    }) 
+    })
 
     },
     handleMouseOver (d, i) {
@@ -141,3 +170,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#shots-text {
+  pointer-events: none;
+}
+</style>
