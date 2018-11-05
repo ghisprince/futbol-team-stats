@@ -2,11 +2,7 @@
   <div>
     <v-toolbar>
       <h2>Shots</h2>
-      <v-divider
-        class="mx-2"
-        inset
-        vertical
-      ></v-divider>
+      <v-divider class="mx-2" inset vertical></v-divider>
       <v-spacer></v-spacer>
 
       <!-- THIS IS POPUP DIALOG -->
@@ -91,9 +87,16 @@
                 
               </v-layout>
               <v-layout wrap>
-                <h1>Shot location</h1><br/>
-                <shots-graph-edit :shots="[editedItem]">
-                </shots-graph-edit>
+                <h1>Shot location</h1>
+                <br/>
+                <p>Click to move active (Yellow) shot</p>
+                <br/>
+                <shots-graph :shots="shots" 
+                             :activeShotId="editedItem.id" 
+                             :onClickShot=onClickShot
+                             :onClickCanvas=onClickCanvas
+                >
+                </shots-graph>
               </v-layout>
 
             </v-container>
@@ -143,21 +146,21 @@
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
     </v-data-table>
-    <match-shots :shots="shots"></match-shots>
+    <shots-graph :shots="shots" 
+      :onClickShot=onClickShot
+    ></shots-graph>
     <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>    
   </div>
 </template>
 
 <script>
 import API from '@/lib/API'
-import MatchShots from '@/components/MatchShots'
-import ShotsGraphEdit from '@/components/ShotsGraphEdit'
+import ShotsGraph from '@/components/ShotsGraph'
 
 export default {
   props: ['match_id', 'player_matches', 'onSubmit', 'onCancel'],
   components: {
-    MatchShots,
-    ShotsGraphEdit
+    ShotsGraph
   },  
   data: () => ({
     dialog: false,
@@ -243,6 +246,14 @@ export default {
     this.load(id)
   },
   methods: {
+    onClickShot(shot) {
+      this.editItem(shot)
+    },
+    onClickCanvas(x, y) {
+      console.log("MOVE SHOT")
+      this.editedItem.x = x
+      this.editedItem.y = y
+    },
     load (id) {
       // TODO : move into store
       API.getPlayers()
@@ -253,9 +264,6 @@ export default {
         .then((shots) => {
           this.shots = shots
         })
-    },
-    clickGraph () {
-
     },
     submit () {
       if (this.valid) {
@@ -297,7 +305,7 @@ export default {
       */
     },
     editItem (item) {
-
+      console.log(item)
       this.editedIndex =  this.shots.indexOf(item)
       this.editedItem = Object.assign({}, this.defaultItem)
       this.editedGoal = Object.assign({}, this.defaultGoal)
@@ -377,7 +385,6 @@ export default {
         name: 'Match',
         params: { id: match_id }
       })
-      
     }
   }
 }

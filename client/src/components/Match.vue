@@ -112,7 +112,8 @@
         </v-btn>
       </v-card-title>
 
-      <match-shots :shots="shots"></match-shots>
+      <shots-graph :shots="shots" :onClickShot=onClickShot
+      ></shots-graph>
     </v-card>
   </div>
 </template>
@@ -120,11 +121,11 @@
 <script>
 import API from '@/lib/API'
 import PlayerMatchesTable from '@/components/PlayerMatchesTable'
-import MatchShots from '@/components/MatchShots'
+import ShotsGraph from '@/components/ShotsGraph'
 
 export default {
   components: {
-    PlayerMatchesTable, MatchShots
+    PlayerMatchesTable, ShotsGraph
   },
   data () {
     return {
@@ -198,6 +199,10 @@ export default {
         .then((shots) => {
           this.shots = shots
         })
+    },
+    onClickShot (shot) {
+      alert("shot details\nplayer: " + shot.player_label
+      )
     },
     createMatchStats () {
       const { id } = this.$route.params

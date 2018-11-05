@@ -1,178 +1,148 @@
 <template>
   <div>
-    <svg id="shots-chart"></svg>
-    <p>Grey: off target, Green: on target, Red: scored.</p>
+    <svg id="shots-chart" :width="width" :height="height"
+      v-on:click="clickCanvas"
+    >
+
+      <!-- field lines -->
+      <g  v-for="field_rect in fieldLinesRects" 
+                 :value="field_rect" :key="field_rect.id">
+
+        <rect class="field-line-rect"
+              :x="field_rect.x" 
+              :y="field_rect.y" 
+              :height="field_rect.height" 
+              :width="field_rect.width">
+        </rect>
+      </g>
+
+      <!-- field text -->
+      <g v-for="field_text in fieldLabels" 
+         :value="field_text" :key="field_text.id">
+
+        <text class="field-text" text-anchor="middle"
+              :x="field_text.x"
+              :y="field_text.y"
+        >
+          {{field_text.label}}
+        </text>
+      </g>
+
+      <!-- shots -->
+      <g v-for="shot in shots"
+         :value="shot" :key="shot.id">
+
+        <!-- shot circle -->
+        <circle class="shot-circle"
+          :cx="shot.x"
+          :cy="shot.y"
+          :r="10"
+          :stroke="shotStrokeColor(shot.by_opponent)"
+          :fill="shotFillColor(shot.id, shot.scored, shot.on_target)"
+          v-on:mouseover="shotMouseOverEvent(shot)"
+          v-on:click="onClickShot(shot)"
+        >
+        </circle>
+
+        <!-- shot text -->
+        <text class="shot-text"
+          :x="shot.x"
+          :y="shot.y + 5"
+        >
+        {{ shot.by_opponent ? "-" : shot.player_number  }}
+        </text>
+      </g>
+
+    </svg>
+    <p>Grey: off target, Green: on target, Red: scored.xxx</p>
   </div>
 </template>
 
 <script>
-import * as d3 from 'd3';
-function handleMouseOver0 (d, i) {
-  console.log(d)
-  d3.select(this).attr({fill: "orange"})
-}
-
 
 export default {
-  props: ['shots', 'onClick'],
+  props: ['shots', 'activeShotId', 'onClickShot', 'onClickCanvas'],
   data () {
     return {
-      _svg: "",
-      width: 450,
-      height: 700
-    }
-  },
-  mounted: function() {
-    this.$nextTick(this.load)
+         height: 700,
+         fieldLinesRects: [
+            // rectangles in top half
+            { id:0, x: 10, y:20, width: 430, height: 330 },
+            { id:1, x: 100, y:20, width: 245, height: 100 },
+            { id:2, x: 170, y:20, width: 115, height: 30 },
+            // bottom half
+            { id:3, x: 10, y:350, width: 430, height: 330 },
+            { id:4, x: 100, y:580, width: 245, height: 100 },
+            { id:5, x: 170, y:650, width: 115, height: 30 },
+            // hidden
+            { id:6, x: 460, y:20, width: 70, height: 660 }
+            ],
+
+          fieldLabels: [
+            { id: 10, x: 225, y: 250, label: "Team's attempts"},
+            { id: 11, x: 225, y: 450, label: "Opponent's attempts"},
+          ],
+     }
   },
   methods: {
-    load () {
-    let fieldLinesRects = [
-      // rectangles in top half
-      { x: 10, y:20, width: 430, height: 330 },
-      { x: 100, y:20, width: 245, height: 100 },
-      { x: 170, y:20, width: 115, height: 30 },
-
-      // bottom half
-      { x: 10, y:350, width: 430, height: 330 },
-      { x: 100, y:580, width: 245, height: 100 },
-      { x: 170, y:650, width: 115, height: 30 }
-      ]
-
-    let fieldLabels = [
-      { x: 225, y: 250, label: "Team's attempts"},
-      { x: 225, y: 450, label: "Opponent's attempts"},
-    ]
-
-    let shotFillColor = { off_target: "grey", 
-                      on_target: "PaleGreen", 
-                      scored: "red" }
-
-    let shotStrokeColor = { by_opponent: "white", 
-                        by_team: "black"}
-
-    let svg  = d3.select('#shots-chart')
-      .attr("width", this.width)
-      .attr("height", this.height)
-      .style("background-color", "DarkGreen")
-      .style('border', '1px solid black')
-
-    let svgRect = svg.append("g")
-      .attr("id", "field-rect")
-      .selectAll('rect')
-      .data(fieldLinesRects)
-      .enter()
-      .append('rect')
-      .attr("x", function (d) { return d.x } )
-      .attr("y", function (d) { return d.y })
-      .attr("width", function (d) { return d.width })
-      .attr("height", function (d) { return d.height })
-      .attr('stroke', 'green')
-      .attr('stroke-width', 3)
-      .attr("fill", "transparent")
-
-    svg.append("g")
-      .attr("id", "field-text")
-      .selectAll("text")
-      .data(fieldLabels)
-      .enter()
-      .append("text")
-      .attr("x", function(d) { return d.x })
-      .attr("y", function(d) { return d.y })
-      .attr("text-anchor", "middle")
-      //.attr("style", "background-color:blue;color:red;font-size:30px;")
-      .style("font-size","30px")
-      .style("opacity", 0.5)
-      .text(function(d) { return d.label })
-      
-
-    let svgPoints = svg.append("g")
-      .attr("id", "shots-point")
-      .selectAll("circle")
-      .data(this.shots)
-      .enter()
-      .append("circle")
-
-    let svgPointAtts = svgPoints
-      .attr("class", "dot")
-      .style("opacity", 0.75)
-      .style("stroke", function (pt) { 
-        return shotStrokeColor[pt.by_opponent ? 'by_opponent' : 'by_team']
-      })
-      .attr("fill", function(pt) {
-        if (pt.scored) {
-          return shotFillColor['scored']
-        }
-        return (shotFillColor[pt.on_target ? 'on_target' : 'off_target' ] )
-      })
-      .attr("cx", function(pt) { return pt.x })
-      .attr("cy", function(pt) { return pt.y })
-      .attr("r", 10)
-
-      /*.attr("transform", function(d) { 
-        return "translate(" + d + ")"; 
-      })*/
-      // a
-      .on("mouseover", function(d, i) {
-        d3.select(this)
-          .attr("r", 14)
-      })
-      .on("mouseout", function(d,i) {
-        d3.select(this)
-          .attr("r", 10)
-      })
-
-    let svgPointsText = svg.append("g")
-      .attr("id", "shots-text")
-      .selectAll("text")
-      .data(this.shots)
-      .enter()
-      .append("text")
-
-    let svgPointsTextAtts = svgPointsText
-      .attr("x", function(pt) { return pt.x })
-      .attr("y", function(pt) { return pt.y })
-      .attr("text-anchor", "middle") // set anchor y justification
-      .attr("dy", "5px")
-      .attr("style", "font-weight:bold")
-      .text(function(pt) { return pt.by_opponent ? "" :pt.player_number.toString() })
-
-
-    // onclick
-    svg.on("click",function () {
-      let coords = d3.mouse(this)
-      //this.click(coords)
-      console.log(coords)
-    })
+    shotMouseOverEvent(shot) {
 
     },
-    handleMouseOver (d, i) {
-      console.log("########")
-      console.log(d)
-      d3.select('circle')
-        .attr({"fill": "orange"})
-        .attr("r", 7)
-    }
-  },
-  watch: {
-    shots: function dataChanged(n, o) {
-      console.log("changed")
-      this.load()
-    }
+    shotClickEvent(shot) {
+      console.log(shot)
+    },
+    shotStrokeColor(by_opponent) {
+      if (by_opponent) {
+        return "white"
+      }
+      return "black"
+    },
+    shotFillColor(id, scored, on_target) {
+      if (id == this.activeShotId) {
+        return "yellow"
+      }
+      if (scored) {
+        return "red"
+      }
+      return on_target ? "PaleGreen" : "grey"
+    },
+    clickCanvas (e) {
+      if (typeof this.onClickCanvas !== 'undefined')
+        this.onClickCanvas(e.offsetX, e.offsetY)
+    },
   },
   computed: {
-    cshots: function () {
-      var vertices = d3.range(100).map(function(d) {
-        return [Math.random() * 500, Math.random() * 300];
-      })
-      return vertices
-    }
+    width: function () {
+      if (this.activeShotId) {
+        return 700
+      }
+      return 450
+    },
   }
 }
 </script>
 
 <style>
-#shots-text {
+#shots-chart {
+  background-color: DarkGreen;
+  border: 1px solid black;
+}
+.field-line-rect {
+  stroke: green;
+  stroke-width: 3;
+  fill: transparent;
+
+}
+.field-text {
+  font-size: 30px;
+  opacity: 0.5;
+}
+.shot-circle {
+  opacity: 0.75;
+}
+.shot-text {
   pointer-events: none;
+  font-weight: bold;
+  text-anchor: middle;
 }
 </style>
