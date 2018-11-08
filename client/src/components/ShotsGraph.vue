@@ -1,23 +1,24 @@
 <template>
   <div>
+  <v-layout justify-center row>
     <svg id="shots-chart" :width="width" :height="height"
       v-on:click="clickCanvas"
     >
 
       <!-- field lines -->
-      <g  v-for="field_rect in fieldLinesRects" 
+      <g  v-for="field_rect in fieldLinesRects"
                  :value="field_rect" :key="field_rect.id">
 
         <rect class="field-line-rect"
-              :x="field_rect.x" 
-              :y="field_rect.y" 
-              :height="field_rect.height" 
+              :x="field_rect.x"
+              :y="field_rect.y"
+              :height="field_rect.height"
               :width="field_rect.width">
         </rect>
       </g>
 
       <!-- field text -->
-      <g v-for="field_text in fieldLabels" 
+      <g v-for="field_text in fieldLabels"
          :value="field_text" :key="field_text.id">
 
         <text class="field-text" text-anchor="middle"
@@ -54,14 +55,19 @@
       </g>
 
     </svg>
-    <p>Grey: off target, Green: on target, Red: scored.xxx</p>
+  </v-layout>
+  <v-layout justify-center row>
+
+      Grey: off target, Green: on target, Red: scored
+  </v-layout>
   </div>
 </template>
+
 
 <script>
 
 export default {
-  props: ['shots', 'activeShotId', 'onClickShot', 'onClickCanvas'],
+  props: ['shots', 'activeShotId', 'onClickShot', 'onClickCanvas', 'showHiddenArea'],
   data () {
     return {
          height: 700,
@@ -113,8 +119,8 @@ export default {
   },
   computed: {
     width: function () {
-      if (this.activeShotId) {
-        return 700
+      if (this.showHiddenArea) {
+        return 550
       }
       return 450
     },

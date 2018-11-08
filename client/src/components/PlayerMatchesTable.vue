@@ -16,7 +16,7 @@
             {{ props.item.player_label }}
           </router-link>
         </td>
-        <td v-if="showMatch">{{ props.item.match.date_time }}</td>
+        <td v-if="showMatch">{{ props.item.match.date_time | formattedDateTime }}</td>
         <td v-if="showMatch">
             <router-link :to="{
               name: 'Competition',
@@ -87,6 +87,12 @@ export default {
         sortBy: 'match.date_time',
         descending: true
       }
+    }
+  },
+  filters: {
+    formattedDateTime: function(v) {
+      if (!v) return ''
+      return v.slice(0,16).replace("T", " ");
     }
   },
   computed: {

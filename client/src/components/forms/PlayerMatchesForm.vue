@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <v-card>
     <v-toolbar>
       <h2>Player Match Stats</h2>
       <v-divider
         class="mx-2"
         inset
-        vertical
-      ></v-divider>
+        vertical>
+      </v-divider>
       <v-spacer></v-spacer>
 
       <!-- THIS IS POPUP DIALOG -->
@@ -28,8 +28,7 @@
                     item-value="id"
                     :rules="[v => !!v || 'Player is required']"
                     label="Player"
-                    required
-                  >
+                    required>
                   </v-select>
                 </v-flex>
 
@@ -39,15 +38,15 @@
 
                 <v-flex>
                   <v-text-field
-                    v-model="editedItem.minutes" 
+                    v-model="editedItem.minutes"
                     label="Minutes Played"
                     mask="##">
                   </v-text-field>
                 </v-flex>
 
                 <v-flex>
-                  <v-text-field 
-                    v-model="editedItem.corners" 
+                  <v-text-field
+                    v-model="editedItem.corners"
                     label="Corners"
                     mask="##">
                 </v-text-field>
@@ -82,8 +81,8 @@
       :headers="headers"
       :items="player_matches"
       hide-actions
-      class="elevation-1"
-    >
+      class="elevation-1">
+
       <template slot="items" slot-scope="props">
         <td>{{ props.item.player_label }}</td>
         <td><v-icon v-show="props.item.starter">done</v-icon></td>
@@ -97,14 +96,13 @@
           <v-icon
             small
             class="mr-2"
-            @click="editItem(props.item)"
-          >
+            @click="editItem(props.item)">
             edit
           </v-icon>
+
           <v-icon
             small
-            @click="deleteItem(props.item)"
-          >
+            @click="deleteItem(props.item)">
             delete
           </v-icon>
         </td>
@@ -115,7 +113,7 @@
       </template>
     </v-data-table>
     <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>
-  </div>
+  </v-card>
 </template>
 
 <script>
@@ -177,9 +175,6 @@ export default {
     },
     valid: true
   }),
-  //created () {
-  //    this.initialize()
-  //},
   computed: {
     formTitle () {
       return this.editedIndex === -1 ? 'New Player Match' : 'Edit Player Match'
@@ -194,7 +189,13 @@ export default {
     // TODO : move into store
     API.getPlayers()
       .then(players => {
-        this.players = players
+        this.players = players.sort(function (a, b) {
+          if (a.name < b.name)
+            return -1;
+          if (a.name > b.name)
+            return 1;
+          return 0;
+        })
       })
   },
   methods: {
@@ -252,7 +253,6 @@ export default {
         name: 'Match',
         params: { id: match_id }
       })
-      
     }
   }
 }

@@ -1,32 +1,33 @@
 <template>
-  <v-layout>
-    <v-flex xs12>
+<v-card>
+  <v-container>
+    <v-card>
       <v-form ref="form" v-model="valid" lazy-validation>
 
         <v-text-field
-        v-model="opponent.name"
-        :rules="nameRules"
-        :counter="50"
-        label="Name"
-        required
-        ></v-text-field>
+          v-model="opponent.name"
+          :rules="nameRules"
+          :counter="50"
+          label="Name"
+          required>
+        </v-text-field>
 
         <v-textarea
-        v-model="opponent.note"
-        label="Note"
-        ></v-textarea>
+          v-model="opponent.note"
+          label="Note">
+        </v-textarea>
 
         <v-text-field
-        v-model="opponent.external_url"
-        label="Opponent URL"
-        ></v-text-field>
+          v-model="opponent.external_url"
+          label="Opponent URL">
+        </v-text-field>
 
         <v-btn :disabled="!valid" @click="submit">submit</v-btn>
         <v-btn @click="clear">clear</v-btn>
       </v-form>
-    </v-flex>
-  </v-layout>
-
+    </v-card>
+  </v-container>
+</v-card>
 </template>
 
 <script>

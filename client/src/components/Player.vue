@@ -1,19 +1,18 @@
 <template>
-  <v-container fluid>
+  <v-card offset-sm3>
+    <v-alert
+      v-model="alert"
+      dismissible
+      color="warning"
+      icon="priority_high"
+    >
+      {{ alertMessage }}
+    </v-alert>
+    <v-card-title>
+      <h1>{{ player.label }}</h1>
+      <v-spacer></v-spacer>
 
-    <v-card offset-sm3>
-      <v-alert
-        v-model="alert"
-        dismissible
-        color="warning"
-        icon="priority_high"
-      >
-        {{ alertMessage }}
-      </v-alert>
-      <v-card-title>
-        <h2>{{ player.label }}</h2>
-
-        <v-spacer></v-spacer>
+      <div v-if="canEdit">
         <v-btn
           :to="{
             name: 'PlayerEdit',
@@ -23,17 +22,26 @@
           }"
           color="primary">Edit</v-btn>
         <v-btn @click="deletePlayer()" color="error">Delete</v-btn>
-
-      </v-card-title>
-      <div>
-        <h2>Aggregated by Competition</h2>
-        <player-matches-agg-table :player_matches="player_matches" :showPlayer="false" :showCompetition="true"></player-matches-agg-table>
-
-        <h2>Individual Matches</h2>
-        <player-matches-table :player_matches="player_matches" :showPlayer="false" :showMatch="true"></player-matches-table>
       </div>
-    </v-card>
-  </v-container>
+
+    </v-card-title>
+    <v-container>
+      <v-card>
+      <v-card-text>
+        <h3>Aggregated by Competition</h3>
+        <player-matches-agg-table :player_matches="player_matches" :showPlayer="false" :showCompetition="true"></player-matches-agg-table>
+      </v-card-text>
+      </v-card>
+    </v-container>
+    <v-container>
+      <v-card>
+        <v-card-text>
+        <h3>Individual Matches</h3>
+        <player-matches-table :player_matches="player_matches" :showPlayer="false" :showMatch="true"></player-matches-table>
+      </v-card-text>
+      </v-card>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -54,6 +62,11 @@ export default {
         label: null
       },
       player_matches: []
+    }
+  },
+  computed: {
+    canEdit () {
+      return this.$store.state.canEdit
     }
   },
   mounted () {

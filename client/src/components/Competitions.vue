@@ -2,8 +2,9 @@
   <div>
     <v-card>
       <v-layout align-start justify-end fill-height>
-        <v-btn color="success"
-              :to="{name: 'CompetitionCreate'}">
+        <v-btn v-if="canEdit"
+               color="success"
+               :to="{name: 'CompetitionCreate'}">
           NEW COMPETITION
         </v-btn>
       </v-layout>
@@ -15,16 +16,16 @@
           v-model="search"
           append-icon="search"
           label="Search"
-          single-line
-        ></v-text-field>
+          single-line>
+        </v-text-field>
       </v-card-title>
 
       <v-data-table
         :headers="headers"
         :items="competitions"
         :search="search"
-        :pagination.sync="pagination"
-      >
+        :pagination.sync="pagination">
+
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.start_date }}</td>
@@ -68,6 +69,11 @@ export default {
         {text: 'Goal Diff', value: 'goal_differential'},
         {text: 'Stats', value: 'id'}
       ]
+    }
+  },
+  computed: {
+    canEdit () {
+      return this.$store.state.canEdit
     }
   },
   mounted () {

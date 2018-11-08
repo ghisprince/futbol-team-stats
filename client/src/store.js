@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    team: {id: 1}
+    team: {id: 1},
+    canEdit: true
 
   },
   mutations: {

@@ -2,14 +2,13 @@
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
       <v-layout column align-center>
-        <img src="@/assets/logo.png" alt="Vuetify.js" class="mb-5">
+        <img src="@/assets/crest.png" alt="Vuetify.js" class="mb-5">
         <blockquote>
-          &#8220;First, solve the problem. Then, write the code.&#8221;
+          &#8220;The thing about football - the important thing about football – is that it is not just about football.&#8221;
           <footer>
             <small>
-              <em>&mdash;John Johnson</em>
+              <em>&mdash;Terry Pratchett</em>
             </small>
-            <router-link :to="{ name: 'Competitions' }">Competitions</router-link>
           </footer>
         </blockquote>
       </v-layout>

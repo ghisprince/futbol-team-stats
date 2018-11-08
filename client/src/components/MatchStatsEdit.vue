@@ -20,7 +20,7 @@ export default {
     }
   },
   mounted () {
-    // TODO: actually could do like PlayerMatchEdit where id is 
+    // TODO: actually could do like PlayerMatchEdit where id is
     //  the match id and that's what we query
     const { id } = this.$route.params
     this.load(id)

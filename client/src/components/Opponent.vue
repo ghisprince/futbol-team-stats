@@ -1,49 +1,58 @@
 <template>
-  <v-container fluid>
+  <v-card>
+    <v-container>
+      <v-card offset-sm3>
+        <v-alert
+          v-model="alert"
+          dismissible
+          color="warning"
+          icon="priority_high">
+          {{ alertMessage }}
+        </v-alert>
+        <v-card-title>
+          <h2>{{ opponent.name }}</h2>
 
-    <v-card offset-sm3>
-      <v-alert
-        v-model="alert"
-        dismissible
-        color="warning"
-        icon="priority_high"
-      >
-        {{ alertMessage }}
-      </v-alert>
-      <v-card-title>
-        <h2>{{ opponent.name }}</h2>
+          <v-spacer></v-spacer>
+          <div v-if="canEdit">
+            <v-btn
+              :to="{
+                name: 'OpponentEdit',
+                params: {
+                    id: opponent.id
+                }
+              }"
+              color="primary">Edit</v-btn>
+            <v-btn @click="deleteOpponent()" color="error">Delete</v-btn>
+          </div>
+        </v-card-title>
 
-        <v-spacer></v-spacer>
-        <v-btn
-          :to="{
-            name: 'OpponentEdit',
-            params: {
-                id: opponent.id
-            }
-          }"
-          color="primary">Edit</v-btn>
-        <v-btn @click="deleteOpponent()" color="error">Delete</v-btn>
+        <v-card-text>
 
-      </v-card-title>
-        <div>
+          Match Results (W-D-L): {{ opponent.match_results }} <br/>
 
-        Match Results (W-D-L): {{ opponent.match_results }} <br/>
-
-        <div v-if="opponent.note">
-          Note: {{ opponent.note }}
-        </div>
-        <div v-if="opponent.external_url">
-            <a v-bind:href="opponent.external_url">Opponent's web site</a>
-        </div>
-
+          <div v-if="opponent.note">
+            Note: {{ opponent.note }}
+          </div>
+          <div v-if="opponent.external_url">
+              <a v-bind:href="opponent.external_url">Opponent's web site</a>
+          </div>
         <matches-table :matches="matches" :showCompetition="true"></matches-table>
+        </v-card-text>
 
-        <h2>Player stats vs this opponent</h2>
-        <player-matches-agg-table :player_matches="player_matches" :showPlayer="true"></player-matches-agg-table>
+      </v-card>
+    </v-container>
+    <v-container>
+      <v-card>
+        <v-card-title>
+          <h2>Player stats vs this opponent</h2>
+        </v-card-title>
 
-        </div>
-    </v-card>
-  </v-container>
+        <v-card-text>
+          <player-matches-agg-table :player_matches="player_matches" :showPlayer="true"></player-matches-agg-table>
+        </v-card-text>
+      </v-card>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -65,6 +74,11 @@ export default {
       },
       matches: [],
       player_matches: []
+    }
+  },
+  computed: {
+    canEdit () {
+      return this.$store.state.canEdit
     }
   },
   mounted () {

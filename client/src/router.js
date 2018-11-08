@@ -98,7 +98,6 @@ export default new Router({
       name: 'MatchStatsEdit',
       component: MatchStatsEdit
     },
-    
     {
       path: '/playerMatches/:id/edit',
       name: 'PlayerMatchEdit',

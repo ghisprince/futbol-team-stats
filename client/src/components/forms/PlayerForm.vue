@@ -1,33 +1,35 @@
 <template>
-  <v-layout>
-    <v-flex xs12>
-      <v-form ref="form" v-model="valid" lazy-validation>
+  <v-card>
+    <v-container>
+      <v-card>
 
-        <v-text-field
-          v-model="player.name"
-          :rules="nameRules"
-          :counter="30"
-          label="Name"
-          required
-        ></v-text-field>
+        <v-form ref="form" v-model="valid" lazy-validation>
 
-        <v-text-field
-          v-model="player.number"
-          label="Jersey Number"
-          mask="###"
-        ></v-text-field>
+          <v-text-field
+            v-model="player.name"
+            :rules="nameRules"
+            :counter="30"
+            label="Name"
+            required>
+          </v-text-field>
 
-        <v-checkbox
-          v-model="player.active"
-          label="Active"
-        ></v-checkbox>
+          <v-text-field
+            v-model="player.number"
+            label="Jersey Number"
+            mask="###">
+          </v-text-field>
 
-        <v-btn :disabled="!valid" @click="submit">submit</v-btn>
-        <v-btn @click="clear">clear</v-btn>
-      </v-form>
-    </v-flex>
-  </v-layout>
+          <v-checkbox
+            v-model="player.active"
+            label="Active">
+          </v-checkbox>
 
+          <v-btn :disabled="!valid" @click="submit">submit</v-btn>
+          <v-btn @click="clear">clear</v-btn>
+        </v-form>
+      </v-card>
+    </v-container>
+  </v-card>  
 </template>
 
 <script>

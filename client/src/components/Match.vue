@@ -1,18 +1,20 @@
 <template>
   <div>
-    <v-card offset-sm3>
+    <v-card>
+      <v-container>
+      <v-card offset-sm3>
+
       <v-alert
         v-model="alert"
         dismissible
         color="warning"
-        icon="priority_high"
-        >
+        icon="priority_high">
         {{ alertMessage }}
       </v-alert>
 
       <v-card-title>
       <v-spacer></v-spacer>
-
+      <div v-if="canEdit">
         <v-btn
           :to="{
             name: 'MatchEdit',
@@ -34,86 +36,103 @@
           }"
           color="primary">Edit Extra Stats</v-btn>
         <v-btn v-else @click="createMatchStats()">Add Extra Stats</v-btn>
+      </div>
       </v-card-title>
 
-      <h2>
-        <strong>Date :</strong> {{ match.date_time }} <br/>
-        <strong>Competition :</strong> {{ match.competition_name }} <br/>
-        <strong>Opponent :</strong> {{ match.opponent_name }} <br/>
-        <strong>Duration :</strong> {{ match.duration }} mins <br/>
-        <div v-if="match.note">
-          Note: {{ match.note }}
-        </div>
-      </h2>
+      <v-card-text>
+        <h3>
+          Date : {{ match.date_time }} <br/>
+          Competition : {{ match.competition_name }} <br/>
+          Opponent : {{ match.opponent_name }} <br/>
+          Duration : {{ match.duration }} mins <br/>
+          <div v-if="match.note">
+            Note: {{ match.note }}
+          </div>
+        </h3>
+      </v-card-text>
 
-      <v-data-table
-          :headers="matchTableHeaders"
-          :items="matchTableRows"
-          hide-actions
-          item-key="stat"
-        >
-        <template slot="items" slot-scope="props">
-          <tr>
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" 
-                class="text-xs-right">
-              <div v-for="goal in props.item.team_stat" v-bind:key="goal">
-              {{ goal }} <br/>
-              </div>
-            </td>
+        <v-card-text>
+          <v-data-table
+              :headers="matchTableHeaders"
+              :items="matchTableRows"
+              hide-actions
+              item-key="stat">
+            <template slot="items" slot-scope="props">
+              <tr>
+                <td v-if="props.item.team_stat instanceof Array" class="text-xs-right">
+                  <div v-for="goal in props.item.team_stat" v-bind:key="goal">
+                    {{ goal }} <br/>
+                  </div>
+                </td>
 
-            <td v-else class="text-xs-right">
-              {{ props.item.team_stat }}
-            </td>
+                <td v-else class="text-xs-right">
+                  {{ props.item.team_stat }}
+                </td>
 
-            <td class="text-xs-center">{{ props.item.stat }}</td>
+                <td class="text-xs-center">{{ props.item.stat }}</td>
 
-            <td v-if="props.item.opponent_stat instanceof Array || props.item.team_stat instanceof Array" class="text-xs-left">
-              <div v-for="goal in props.item.opponent_stat" v-bind:key="goal">
-              {{ goal }} <br/>
-              </div>
-            </td>
+                <td v-if="props.item.opponent_stat instanceof Array" class="text-xs-left">
+                  <div v-for="goal in props.item.opponent_stat" v-bind:key="goal">
+                    {{ goal }} <br/>
+                  </div>
+                </td>
 
-            <td v-else class="text-xs-left">
-              {{ props.item.opponent_stat }}
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
+                <td v-else class="text-xs-left">
+                  {{ props.item.opponent_stat }}
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+      </v-container>
 
-      <v-layout row>
-        <v-spacer></v-spacer>
 
-        <v-btn 
-          :to="{
-            name: 'PlayerMatchEdit',
-            params: {
-                id: match.id
-            }
-          }"
-        color="primary">Edit Player Stats</v-btn>
-      </v-layout>
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h2>Player match stats</h2>
 
-      <player-matches-table :player_matches="player_matches" 
-                            :match="match"
-                            :showPlayer="true">
-      </player-matches-table>
-    </v-card>
-    <v-card>
-      <v-card-title>
-      <v-spacer></v-spacer>
-        <v-btn 
-          :to="{
-            name: 'MatchShotsEdit',
-            params: {
-                id: match.id
-            }
-          }"
-          color="primary">Edit Shots
-        </v-btn>
-      </v-card-title>
+            <v-spacer></v-spacer>
 
-      <shots-graph :shots="shots" :onClickShot=onClickShot
-      ></shots-graph>
+            <v-btn v-if="canEdit"
+                   :to="{
+                     name: 'PlayerMatchEdit',
+                     params: {id: match.id}
+                   }"
+                   color="primary">
+              Edit Player Stats
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <player-matches-table :player_matches="player_matches"
+                                  :match="match"
+                                  :showPlayer="true">
+            </player-matches-table>
+          </v-card-text>
+        </v-card>
+      </v-container>
+
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h2>Shots</h2>
+          <v-spacer></v-spacer>
+            <v-btn v-if="canEdit"
+                   :to="{
+                     name: 'MatchShotsEdit',
+                     params: {id: match.id}
+                   }"
+                   color="primary">
+              Edit Shots
+            </v-btn>
+          </v-card-title>
+
+          <shots-graph :shots="shots" 
+                       :onClickShot=onClickShot>
+          </shots-graph>
+        </v-card>
+      </v-container>
     </v-card>
   </div>
 </template>
@@ -146,6 +165,9 @@ export default {
     }
   },
   computed: {
+    canEdit () {
+      return this.$store.state.canEdit
+    },
     matchTableRows: function () {
       let rows = [{
         team_stat: this.match.num_goals,

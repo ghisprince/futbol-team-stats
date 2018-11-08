@@ -124,7 +124,7 @@ export default {
     return axios.get(`${playerMatchesURL}/?player_id=${id}&expand=true`)
       .then(response => response.data)
   },
- 
+
   // players
   getPlayers () {
     return axios.get(playersURL)
@@ -157,6 +157,8 @@ export default {
       .then(response => response.data)
   },
   createShot (shot) {
+    if (shot.id == -1) { delete shot.id }
+
     return axios.post(shotsURL, shot)
       .then(response => response.data)
   },

@@ -3,10 +3,9 @@
     <shots-form
                :player_matches="player_matches"
                :onSubmit="submit"
-               :onCancel="cancel"
-    ></shots-form>
-
-  </div>    
+               :onCancel="cancel">
+    </shots-form>
+  </div>
 </template>
 
 <script>

@@ -8,7 +8,7 @@
       >
         <template slot="items" slot-scope="props">
 
-          <td>{{ props.item.date_time }}</td>
+          <td>{{ props.item.date_time | formattedDateTime }}</td>
 
           <td v-if="showOpponent">
               <router-link :to="{
@@ -63,6 +63,12 @@ export default {
     }
   },
   methods: {
+  },
+  filters: {
+    formattedDateTime: function(v) {
+      if (!v) return ''
+      return v.slice(0,16).replace("T", " ");
+    }
   },
   computed: {
     headers: function () {

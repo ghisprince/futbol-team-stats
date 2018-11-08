@@ -8,6 +8,18 @@
 import MatchForm from '@/components/forms/MatchForm'
 import API from '@/lib/API'
 
+function today() {
+    var d = new Date(Date.now()),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-') + "T10:00:00";
+}
+
 export default {
   components: {
     MatchForm
@@ -15,7 +27,7 @@ export default {
   data () {
     return {
       match: {
-        date_time: '2018-10-20T12:20:00', // TODO today
+        date_time: today(),
         at_home: null,
         duration: 80,
         note: null

@@ -19,7 +19,7 @@
                 <v-flex>
                   <v-select
                     v-model="editedItem.player_match"
-                    :items="player_matches"
+                    :items="player_matches_sorted"
                     item-text="player_label"
                     item-value="id"
                     :rules="[v => !!v || 'Player is required']"
@@ -31,19 +31,19 @@
               </v-layout>
               <v-layout wrap>
                 <v-flex>
-                  <v-checkbox v-model="editedItem.by_opponent" 
+                  <v-checkbox v-model="editedItem.by_opponent"
                               label="By Opponent">
                   </v-checkbox>
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.on_target" 
+                  <v-checkbox v-model="editedItem.on_target"
                               label="On Target">
                   </v-checkbox>
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.pk" 
+                  <v-checkbox v-model="editedItem.pk"
                               label="Penalty Kick">
                   </v-checkbox>
                 </v-flex>
@@ -59,7 +59,7 @@
 
                 <v-flex v-if="editedItem.scored">
                   <v-text-field
-                    v-model="editedGoal.time" 
+                    v-model="editedGoal.time"
                     label="Goal Time"
                     mask="##">
                   </v-text-field>
@@ -84,17 +84,18 @@
                   >
                   </v-select>
                 </v-flex>
-                
+
               </v-layout>
               <v-layout wrap>
                 <h1>Shot location</h1>
                 <br/>
                 <p>Click to move active (Yellow) shot</p>
                 <br/>
-                <shots-graph :shots="shots" 
-                             :activeShotId="editedItem.id" 
+                <shots-graph :shots="shots"
+                             :activeShotId="editedItem.id"
                              :onClickShot=onClickShot
                              :onClickCanvas=onClickCanvas
+                             :showHiddenArea="true"
                 >
                 </shots-graph>
               </v-layout>
@@ -146,10 +147,11 @@
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
     </v-data-table>
-    <shots-graph :shots="shots" 
+    <shots-graph :shots="shots"
       :onClickShot=onClickShot
+      :showHiddenArea="true"
     ></shots-graph>
-    <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>    
+    <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>
   </div>
 </template>
 
@@ -161,7 +163,7 @@ export default {
   props: ['match_id', 'player_matches', 'onSubmit', 'onCancel'],
   components: {
     ShotsGraph
-  },  
+  },
   data: () => ({
     dialog: false,
     players: [],
@@ -235,6 +237,16 @@ export default {
     formTitle () {
       return this.editedIndex === -1 ? 'New Player Shot' : 'Edit Player Shot'
     },
+    player_matches_sorted () {
+      return this.player_matches.sort(function (a, b) {
+        if (a.player_label < b.player_label)
+          return -1
+        if (a.player_label > b.player_label)
+          return 1
+        return 0
+      })
+
+    }
   },
   watch: {
     dialog (val) {
@@ -255,10 +267,16 @@ export default {
       this.editedItem.y = y
     },
     load (id) {
-      // TODO : move into store
+      // TODO : doesn't get used at all does this?
       API.getPlayers()
         .then(players => {
-          this.players = players
+          this.players = players.sort(function (a, b) {
+            if (a.name < b.name)
+              return -1;
+            if (a.name > b.name)
+              return 1;
+            return 0;
+          })
         })
       API.getShotsByMatch(id)
         .then((shots) => {
@@ -315,7 +333,7 @@ export default {
       if (item.goal && item.goal.assist) {
         Object.assign(this.editedAssist, item.goal.assist)
       }
-      
+
       this.dialog = true
     },
     deleteItem (item) {

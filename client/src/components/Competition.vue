@@ -1,63 +1,79 @@
 <template>
-  <v-container fluid>
+  <v-card>
+    <v-container>
+      <v-card offset-sm3>
+        <v-alert
+          v-model="alert"
+          dismissible
+          color="warning"
+          icon="priority_high"
+        >
+          {{ alertMessage }}
+        </v-alert>
+        <v-card-title>
+          <h2>{{ competition.name }}</h2>
 
-    <v-card offset-sm3>
-      <v-alert
-        v-model="alert"
-        dismissible
-        color="warning"
-        icon="priority_high"
-      >
-        {{ alertMessage }}
-      </v-alert>
-      <v-card-title>
-        <h2>{{ competition.name }}</h2>
-
-        <v-spacer></v-spacer>
-        <v-btn
-          :to="{
-            name: 'CompetitionEdit',
-            params: {
-                id: competition.id
-            }
-          }"
-          color="primary">Edit</v-btn>
-        <v-btn @click="deleteCompetition()" color="error">Delete</v-btn>
-
-      </v-card-title>
-      <div>
-        Match Results (W-D-L): {{ competition.match_results }} <br/>
-
-        <div v-if="competition.result">
-          Results : {{ competition.result }}
-        </div>
-
-        <div v-if="competition.note">
-          Note: {{ competition.note }}
-        </div>
-        <div v-if="competition.external_url">
-            <a v-bind:href="competition.external_url">Competition's web site</a>
-        </div>
-        <v-spacer></v-spacer>
-
-        <v-layout row>
-          <h2>Matches</h2>
           <v-spacer></v-spacer>
-          <v-btn color="success"
-                :to="{name: 'MatchCreate'}">
-            ADD MATCH
-          </v-btn>
-        </v-layout>
-        <matches-table :matches="matches" :showOpponent="true"></matches-table>
+          <div v-if="canEdit">
+            <v-btn
+              :to="{
+                name: 'CompetitionEdit',
+                params: {
+                    id: competition.id
+                }
+              }"
+              color="primary">Edit</v-btn>
+            <v-btn @click="deleteCompetition()" color="error">Delete</v-btn>
+          </div>
+        </v-card-title>
+        <v-card-text>
+          Match Results (W-D-L): {{ competition.match_results }} <br/>
 
-        <h2>Player stats</h2>
-        <player-matches-agg-table :player_matches="player_matches" :showPlayer="true"></player-matches-agg-table>
-      </div>
-    </v-card>
-  </v-container>
+          <div v-if="competition.result">
+            Results : {{ competition.result }}
+          </div>
+
+          <div v-if="competition.note">
+            Note: {{ competition.note }}
+          </div>
+          <div v-if="competition.external_url">
+              <a v-bind:href="competition.external_url">Competition's web site</a>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-container>
+    <v-container>
+        <v-card>
+          <v-card-title>
+            <h2>Matches</h2>
+            <v-spacer></v-spacer>
+            <v-btn v-if="canEdit"
+                   color="success"
+                   :to="{name: 'MatchCreate'}">
+              ADD MATCH
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <matches-table :matches="matches" :showOpponent="true"></matches-table>
+          </v-card-text>
+        </v-card>
+    </v-container>
+    <v-container>
+      <v-card>
+        <v-card-title>
+          <h2>Player stats</h2>
+        </v-card-title>
+
+        <v-card-text>
+          <player-matches-agg-table :player_matches="player_matches" :showPlayer="true"></player-matches-agg-table>
+        </v-card-text>
+      </v-card>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import API from '@/lib/API'
 import MatchesTable from '@/components/MatchesTable'
 import PlayerMatchesAggTable from '@/components/PlayerMatchesAggTable'
@@ -81,6 +97,11 @@ export default {
   mounted () {
     const { id } = this.$route.params
     this.load(id)
+  },
+  computed: {
+    canEdit () {
+      return this.$store.state.canEdit
+    }
   },
   methods: {
     load (id) {
