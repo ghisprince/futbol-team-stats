@@ -28,6 +28,7 @@
         >
           <template slot="items" slot-scope="props">
             <td>{{ props.item.name }}</td>
+            <td>{{ props.item.num_match }}</td>
             <td>{{ props.item.match_results }}</td>
             <td><span v-show="props.item.goal_differential > 0">+</span>{{ props.item.goal_differential}}</td>
             <td>
@@ -35,7 +36,7 @@
                   name: 'Opponent',
                   params: { id: props.item.id }
                 }">
-                Stats
+                <v-icon>insert_chart</v-icon>
               </router-link>
             </td>
           </template>
@@ -58,9 +59,10 @@ export default {
       search: '',
       headers: [
         {text: 'Name', value: 'name'},
+        {text: 'Matches', value: 'num_match'},
         {text: 'W-D-L', value: 'match_results'},
         {text: 'Goal Diff', value: 'goal_differential'},
-        {text: 'Stats', value: 'id'}
+        {text: 'Details', value: 'id'}
       ]
     }
   },

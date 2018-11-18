@@ -24,6 +24,8 @@ import Player from '@/components/Player.vue'
 import PlayerCreate from '@/components/PlayerCreate.vue'
 import PlayerEdit from '@/components/PlayerEdit.vue'
 
+import Login from '@/components/forms/Login.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -32,6 +34,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     // Competitions
     {

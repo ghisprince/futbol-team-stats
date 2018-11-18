@@ -1,44 +1,49 @@
 <template>
   <div>
-      <v-data-table
-        :headers="headers"
-        :items="matches"
-        :search="search"
-        :pagination.sync="pagination"
-      >
-        <template slot="items" slot-scope="props">
+    <v-data-table
+      :headers="headers"
+      :items="matches"
+      :search="search"
+      :pagination.sync="pagination"
+    >
+      <template slot="items" slot-scope="props">
 
-          <td>{{ props.item.date_time | formattedDateTime }}</td>
+        <td>{{ props.item.date_time | formattedDateTime }}</td>
 
-          <td v-if="showOpponent">
-              <router-link :to="{
-                name: 'Opponent',
-                params: { id: props.item.opponent }
-              }">
-              {{ props.item.opponent_name }}
-            </router-link>
-          </td>
-          <td v-if="showCompetition">
-              <router-link :to="{
-                name: 'Competition',
-                params: { id: props.item.competition }
-              }">
-              {{ props.item.competition_name }}
-            </router-link>
-          </td>
-          <td>{{ props.item.result }}</td>
-          <td>{{ props.item.score }}</td>
-          <td>
+        <td v-if="showOpponent">
             <router-link :to="{
-                name: 'Match',
-                params: { id: props.item.id }
-              }">
-              Details
-            </router-link></td>
+              name: 'Opponent',
+              params: { id: props.item.opponent }
+            }">
+            {{ props.item.opponent_name }}
+          </router-link>
+        </td>
 
-        </template>
-      </v-data-table>
+        <td v-if="showCompetition">
+            <router-link :to="{
+              name: 'Competition',
+              params: { id: props.item.competition }
+            }">
+            {{ props.item.competition_name }}
+          </router-link>
+        </td>
 
+        <td>
+          <span v-show="props.item.result === 'win'" style="color:lime">{{ props.item.result }}</span>
+          <span v-show="props.item.result === 'loss'" style="color:red">{{ props.item.result }}</span>
+          <span v-show="props.item.result === 'tie'" style="color:grey">{{ props.item.result }}</span>
+        </td>
+        <td>{{ props.item.score }}</td>
+        <td>
+          <router-link :to="{
+              name: 'Match',
+              params: { id: props.item.id }
+            }">
+            <v-icon>insert_chart</v-icon>
+          </router-link></td>
+
+      </template>
+    </v-data-table>
   </div>
 </template>
 
@@ -47,18 +52,19 @@ export default {
   props: ['matches', 'showOpponent', 'showCompetition'],
   data () {
     return {
+      win_color: "blue",
       pagination: {
         sortBy: 'date_time',
         descending: true
       },
       search: '',
       headersAll: [
-        {text: 'Date', value: 'date_time'},
-        {text: 'Competition', value: 'competition_name'},
-        {text: 'Opponent', value: 'opponent_name'},
-        {text: 'Result', value: 'result'},
-        {text: 'Score', value: 'score'},
-        {text: 'Match Details', value: 'match'}
+        {text: 'Date', value: 'date_time', width: "1%"},
+        {text: 'Competition', value: 'competition_name', width: "1%"},
+        {text: 'Opponent', value: 'opponent_name', width: "1%"},
+        {text: 'Result', value: 'result', width: "1%"},
+        {text: 'Score', value: 'score', width: "1%"},
+        {text: 'Match Details', value: 'match', width: "1%"}
       ]
     }
   },

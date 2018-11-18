@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, flash, redirect, url_for, send_fil
 from flask_login import login_user, logout_user, login_required
 
 #from .. extensions import cache
-from .. forms import LoginForm
 from .. models import *
 from .. api import *
 
@@ -28,27 +27,18 @@ def login():
         else:
             raise Exception
     except:
-        import time;time.sleep(1)
+        import time;time.sleep(0.3)
         resp = jsonify({"error": "Login failed"})
         resp.status_code = 401
         return resp
 
 
-
-
-
-@main.route("/logout")
+@main.route("/api/v1/logout", methods=["GET"])
 def logout():
     logout_user()
-    flash("You have been logged out.", "success")
-
-    return redirect(url_for(".login"))
-
-
-@main.route("/stats")
-@login_required
-def stats():
-    return render_template('stats.html')
+    resp = jsonify({})
+    resp.status_code = 204
+    return resp
 
 
 @main.route("/restricted")

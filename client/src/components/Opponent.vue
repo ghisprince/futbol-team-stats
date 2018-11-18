@@ -34,7 +34,7 @@
             Note: {{ opponent.note }}
           </div>
           <div v-if="opponent.external_url">
-              <a v-bind:href="opponent.external_url">Opponent's web site</a>
+              <a v-bind:href="opponent.external_url">Web site</a>
           </div>
         <matches-table :matches="matches" :showCompetition="true"></matches-table>
         </v-card-text>

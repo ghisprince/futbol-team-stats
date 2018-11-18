@@ -189,6 +189,7 @@ export default {
     // TODO : move into store
     API.getPlayers()
       .then(players => {
+        players = players.filter(i => i.active)
         this.players = players.sort(function (a, b) {
           if (a.name < b.name)
             return -1;
@@ -235,7 +236,7 @@ export default {
         Object.assign(this.player_matches[this.editedIndex], this.editedItem)
         API.updatePlayerMatch(this.editedItem.id, this.editedItem)
       } else {
-        // create new  PlayerMatch
+        // create new PlayerMatch
         const match_id = this.$route.params.id
         this.editedItem.match = match_id
         API.createPlayerMatch(this.editedItem)

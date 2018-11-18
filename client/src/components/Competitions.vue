@@ -29,15 +29,17 @@
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.start_date }}</td>
-          <td>{{ props.item.result }}</td>
+          <td>{{ props.item.num_match }}</td>
           <td>{{ props.item.match_results }}</td>
+          <td>{{ props.item.result }}</td>
           <td><span v-show="props.item.goal_differential > 0">+</span>{{ props.item.goal_differential}}</td>
+          <td>{{ props.item.clean_sheets }}</td>
           <td>
               <router-link :to="{
                 name: 'Competition',
                 params: { id: props.item.id }
               }">
-              Stats
+              <v-icon>insert_chart</v-icon>
             </router-link>
           </td>
         </template>
@@ -63,11 +65,13 @@ export default {
       search: '',
       headers: [
         {text: 'Name', value: 'name', sortable: false},
-        {text: 'Start Date', value: 'start_date'},
-        {text: 'Result', value: 'result'},
+        {text: 'Start', value: 'start_date'},
+        {text: '# Match', value: 'num_match'},
         {text: 'W-D-L', value: 'match_results'},
+        {text: 'Result', value: 'result'},
         {text: 'Goal Diff', value: 'goal_differential'},
-        {text: 'Stats', value: 'id'}
+        {text: 'Clean Sheets', value: 'clean_sheets'},
+        {text: 'Details', value: 'id'}
       ]
     }
   },

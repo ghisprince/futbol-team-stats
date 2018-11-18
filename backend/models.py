@@ -185,6 +185,11 @@ class Opponent(db.Model, CRUD_MixIn):
         return len([i for i in self.matches if (i.result == "loss")])
 
     @hybrid_property
+    def num_match(self):
+        """ number of matches """
+        return len(self.matches)
+
+    @hybrid_property
     def match_results(self):
         """ return competition result in W-D-L format """
         return "{}-{}-{}".format(self.num_match_won,
@@ -246,6 +251,11 @@ class Competition(db.Model, CRUD_MixIn):
         return len([i for i in self.matches if (i.result == "loss")])
 
     @hybrid_property
+    def num_match(self):
+        """ number of matches """
+        return len(self.matches)
+
+    @hybrid_property
     def match_results(self):
         """ return competition result in W-D-L format """
         return "{}-{}-{}".format(self.num_match_won,
@@ -256,6 +266,11 @@ class Competition(db.Model, CRUD_MixIn):
     def goal_differential(self):
         """ team's goal differential vs this opponent """
         return sum([i.goal_differerential for i in self.matches])
+
+    @hybrid_property
+    def clean_sheets(self):
+        """ team's clean sheets aka no goals allowed """
+        return len([1 for i in self.matches if (i.num_goals_against == 0)])
 
     def __init__(self, name, team, result=None, external_url=None, note=None):
         self.name = name

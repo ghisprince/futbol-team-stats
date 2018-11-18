@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
       <v-layout column align-center>
-        <img src="@/assets/crest.png" alt="Vuetify.js" class="mb-5">
+        <img src="@/assets/crest.png" alt="Crest.js" class="mb-5">
         <blockquote>
           &#8220;The thing about football - the important thing about football – is that it is not just about football.&#8221;
           <footer>

@@ -189,9 +189,10 @@ class CreateListShot(CreateListResourceBase):
 
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
+                 'competition_id': webargs.fields.Int(required=False),
                  'by_opponent': webargs.fields.Bool(required=False),
                  'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, match_id, by_opponent, expand):
+    def get(self, player_id, match_id, competition_id, by_opponent, expand):
         query = self.ModelClass.query
 
         if player_id:
@@ -201,6 +202,10 @@ class CreateListShot(CreateListResourceBase):
         if match_id:
             query = query.join(PlayerMatch).join(Match).filter(
                 Match.id == match_id)
+
+        if competition_id:
+            query = query.join(PlayerMatch).join(Match).join(Competition).filter(
+                Competition.id == competition_id)
 
         if not isinstance(by_opponent, marshmallow.utils._Missing):
             query = query.filter(Shot.by_opponent == by_opponent)
@@ -300,9 +305,8 @@ class GetUpdateDeleteResourceBase(Resource):
 
     def patch(self, id):
         modelInst = self.ModelClass.query.get_or_404(id)
-
         request_dict = request.get_json(force=True)
-        pprint(request_dict)
+
         try:
             self.mm_schema.validate(request_dict, partial=True)
             modelInst = self.mm_schema.load(request_dict, partial=True)

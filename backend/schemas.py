@@ -60,11 +60,13 @@ class CompetitionSchema(ModelSchema):
     #     'collection': ma.URLFor('CreateListCompetition'.lower())})
 
     start_date = fields.String(dump_only=True)
-    num_match_won = fields.String(dump_only=True)
-    num_match_tied = fields.String(dump_only=True)
-    num_match_lost = fields.String(dump_only=True)
+    num_match_won = fields.Integer(dump_only=True)
+    num_match_tied = fields.Integer(dump_only=True)
+    num_match_lost = fields.Integer(dump_only=True)
+    num_match = fields.Integer(dump_only=True)
     match_results = fields.String(dump_only=True)
     goal_differential = fields.Integer(dump_only=True)
+    clean_sheets = fields.Integer(dump_only=True)
 
     class Meta:
         strict = True
@@ -83,9 +85,10 @@ class OpponentSchema(ModelSchema):
     #    {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), id="<id>"),
     #     'collection': ma.URLFor('CreateListOpponent'.lower())})
 
-    num_match_won = fields.String(dump_only=True)
-    num_match_tied = fields.String(dump_only=True)
-    num_match_lost = fields.String(dump_only=True)
+    num_match_won = fields.Integer(dump_only=True)
+    num_match_tied = fields.Integer(dump_only=True)
+    num_match_lost = fields.Integer(dump_only=True)
+    num_match = fields.Integer(dump_only=True)
     match_results = fields.String(dump_only=True)
     goal_differential = fields.Integer(dump_only=True)
 

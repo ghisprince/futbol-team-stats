@@ -66,9 +66,6 @@ export default {
     valid: true,
     opponents: [],
     competitions: [],
-    nameRules: [
-      v => !!v || 'Name is required'
-    ]
   }),
   methods: {
     submit () {

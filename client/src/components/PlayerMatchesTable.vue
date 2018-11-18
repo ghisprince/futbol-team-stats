@@ -48,7 +48,7 @@
               name: 'Match',
               params: { id: props.item.match.id }
             }">
-            Details
+            <v-icon>insert_chart</v-icon>
           </router-link>
         </td>
 

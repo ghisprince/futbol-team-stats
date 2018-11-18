@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+const loginURL = '/api/v1/login'
 const competitionsURL = '/api/v1/competitions/'
 const matchesURL = '/api/v1/matches/'
 const opponentsURL = '/api/v1/opponents/'
@@ -10,6 +11,10 @@ const shotsURL = '/api/v1/shots/'
 
 
 export default {
+  login (username, password) {
+    return axios.post(loginURL, {username: username,  password: password})
+      .then(response => response.data)
+  },
   //  competitions
   getCompetitions () {
     return axios.get(competitionsURL)

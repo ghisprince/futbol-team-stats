@@ -36,9 +36,11 @@
           <div v-if="competition.note">
             Note: {{ competition.note }}
           </div>
+
           <div v-if="competition.external_url">
-              <a v-bind:href="competition.external_url">Competition's web site</a>
+              <a v-bind:href="competition.external_url">Web site</a>
           </div>
+
         </v-card-text>
       </v-card>
     </v-container>
