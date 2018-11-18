@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, send_file, session
+from flask import Blueprint, render_template, flash, redirect, url_for, send_file, session, request, jsonify
 from flask_login import login_user, logout_user, login_required
 
 #from .. extensions import cache
@@ -15,18 +15,26 @@ def home():
     return render_template('index.html')
 
 
-@main.route("/login", methods=["GET", "POST"])
+@main.route("/api/v1/login", methods=["POST"])
 def login():
-    form = LoginForm()
+    data = json.loads(request.data)
+    username = data["username"]
+    password = data["password"]
 
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).one()
-        login_user(user, remember=True)
+    try:
+        user = User.query.filter_by(username=username).one()
+        if user.check_password(password):
+            login_user(user, remember=True)
+        else:
+            raise Exception
+    except:
+        import time;time.sleep(1)
+        resp = jsonify({"error": "Login failed"})
+        resp.status_code = 401
+        return resp
 
-        flash("Logged in successfully.", "success")
-        return redirect(request.args.get("next") or url_for(".home"))
 
-    return render_template("login.html", form=form)
+
 
 
 @main.route("/logout")
@@ -57,7 +65,7 @@ rest api version 1.0
     <li><a href="/api/v1/players/">/api/v1/players/</a></li>
     <li><a href="/api/v1/competitions/">/api/v1/competitions/</a></li>
     <li><a href="/api/v1/matches/">/api/v1/matches/</a></li>
-    <li><a href="/api/v1/playermatches/">/api/v1/playermatches/</a></li>    
+    <li><a href="/api/v1/playermatches/">/api/v1/playermatches/</a></li>
     </ul>
 </p>
 

@@ -16,10 +16,9 @@ class UserSchema(ModelSchema):
 
 
 class TeamSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteTeam'.lower(), team_id="<id>"),
-         'collection': ma.URLFor('CreateListTeam'.lower(), ),
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteTeam'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListTeam'.lower(), ), })
 
     class Meta:
         strict = True
@@ -33,10 +32,9 @@ class TeamSchemaEx(TeamSchema):
 
 
 class PlayerSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeletePlayer'.lower(), player_id="<id>"),
-         'collection': ma.URLFor('CreateListPlayer'.lower()),
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeletePlayer'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListPlayer'.lower()), })
 
     label = fields.String(dump_only=True)
     num_apps =  fields.Integer(dump_only=True)
@@ -57,10 +55,9 @@ class PlayerSchemaEx(PlayerSchema):
 
 
 class CompetitionSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(),
-                           competition_id="<id>"),
-         'collection': ma.URLFor('CreateListCompetition'.lower())})
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteCompetition'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListCompetition'.lower())})
 
     start_date = fields.String(dump_only=True)
     num_match_won = fields.String(dump_only=True)
@@ -82,9 +79,9 @@ class CompetitionSchemaEx(CompetitionSchema):
 
 
 class OpponentSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), opponent_id="<id>"),
-         'collection': ma.URLFor('CreateListOpponent'.lower())})
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteOpponent'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListOpponent'.lower())})
 
     num_match_won = fields.String(dump_only=True)
     num_match_tied = fields.String(dump_only=True)
@@ -155,8 +152,7 @@ class AssistSchemaEx(AssistSchema):
 class GoalSchema(ModelSchema):
     #_links = ma.Hyperlinks(
     #    {'self': ma.URLFor('GetUpdateDeleteGoal'.lower(), goal_id="<id>"),
-    #     'collection': ma.URLFor('CreateListGoal'.lower())
-    #     })
+    #     'collection': ma.URLFor('CreateListGoal'.lower()) })
 
     assisted = fields.Boolean(dump_only=True)
     assist = fields.Nested('AssistSchemaEx', dump_only=True, exclude=["goal", ])
@@ -173,11 +169,9 @@ class GoalSchemaEx(GoalSchema):
 
 
 class PlayerMatchSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeletePlayerMatch'.lower(),
-                           playermatch_id="<id>"),
-         'collection': ma.URLFor('CreateListPlayerMatch'.lower()),
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeletePlayerMatch'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListPlayerMatch'.lower()), })
 
     # hybrid properties on model
     player_label = fields.String(dump_only=True)
@@ -215,11 +209,9 @@ class PlayerMatchSchemaEx(PlayerMatchSchema):
 
 
 class MatchStatsSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteMatchStats'.lower(),
-                           matchstats_id="<id>"),
-         'collection': ma.URLFor('CreateListMatchStats'.lower()),
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteMatchStats'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListMatchStats'.lower()), })
 
     class Meta:
         strict = True
@@ -228,10 +220,9 @@ class MatchStatsSchema(ModelSchema):
 
 
 class MatchSchema(ModelSchema):
-    _links = ma.Hyperlinks(
-        {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), match_id="<id>"),
-         'collection': ma.URLFor('CreateListMatch'.lower()),
-         })
+    #_links = ma.Hyperlinks(
+    #    {'self': ma.URLFor('GetUpdateDeleteMatch'.lower(), id="<id>"),
+    #     'collection': ma.URLFor('CreateListMatch'.lower()), })
 
     # add hybrid properties on model
     result = fields.String(dump_only=True)

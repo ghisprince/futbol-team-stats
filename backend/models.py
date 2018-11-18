@@ -492,9 +492,9 @@ class MatchStats(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
 
     # high level opponent stats
-    opponent_yellow_cards = db.Column(db.Integer())
-    opponent_red_cards = db.Column(db.Integer())
-    opponent_corners = db.Column(db.Integer())
+    opponent_yellow_cards = db.Column(db.Integer(), default=0)
+    opponent_red_cards = db.Column(db.Integer(), default=0)
+    opponent_corners = db.Column(db.Integer(), default=0)
     opponent_fouls = db.Column(db.Integer())
 
     # team pass numbers

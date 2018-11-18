@@ -20,7 +20,7 @@ import json
 This module servers views of the model as REST api
 
 This module should be refactored to be DRY-er.
-  
+
 """
 
 user_schema = UserSchema()
@@ -55,21 +55,21 @@ assist_schema = AssistSchema()
 assist_schema_ex = AssistSchemaEx()
 
 """http://jsonapi.org/format/#fetching
-A server MUST respond to a successful request to fetch an individual 
+A server MUST respond to a successful request to fetch an individual
 resource or resource collection with a 200 OK response.
-A server MUST respond with 404 Not Found when processing a request to 
-fetch a single resource that does not exist, except when the request 
-warrants a 200 OK response with null as the primary data 
+A server MUST respond with 404 Not Found when processing a request to
+fetch a single resource that does not exist, except when the request
+warrants a 200 OK response with null as the primary data
 (as described above) a self link as part of the top-level links object
 """
 
 """http://jsonapi.org/format/#crud
-A resource can be created by sending a POST request to a URL that 
-represents a collection of roles. The request MUST include a 
-single resource object as primary data. The resource object 
+A resource can be created by sending a POST request to a URL that
+represents a collection of roles. The request MUST include a
+single resource object as primary data. The resource object
 MUST contain at least a type member.
-If a POST request did not include a Client-Generated ID and the 
-requested resource has been created successfully, the server MUST 
+If a POST request did not include a Client-Generated ID and the
+requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
@@ -80,10 +80,38 @@ class Resource(flask_restful.Resource):
 
 
 class CreateListResourceBase(Resource):
+    @use_kwargs({'name': webargs.fields.Str(required=False),
+                 'player_id': webargs.fields.Int(required=False),
+                 'match_id': webargs.fields.Int(required=False),
+                 'competition_id': webargs.fields.Int(required=False),
+                 'opponent_id': webargs.fields.Int(required=False),
+                 'expand': webargs.fields.Bool(required=False)})
+    def get(self, name, player_id, match_id, competition_id, opponent_id, expand=False):
+        query = self.ModelClass.query
+        if name:
+            query = query.filter_by(name=name)
+
+        if player_id:
+            query = query.join(Player).filter(Player.id == player_id)
+
+        if match_id:
+            query = query.join(Match).filter(Match.id == match_id)
+
+        if competition_id:
+            query = query.join(Match).join(Competition).filter(
+                Competition.id == competition_id)
+
+        if opponent_id:
+            query = query.join(Match).join(Opponent).filter(
+                Opponent.id == opponent_id)
+
+        if expand:
+            return self.mm_schema_ex.dump(query.all(), many=True).data
+
+        return self.mm_schema.dump(query.all(), many=True).data
+
     def post(self):
-        
         request_dict = request.get_json(force=True)
-        pprint(request_dict)
         try:
             self.mm_schema.validate(request_dict)
             modelInst = self.mm_schema.load(request_dict).data
@@ -113,80 +141,18 @@ class CreateListTeam(CreateListResourceBase):
     mm_schema = team_schema
     mm_schema_ex = team_schema_ex
 
-    @use_kwargs({'name': webargs.fields.Str(required=False),
-                 'expand': webargs.fields.Bool(required=False)})
-    def get(self, name, expand):
-        query = self.ModelClass.query
-
-        if name:
-            query = query.filter_by(name=name)
-
-        if expand:
-            return self.mm_schema_ex.dump(query.all(), many=True).data
-
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        return self.ModelClass(**request_dict)
-
-
 class CreateListPlayer(CreateListResourceBase):
     ModelClass = Player
     mm_schema = player_schema
-
-    @use_kwargs({'name': webargs.fields.Str(required=False)})
-    def get(self, name):
-        query = self.ModelClass.query
-
-        if name:
-            query = query.filter_by(name=name)
-
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
-        return self.ModelClass(**request_dict)
-
 
 class CreateListCompetition(CreateListResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
     mm_schema_ex = competition_schema_ex
 
-    @use_kwargs({'name': webargs.fields.Str(required=False),
-                 'expand': webargs.fields.Bool(required=False)})
-    def get(self, name, expand):
-
-        query = self.ModelClass.query
-        if name:
-            query = query.filter_by(name=name)
-        if expand:
-            return self.mm_schema_ex.dump(query.all(), many=True).data
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        request_dict['team'] = db.session.query(Team).filter_by(
-            id=request_dict['team']['id']).one()
-        return self.ModelClass(**request_dict)
-
-
 class CreateListOpponent(CreateListResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
-
-    @use_kwargs({'name': webargs.fields.Str(required=False)})
-    def get(self, name):
-        query = self.ModelClass.query
-        if name:
-            query = query.filter_by(name=name)
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        request_dict['team'] = db.session.query(Team).filter_by(
-            id=request_dict['team']['id']).one()
-        
-        return self.ModelClass(**request_dict)
-
 
 class CreateListMatch(CreateListResourceBase):
     ModelClass = Match
@@ -194,9 +160,8 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema_ex = match_schema_ex
 
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
-                 'competition_id': webargs.fields.Int(required=False),
-                 'expand': webargs.fields.Bool(required=False) })
-    def get(self, opponent_id, competition_id, expand=False):
+                 'competition_id': webargs.fields.Int(required=False) })
+    def get(self, opponent_id, competition_id):
         query = self.ModelClass.query
 
         if opponent_id:
@@ -206,88 +171,16 @@ class CreateListMatch(CreateListResourceBase):
             query = query.join(Competition).filter(
                 Competition.id == competition_id)
 
-        if expand:
-            return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
-
-
-    def InstanceFromDict(self, request_dict):
-        request_dict['team'] = Team.query.get_or_404(request_dict['team']['id'])
-
-        request_dict['opponent'] = Opponent.query.get_or_404(
-            request_dict['opponent'])
-
-        if request_dict.get('competition', None):
-            request_dict['competition'] = Competition.query.get_or_404(
-                request_dict['competition'])
-
-        return self.ModelClass(**request_dict)
-
 
 class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
 
-    @use_kwargs({'player_id': webargs.fields.Int(required=False),
-                 'match_id': webargs.fields.Int(required=False),
-                 'competition_id': webargs.fields.Int(required=False),
-                 'opponent_id': webargs.fields.Int(required=False),
-                 'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, match_id, competition_id, opponent_id, expand=False):
-
-        query = self.ModelClass.query
-        if player_id:
-            query = query.join(Player).filter(Player.id == player_id)
-
-        if match_id:
-            query = query.join(Match).filter(Match.id == match_id)
-
-        if competition_id:
-            query = query.join(Match).join(Competition).filter(
-                Competition.id == competition_id)
-
-        if opponent_id:
-            query = query.join(Match).join(Opponent).filter(
-                Opponent.id == opponent_id)
-
-        if expand:
-            return self.mm_schema_ex.dump(query.all(), many=True).data
-
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-
-        #request_dict['player'] = db.session.query(Player).filter_by(
-        #    id=request_dict['player']).one()
-
-        #request_dict['match'] = db.session.query(Match).filter_by(
-        #    id=request_dict['match']).one()
-
-        #import pdb;pdb.set_trace()
-        # TODO : make all InstanceFromDict like use mm.load
-        return self.ModelClass(self.mm_schema.load(request_dict))
-        #return self.ModelClass(**request_dict)
-
-
 class CreateListMatchStats(CreateListResourceBase):
     ModelClass = MatchStats
     mm_schema = matchstats_schema
-
-    @use_kwargs({'match_id': webargs.fields.Int(required=False)})
-    def get(self, match_id):
-        query = self.ModelClass.query
-
-        if match_id:
-            query = query.filter(self.ModelClass.match_id == match_id)
-
-        return self.mm_schema.dump(query.all(), many=True).data
-
-    def InstanceFromDict(self, request_dict):
-        # TODO redo this, can this be centralized?
-        request_dict['match'] = Match.query.get_or_404(request_dict['match'])
-        return self.ModelClass(**request_dict)
-
 
 class CreateListShot(CreateListResourceBase):
     ModelClass = Shot
@@ -341,19 +234,8 @@ class CreateListShot(CreateListResourceBase):
 
         # todo: add goal/assist?
         db.session.commit()
-        
         results = self.mm_schema.dump(query).data
         return results, 201
-
-
-
-
-    def InstanceFromDict(self, request_dict):
-        request_dict['player_match'] = db.session.query(
-            PlayerMatch).filter_by(id=request_dict['player_match']['id']).one()
-
-        return self.ModelClass(**request_dict)
-
 
 class CreateListGoal(CreateListResourceBase):
     ModelClass = Goal
@@ -379,13 +261,6 @@ class CreateListGoal(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
-    def InstanceFromDict(self, request_dict):
-        request_dict['shot'] = db.session.query(Shot).filter_by(
-            id=request_dict['shot']['id']).one()
-
-        return self.ModelClass(**request_dict)
-
-
 class CreateListAssist(CreateListResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
@@ -408,16 +283,6 @@ class CreateListAssist(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
-    def InstanceFromDict(self, request_dict):
-        request_dict['goal'] = db.session.query(
-            Goal).filter_by(id=request_dict['goal']['id']).one()
-
-        request_dict['player_match'] = db.session.query(
-            PlayerMatch).filter_by(
-            id=request_dict['player_match']['id']).one()
-
-        return self.ModelClass(**request_dict)
-
 
 class GetUpdateDeleteResourceBase(Resource):
     """ base class that adds
@@ -426,6 +291,7 @@ class GetUpdateDeleteResourceBase(Resource):
         - delete(id)
       """
 
+    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, id, expand=False):
         query = self.ModelClass.query.get_or_404(id)
         if expand:
@@ -513,16 +379,9 @@ class GetCurrentTeamID(Resource):  # not GetUpdateDeleteResourceBase
 class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
     ModelClass = Team
     mm_schema = team_schema
-    mm_schema_ex = team_schema_ex
+    mm_schema = team_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, team_id, expand=False):
-        return super().get(team_id, expand)
-
-    def patch(self, team_id):
-        return super().patch(team_id)
-
-    def delete(self, team_id):
+    def delete(self, id):
         resp = jsonify({"error": "Deleting of team not allowed!"})
         resp.status_code = 403
         return resp
@@ -531,18 +390,12 @@ class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
 class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
     ModelClass = Player
     mm_schema = player_schema
-    mm_schema_ex = player_schema_ex
+    mm_schema = player_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, expand=False):
-        return super().get(player_id, expand)
-
-    def patch(self, player_id):
-        return super().patch(player_id)
-
-    def delete(self, player_id):
+    def delete(self, id):
         resp = jsonify({"error": "Deleting of player not allowed!"})
-        return super().delete(player_id)
+        resp.status_code = 403
+        return resp
 
 
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
@@ -550,148 +403,46 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, match_id, expand=False):
-        return super().get(match_id, expand)
-
-    def patch(self, match_id):
-        return super().patch(match_id)
-
-    def delete(self, match_id):
-        return super().delete(match_id)
-
-
 class GetUpdateDeleteMatchStats(GetUpdateDeleteResourceBase):
     ModelClass = MatchStats
     mm_schema = matchstats_schema
-
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, matchstats_id, expand=False):
-        return super().get(matchstats_id, expand)
-
-    def patch(self, matchstats_id):
-        return super().patch(matchstats_id)
-
-    def delete(self, matchstats_id):
-        return super().delete(matchstats_id)
-
+    mm_schema_ex = None # todo ?
 
 class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
     mm_schema_ex = competition_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, competition_id, expand=False):
-        return super().get(competition_id, expand)
-
-    def patch(self, competition_id):
-        return super().patch(competition_id)
-
-    def delete(self, competition_id):
-        return super().delete(competition_id)
-
-
 class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
     mm_schema_ex = opponent_schema_ex
-
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, opponent_id, expand=False):
-        return super().get(opponent_id, expand)
-
-    def patch(self, opponent_id):
-        return super().patch(opponent_id)
-
-    def delete(self, opponent_id):
-        return super().delete(opponent_id)
-
 
 class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, playermatch_id, expand=False):
-        return super().get(playermatch_id, expand)
-
-    def patch(self, playermatch_id):
-        return super().patch(playermatch_id)
-
-    def delete(self, playermatch_id):
-        return super().delete(playermatch_id)
-
-
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     ModelClass = Match
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
-
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, match_id, expand=False):
-        #from pprint import pprint
-        return super().get(match_id, expand)
-
-    
-    def patch(self, match_id):
-        return super().patch(match_id)
-
-    """
-        modelInst = self.ModelClass.query.get_or_404(match_id)
-
-        request_dict = request.get_json(force=True)
-        request_dict['team'] = db.session.query(
-            Team).filter_by(id=request_dict['team']).one()
-
-        request_dict['opponent'] = db.session.query(
-            Opponent).filter_by(id=request_dict['opponent']['id']).one()
-
-        request_dict['competition'] = db.session.query(
-            Competition).filter_by(id=request_dict['competition']['id']).one()
-
-        request_dict['date_time'] = datetime.datetime.strptime(
-            request_dict['date_time'][:-6],
-            "%Y-%m-%dT%H:%M:%S")
-        try:
-            # self.mm_schema.validate(request_dict, partial=True)
-            for key, value in request_dict.items():
-                setattr(modelInst, key, value)
-            modelInst.update()
-            return self.get(match_id)
-
-        except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
-    """
-
-    # TODO : drop alllllll of these in favor of just ID 
-    #  need to also update api.py
-    def delete(self, match_id):
-        return super().delete(match_id)
-
 
 class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     ModelClass = Shot
     mm_schema = shot_schema
     mm_schema_ex = shot_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, shot_id, expand=False):
-        return super().get(shot_id, expand)
-
-    def patch(self, shot_id):
-        request_dict = request.get_json(force=True)        
-        modelInst = self.ModelClass.query.get_or_404(shot_id)
+    def patch(self, id):
+        request_dict = request.get_json(force=True)
+        modelInst = self.ModelClass.query.get_or_404(id)
         print(">"*30)
         goal_dict = request_dict.pop('goal', {})
         if goal_dict:
             assist_dict = goal_dict.pop('assist', {})
 
         if request_dict['scored'] == True and goal_dict:
-            goal_dict['shot'] = shot_id
+            goal_dict['shot'] = id
             goal_schema.validate(goal_dict, partial=True)
 
             if modelInst.goal is None:
@@ -702,17 +453,13 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
             else:
                 # update existing Goal
                 # TODO : isthis first get_or_404 needed?
-                print("#"*40)
-                pprint(goal_dict)
-                print("#"*40)
                 goal = Goal.query.get_or_404(goal_dict['id'])
                 goal = goal_schema.load(goal_dict, partial=True).data
-                #import pdb;pdb.set_trace()
                 print("Update Goal {}".format(goal))
 
             if (goal_dict['assisted'] == True) and assist_dict:
                 assist_dict['goal'] = modelInst.goal.id
-                
+
                 if modelInst.goal.assist is None:
                     # add new Assist
                     # todo : this seemswrong
@@ -728,7 +475,7 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
                 assist = modelInst.goal.assist
                 db.session.delete(assist)
                 print("Delete Assist")
-                
+
         else:
             if modelInst.goal:
                 goal = modelInst.goal
@@ -740,12 +487,7 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
         print("now patch the shot")
         print(">"*30)
         # finally patch the shot's main properties
-        return super().patch(shot_id)
-        print("<"*30)
-
-
-    def delete(self, shot_id):
-        return super().delete(shot_id)
+        return super().patch(id)
 
 
 class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
@@ -753,16 +495,7 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     mm_schema = goal_schema
     mm_schema_ex = goal_schema_ex
 
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, goal_id, expand=False):
-        return super().get(goal_id, expand)
-
-
 class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
     mm_schema_ex = assist_schema_ex
-
-    @use_kwargs({'expand': webargs.fields.Bool(required=False)})
-    def get(self, assist_id, expand=False):
-        return super().get(assist_id, expand)
