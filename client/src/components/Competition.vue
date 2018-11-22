@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import API from '@/lib/API'
 import MatchesTable from '@/components/MatchesTable'
 import PlayerMatchesAggTable from '@/components/PlayerMatchesAggTable'
@@ -102,7 +101,7 @@ export default {
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
+      return this.$store.state.authUser.canEdit
     }
   },
   methods: {
@@ -110,6 +109,11 @@ export default {
       API.getCompetition(id)
         .then((competition) => {
           this.competition = competition
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.$router.push({name: 'login'})
+          }
         })
       API.getMatchesByCompetition(id)
         .then((matches) => {
@@ -121,16 +125,14 @@ export default {
         })
     },
     deleteCompetition () {
-      API.deleteCompetition(this.competition.id)
-        .then(() => {
-          this.$router.push({
-            name: 'Competitions'
-          })
-        })
-        .catch((err) => {
-          this.alert = true
-          this.alertMessage = err.response.data.error
-        })
+      this.$store.dispatch('deleteCompetition', this.competition.id)
+      .then(response => {
+        console.log('deleteCompetition success')
+      }, error => {
+        console.log('deleteCompetition error')
+        this.alert = true
+        this.alertMessage = error.response.data.error
+      })
     }
   }
 }

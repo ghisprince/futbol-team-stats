@@ -29,7 +29,7 @@
         </v-form>
       </v-card>
     </v-container>
-  </v-card>  
+  </v-card>
 </template>
 
 <script>

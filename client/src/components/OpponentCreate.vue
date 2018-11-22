@@ -7,7 +7,6 @@
 
 <script>
 import OpponentForm from '@/components/forms/OpponentForm'
-import API from '@/lib/API'
 
 export default {
   components: {
@@ -25,15 +24,7 @@ export default {
   },
   methods: {
     submit () {
-      // add team onto payload
-      this.opponent.team = this.$store.state.team
-
-      API.createOpponent(this.opponent)
-        .then(result => {
-          this.$router.push({
-            name: 'Opponent',
-            params: { id: result.id }})
-        })
+      this.$store.dispatch('createOpponent', this.opponent)
     }
   }
 }

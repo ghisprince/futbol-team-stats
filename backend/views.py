@@ -1,20 +1,23 @@
 import flask_restful
 import flask_login
 
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, g
 from flask import session as flask_session
 from sqlalchemy.exc import SQLAlchemyError
 from webargs.flaskparser import use_kwargs
 
 from . models import *
 from . schemas import *
-from flask_login import login_required
+#from flask_login import login_required
+from flask_httpauth import HTTPTokenAuth
 
 import marshmallow
 from marshmallow import ValidationError
 import webargs
 from pprint import pprint
 import json
+
+auth = HTTPTokenAuth(scheme='Token')
 
 """
 This module servers views of the model as REST api
@@ -73,10 +76,36 @@ requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
+@auth.verify_token
+def verify_token(token):
+    try:
+        token = request.headers['Authorization'].split("Bearer ")[1]
+        return User.verify_auth_token(token) is not None
+    except:
+        return False
+
+class GetAuthToken(flask_restful.Resource):
+    def post(self):
+        req = request.get_json(force=True)
+        username = req.get("username")
+        password = req.get("password") 
+        if not (username and password):
+            return False
+
+        try:
+            user = User.query.filter_by(username=username).first()
+            if user.check_password(password):
+                return jsonify({'status': "success",
+                                'token': user.generate_auth_token().decode('ascii'),
+                                'canEdit': user.is_editor,
+                                'username': user.username})
+        except:
+            return False
+
 # decorate all with end points with login_required
 class Resource(flask_restful.Resource):
-    #method_decorators = [login_required]
-    pass
+    method_decorators = [auth.login_required]
+    #pass
 
 
 class CreateListResourceBase(Resource):
@@ -107,7 +136,6 @@ class CreateListResourceBase(Resource):
 
         if expand:
             return self.mm_schema_ex.dump(query.all(), many=True).data
-
         return self.mm_schema.dump(query.all(), many=True).data
 
     def post(self):
@@ -440,7 +468,6 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     def patch(self, id):
         request_dict = request.get_json(force=True)
         modelInst = self.ModelClass.query.get_or_404(id)
-        print(">"*30)
         goal_dict = request_dict.pop('goal', {})
         if goal_dict:
             assist_dict = goal_dict.pop('assist', {})
@@ -452,14 +479,12 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
             if modelInst.goal is None:
                 # add new Goal
                 goal = goal_schema.load(goal_dict, partial=True).data
-                print("Add Goal {}".format(goal))
 
             else:
                 # update existing Goal
                 # TODO : isthis first get_or_404 needed?
                 goal = Goal.query.get_or_404(goal_dict['id'])
                 goal = goal_schema.load(goal_dict, partial=True).data
-                print("Update Goal {}".format(goal))
 
             if (goal_dict['assisted'] == True) and assist_dict:
                 assist_dict['goal'] = modelInst.goal.id
@@ -469,27 +494,20 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
                     # todo : this seemswrong
                     assist_dict.pop('id')
                     assist = assist_schema.load(assist_dict, partial=True).data
-                    print("Add Assist {}".format(assist))
                 else:
                     # update existing Assist
                     assist_schema.validate(assist_dict, partial=True)
                     assist = assist_schema.load(assist_dict).data
-                    print("Update Assist {}".format(assist))
             elif modelInst.goal and modelInst.goal.assist:
                 assist = modelInst.goal.assist
                 db.session.delete(assist)
-                print("Delete Assist")
 
         else:
             if modelInst.goal:
                 goal = modelInst.goal
                 db.session.delete(goal)
-                print("Delete Goal")
 
         db.session.commit()
-        print("<"*30)
-        print("now patch the shot")
-        print(">"*30)
         # finally patch the shot's main properties
         return super().patch(id)
 

@@ -29,6 +29,9 @@ export default {
             name: 'Competition',
             params: { id: this.competition.id }})
         })
+        .then(
+          this.$store.dispatch('fetchCompetitions')
+        )
     },
     load (id) {
       API.getCompetition(id)

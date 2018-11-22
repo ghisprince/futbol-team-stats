@@ -11,7 +11,7 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="500px">
-        <v-btn slot="activator" color="primary" dark class="mb-2">New Player Match</v-btn>
+        <v-btn slot="activator" color="primary" dark class="mb-2">Add Player Match</v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -123,7 +123,6 @@ export default {
   props: ['player_matches', 'onSubmit', 'onCancel'],
   data: () => ({
     dialog: false,
-    players: [],
     headers: [
       {
         text: 'Player',
@@ -177,27 +176,16 @@ export default {
   }),
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Player Match' : 'Edit Player Match'
+      return this.editedIndex === -1 ? 'Add Player Match' : 'Edit Player Match'
     },
+    players () {
+      return this.$store.getters.activePlayers
+    }
   },
   watch: {
     dialog (val) {
       val || this.close()
     }
-  },
-  mounted () {
-    // TODO : move into store
-    API.getPlayers()
-      .then(players => {
-        players = players.filter(i => i.active)
-        this.players = players.sort(function (a, b) {
-          if (a.name < b.name)
-            return -1;
-          if (a.name > b.name)
-            return 1;
-          return 0;
-        })
-      })
   },
   methods: {
     submit () {
@@ -228,7 +216,7 @@ export default {
       }, 300)
     },
     initialize () {
-      alert("not imple yo!")
+      alert('Not implemented')
     },
     save () {
       if (this.editedIndex > -1) {
@@ -240,9 +228,9 @@ export default {
         const match_id = this.$route.params.id
         this.editedItem.match = match_id
         API.createPlayerMatch(this.editedItem)
-        .then((player_match) => {
-          this.player_matches.push(player_match)
-        })
+          .then((player_match) => {
+            this.player_matches.push(player_match)
+          })
       }
       this.close()
     },

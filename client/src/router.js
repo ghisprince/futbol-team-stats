@@ -28,7 +28,7 @@ import Login from '@/components/forms/Login.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -146,3 +146,14 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const authUser = JSON.parse(window.localStorage.getItem('futUser'))
+  if (!authUser || !authUser.token) {
+    next({name: 'login'})
+  } else {
+    next()
+  }
+})
+
+export default router

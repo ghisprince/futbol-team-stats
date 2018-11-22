@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
+      return this.$store.state.authUser.canEdit
     }
   },
   mounted () {
@@ -78,6 +78,11 @@ export default {
       API.getPlayer(id)
         .then((player) => {
           this.player = player
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.$router.push({name: 'login'})
+          }
         })
       API.getPlayerMatchesByPlayerEx(id)
         .then((player_matches) => {

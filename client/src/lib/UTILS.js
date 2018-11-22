@@ -1,20 +1,19 @@
 
 // business logic
 
-function groupBy(list, keyGetter) {
-  const map = new Map();
+function groupBy (list, keyGetter) {
+  const map = new Map()
   list.forEach((item) => {
-      const key = keyGetter(item);
-      const collection = map.get(key);
-      if (!collection) {
-          map.set(key, [item]);
-      } else {
-          collection.push(item);
-      }
-  });
-  return map;
+    const key = keyGetter(item)
+    const collection = map.get(key)
+    if (!collection) {
+      map.set(key, [item])
+    } else {
+      collection.push(item)
+    }
+  })
+  return map
 }
-
 
 export default {
   sum (arr, name) {
@@ -41,9 +40,9 @@ export default {
         subbed_due_to_injury: this.sum(k[1], 'subbed_due_to_injury')
       })
     }
-  return result
+    return result
   },
-  aggregateByPlayer (arr)  {
+  aggregateByPlayer (arr) {
     return this.aggregateBy(arr, 'player_label')
   },
   aggregateByCompetition (arr) {
@@ -67,7 +66,6 @@ export default {
         subbed_due_to_injury: this.sum(k[1], 'subbed_due_to_injury')
       })
     }
-  return result
-  },
-
+    return result
+  }
 }

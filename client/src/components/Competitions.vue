@@ -26,6 +26,17 @@
         :search="search"
         :pagination.sync="pagination">
 
+        <template slot="headerCell" slot-scope="props">
+          <v-tooltip bottom>
+            <span slot="activator">
+              {{ props.header.text }}
+            </span>
+            <span>
+              {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+            </span>
+          </v-tooltip>
+        </template>
+
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.start_date }}</td>
@@ -52,12 +63,9 @@
 </template>
 
 <script>
-import API from '@/lib/API'
-
 export default {
   data () {
     return {
-      competitions: [],
       pagination: {
         sortBy: 'start_date',
         descending: true
@@ -65,11 +73,11 @@ export default {
       search: '',
       headers: [
         {text: 'Name', value: 'name', sortable: false},
-        {text: 'Start', value: 'start_date'},
-        {text: '# Match', value: 'num_match'},
-        {text: 'W-D-L', value: 'match_results'},
+        {text: 'Start', tooltip: 'Start Date', value: 'start_date'},
+        {text: 'Matches', tooltip: 'Number of Matches', value: 'num_match'},
+        {text: 'W-D-L', tooltip: 'Number of Wins-Draws-Losses', value: 'match_results'},
         {text: 'Result', value: 'result'},
-        {text: 'Goal Diff', value: 'goal_differential'},
+        {text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential'},
         {text: 'Clean Sheets', value: 'clean_sheets'},
         {text: 'Details', value: 'id'}
       ]
@@ -77,18 +85,10 @@ export default {
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
-    }
-  },
-  mounted () {
-    this.load()
-  },
-  methods: {
-    load () {
-      API.getCompetitions()
-        .then(competitions => {
-          this.competitions = competitions
-        })
+      return this.$store.state.authUser.canEdit
+    },
+    competitions () {
+      return this.$store.state.competitions
     }
   }
 }

@@ -99,22 +99,15 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     def is_active(self):
         return True
 
-    def is_anonymous(self):
-        if isinstance(self, AnonymousUserMixin):
-            return True
-        else:
-            return False
-
     def get_id(self):
         return self.id
 
-    def generate_auth_token(self, expiration=600):
+    def generate_auth_token(self, expiration=6000):
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
-
         s = Serializer(Config.SECRET_KEY)
         try:
             data = s.loads(token)
@@ -231,7 +224,7 @@ class Competition(db.Model, CRUD_MixIn):
     def start_date(self):
         """ date of first match """
         if len(self.matches) == 0:
-            return None
+            return datetime.datetime.now().strftime("%Y-%m-%d")
         min_date = min([i.date_time for i in self.matches])
         return min_date.strftime("%Y-%m-%d")
 
@@ -579,7 +572,6 @@ class Player(db.Model, CRUD_MixIn):
     @hybrid_property
     def num_apps(self):
         return len(self.player_matches)
-
 
     def __init__(self, name, number=None, team=None, active=True):
         self.name = name

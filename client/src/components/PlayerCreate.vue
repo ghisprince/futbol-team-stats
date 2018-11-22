@@ -25,13 +25,7 @@ export default {
   },
   methods: {
     submit () {
-      this.player.team = this.$store.state.team
-      API.createPlayer(this.player)
-        .then(player => {
-          this.$router.push({
-            name: 'Player',
-            params: { id: player.id }})
-        })
+      this.$store.dispatch('createPlayer', this.player)
     }
   }
 }

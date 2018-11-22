@@ -29,6 +29,9 @@ export default {
             name: 'Player',
             params: { id: this.player.id }})
         })
+        .then(
+          this.$store.dispatch('fetchPlayers')
+        )
     },
     load (id) {
       API.getPlayer(id)

@@ -29,3 +29,6 @@ api.add_resource(GetUpdateDeleteOpponent, '/api/v1/opponents/<int:id>')
 api.add_resource(GetUpdateDeleteShot, '/api/v1/shots/<int:id>')
 api.add_resource(GetUpdateDeleteGoal, '/api/v1/goals/<int:id>')
 api.add_resource(GetUpdateDeleteAssist, '/api/v1/assists/<int:id>')
+
+
+api.add_resource(GetAuthToken, '/api/v1/get_auth_token')

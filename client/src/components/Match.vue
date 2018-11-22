@@ -87,7 +87,6 @@
       </v-card>
       </v-container>
 
-
       <v-container>
         <v-card>
           <v-card-title>
@@ -128,7 +127,7 @@
             </v-btn>
           </v-card-title>
 
-          <shots-graph :shots="shots" 
+          <shots-graph :shots="shots"
                        :onClickShot=onClickShot>
           </shots-graph>
         </v-card>
@@ -166,7 +165,7 @@ export default {
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
+      return this.$store.state.authUser.canEdit
     },
     matchTableRows: function () {
       let rows = [{
@@ -213,6 +212,11 @@ export default {
         .then((match) => {
           this.match = match
         })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.$router.push({name: 'login'})
+          }
+        })
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
           this.player_matches = player_matches
@@ -223,7 +227,8 @@ export default {
         })
     },
     onClickShot (shot) {
-      alert("shot details\nplayer: " + shot.player_label
+      // todo: vuetify hover https://vuetifyjs.com/en/components/hover
+      alert('shot details\nplayer: ' + shot.player_label
       )
     },
     createMatchStats () {
@@ -236,9 +241,12 @@ export default {
     deleteMatch () {
       API.deleteMatch(this.match.id)
         .then(() => {
+          //this.$store.actions('fetchOpponents')
+          //this.$store.actions('fetchCompetitions')
           this.$router.push({
-            name: 'Competitions'
-          })
+            name: 'Competition',
+            params: { id: this.match.competition }}
+            )
         })
         .catch((err) => {
           this.alert = true

@@ -27,6 +27,17 @@
           :search="search"
           :pagination.sync="pagination"
         >
+          <template slot="headerCell" slot-scope="props">
+            <v-tooltip bottom>
+              <span slot="activator">
+                {{ props.header.text }}
+              </span>
+              <span>
+                {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+              </span>
+            </v-tooltip>
+          </template>
+
           <template slot="items" slot-scope="props">
             <td>{{ props.item.label }}</td>
             <td><v-icon v-show="props.item.active">done</v-icon></td>
@@ -50,39 +61,25 @@
 </template>
 
 <script>
-import API from '@/lib/API'
-
 export default {
   data () {
     return {
-      players: [],
-      pagination: {
-
-      },
+      pagination: {},
       search: '',
       headers: [
         {text: 'Name', value: 'label'},
         {text: 'Active', value: 'active'},
-        {text: 'Apps', value: 'num_apps'},
+        {text: 'Apps', tooltip: 'Number of Matches participated in', value: 'num_apps'},
         {text: 'Stats', value: 'id'}
       ]
     }
   },
-  mounted () {
-    this.load()
-  },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
-    }
-  },
-  methods: {
-    load () {
-      // TODO: move into store
-      API.getPlayers()
-        .then(players => {
-          this.players = players
-        })
+      return this.$store.state.authUser.canEdit
+    },
+    players () {
+      return this.$store.state.players
     }
   }
 }

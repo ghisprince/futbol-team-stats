@@ -90,9 +90,9 @@ export default {
     }
   },
   filters: {
-    formattedDateTime: function(v) {
+    formattedDateTime: function (v) {
       if (!v) return ''
-      return v.slice(0,16).replace("T", " ");
+      return v.slice(0, 16).replace('T', ' ')
     }
   },
   computed: {

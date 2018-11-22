@@ -62,60 +62,58 @@
   </v-layout>
   </div>
 </template>
-
-
 <script>
 
 export default {
   props: ['shots', 'activeShotId', 'onClickShot', 'onClickCanvas', 'showHiddenArea'],
   data () {
     return {
-         height: 700,
-         fieldLinesRects: [
-            // rectangles in top half
-            { id:0, x: 10, y:20, width: 430, height: 330 },
-            { id:1, x: 100, y:20, width: 245, height: 100 },
-            { id:2, x: 170, y:20, width: 115, height: 30 },
-            // bottom half
-            { id:3, x: 10, y:350, width: 430, height: 330 },
-            { id:4, x: 100, y:580, width: 245, height: 100 },
-            { id:5, x: 170, y:650, width: 115, height: 30 },
-            // hidden
-            { id:6, x: 460, y:20, width: 70, height: 660 }
-            ],
-
-          fieldLabels: [
-            { id: 10, x: 225, y: 250, label: "Team's attempts"},
-            { id: 11, x: 225, y: 450, label: "Opponent's attempts"},
-          ],
-     }
+      height: 700,
+      fieldLinesRects: [
+        // rectangles in top half
+        { id: 0, x: 10, y: 20, width: 430, height: 330 },
+        { id: 1, x: 100, y: 20, width: 245, height: 100 },
+        { id: 2, x: 170, y: 20, width: 115, height: 30 },
+        // bottom half
+        { id: 3, x: 10, y: 350, width: 430, height: 330 },
+        { id: 4, x: 100, y: 580, width: 245, height: 100 },
+        { id: 5, x: 170, y: 650, width: 115, height: 30 },
+        // hidden
+        { id: 6, x: 460, y: 20, width: 70, height: 660 }
+      ],
+      fieldLabels: [
+        { id: 10, x: 225, y: 250, label: "Team's attempts"},
+        { id: 11, x: 225, y: 450, label: "Opponent's attempts"}
+      ]
+    }
   },
   methods: {
-    shotMouseOverEvent(shot) {
+    shotMouseOverEvent (shot) {
 
     },
-    shotClickEvent(shot) {
+    shotClickEvent (shot) {
       console.log(shot)
     },
-    shotStrokeColor(by_opponent) {
+    shotStrokeColor (by_opponent) {
       if (by_opponent) {
-        return "white"
+        return 'white'
       }
-      return "black"
+      return 'black'
     },
-    shotFillColor(id, scored, on_target) {
-      if (id == this.activeShotId) {
-        return "yellow"
+    shotFillColor (id, scored, on_target) {
+      if (id === this.activeShotId) {
+        return 'yellow'
       }
       if (scored) {
-        return "red"
+        return 'red'
       }
-      return on_target ? "PaleGreen" : "grey"
+      return on_target ? 'PaleGreen' : 'grey'
     },
     clickCanvas (e) {
-      if (typeof this.onClickCanvas !== 'undefined')
+      if (typeof this.onClickCanvas !== 'undefined') {
         this.onClickCanvas(e.offsetX, e.offsetY)
-    },
+      }
+    }
   },
   computed: {
     width: function () {
@@ -123,7 +121,7 @@ export default {
         return 550
       }
       return 450
-    },
+    }
   }
 }
 </script>

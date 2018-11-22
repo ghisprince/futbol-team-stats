@@ -26,6 +26,17 @@
           :items="opponents"
           :search="search"
         >
+          <template slot="headerCell" slot-scope="props">
+            <v-tooltip bottom>
+              <span slot="activator">
+                {{ props.header.text }}
+              </span>
+              <span>
+                {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+              </span>
+            </v-tooltip>
+          </template>
+
           <template slot="items" slot-scope="props">
             <td>{{ props.item.name }}</td>
             <td>{{ props.item.num_match }}</td>
@@ -50,37 +61,25 @@
 </template>
 
 <script>
-import API from '@/lib/API'
-
 export default {
   data () {
     return {
-      opponents: [],
       search: '',
       headers: [
         {text: 'Name', value: 'name'},
-        {text: 'Matches', value: 'num_match'},
-        {text: 'W-D-L', value: 'match_results'},
-        {text: 'Goal Diff', value: 'goal_differential'},
+        {text: 'Matches', tooltip: 'Number of Matches', value: 'num_match'},
+        {text: 'W-D-L', tooltip: 'Number of Wins-Draws-Losses', value: 'match_results'},
+        {text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential'},
         {text: 'Details', value: 'id'}
       ]
     }
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
-    }
-  },
-  mounted () {
-    this.load()
-  },
-  methods: {
-    load () {
-      // TODO: possibly move this to store?
-      API.getOpponents()
-        .then(opponents => {
-          this.opponents = opponents
-        })
+      return this.$store.state.authUser.canEdit
+    },
+    opponents () {
+      return this.$store.getters.opponentsSorted
     }
   }
 }

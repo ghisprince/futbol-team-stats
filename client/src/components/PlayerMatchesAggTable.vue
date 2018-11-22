@@ -8,6 +8,17 @@
       :loading="true"
     >
       <v-progress-linear v-show="showProgress" slot="progress" color="blue" indeterminate></v-progress-linear>
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+          </span>
+        </v-tooltip>
+      </template>
+
       <template slot="items" slot-scope="props">
         <td v-if="showPlayer">
             <router-link :to="{
@@ -84,16 +95,16 @@ export default {
         arr.push({ text: 'Competition', value: 'date_time' })
       }
       arr.push.apply(arr, [
-        { text: 'Apps', value: 'apps' },
-        { text: 'Starter', value: 'starter' },
-        { text: 'Minutes', value: 'minutes' },
-        { text: 'Goals', value: 'num_goals' },
-        { text: 'Assists', value: 'num_assists' },
-        { text: 'Shots', value: 'num_shots' },
-        { text: 'Corners', value: 'corners' },
+        { text: 'Apps', tooltip: 'Appearances', value: 'apps' },
+        { text: 'Starter', tooltip: 'Part of starting 11', value: 'starter' },
+        { text: 'Minutes', tooltip: 'Minutes played', value: 'minutes' },
+        { text: 'Goals', tooltip: 'Goals Scored', value: 'num_goals' },
+        { text: 'Assists', tooltip: 'Goals Assisted', value: 'num_assists' },
+        { text: 'Shots', tooltip: 'Attempts on goal', value: 'num_shots' },
+        { text: 'Corners', tooltip: 'Corners taken', value: 'corners' },
         { text: 'Yellow Card', value: 'yellow_cards' },
         { text: 'Red Card', value: 'red_cards' },
-        { text: 'Subbed due to injury', value: 'subbed_due_to_injury' }
+        { text: 'Injury substitution', tooltip: 'Number Of Times Subsituted due to injury', value: 'subbed_due_to_injury' }
       ])
 
       return arr

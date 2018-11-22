@@ -58,15 +58,19 @@
 </template>
 
 <script>
-import API from '@/lib/API'
-
 export default {
   props: ['match', 'match_stats', 'onSubmit', 'onCancel'],
   data: () => ({
-    valid: true,
-    opponents: [],
-    competitions: [],
+    valid: true
   }),
+  computed: {
+    competitions () {
+      return this.$store.getters.competitionsByDate
+    },
+    opponents () {
+      return this.$store.getters.opponentsSorted
+    }
+  },
   methods: {
     submit () {
       if (this.valid) {
@@ -75,33 +79,7 @@ export default {
     },
     cancel () {
       this.onCancel()
-    },
-    // TODO : move this into $store so don't keep fetching it
-    load () {
-      API.getOpponents()
-        .then(opponents => {
-          this.opponents = opponents.sort(function (a, b) {
-            if (a.name < b.name)
-              return -1
-            if (a.name > b.name)
-              return 1
-            return 0
-          })
-        })
-      API.getCompetitions()
-        .then(competitions => {
-          this.competitions = competitions.sort(function (a, b) {
-            if (a.start_date < b.start_date)
-              return 1
-            if (a.start_date > b.start_date) 
-              return -1
-            return 0
-          })
-        })
     }
-  },
-  mounted () {
-    this.load()
   }
 }
 </script>

@@ -17,10 +17,11 @@
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
-          <v-list-tile-content>
 
+          <v-list-tile-content>
             <router-link :to="{ name: item.route }">{{item.title}}</router-link>
           </v-list-tile-content>
+
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -30,7 +31,8 @@
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
-      <router-view/>
+      <router-view/> <!-- this all the content -->
+      <!-- state is {{ state }} -->
     </v-content>
     <v-footer :fixed="fixed" app>
       <span>&copy; 2018</span>
@@ -50,11 +52,20 @@ export default {
       right: true,
       title: 'Pats B04 Futbol stats',
       items: [
-        { icon: 'view_list', title: 'Competition', route: 'Competitions' },
-        { icon: 'view_list', title: 'Opponent', route: 'Opponents' },
-        { icon: 'view_list', title: 'Players', route: 'Players' }
+        {icon: 'view_list', title: 'Competition', route: 'Competitions'},
+        {icon: 'view_list', title: 'Opponent', route: 'Opponents'},
+        {icon: 'view_list', title: 'Players', route: 'Players'},
+        {icon: '', title: 'Logout', route: 'login'}
       ]
     }
+  },
+  computed: {
+    state () {
+      return this.$store.state
+    }
+  },
+  created () {
+    this.$store.dispatch('init')
   }
 }
 </script>

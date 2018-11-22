@@ -53,7 +53,6 @@
 
                 <v-flex>
                   <v-checkbox v-model="editedItem.scored"
-                              v-on:change="toggleShotScored"
                               label="Scored"></v-checkbox>
                 </v-flex>
 
@@ -69,7 +68,6 @@
               <v-layout wrap v-if="editedItem.scored && !editedItem.by_opponent">
                 <v-flex>
                   <v-checkbox v-model="editedGoal.assisted"
-                              v-on:change="toggleGoalAssisted"
                               label="Assisted"></v-checkbox>
                 </v-flex>
 
@@ -166,7 +164,6 @@ export default {
   },
   data: () => ({
     dialog: false,
-    players: [],
     shots: [],
     headers: [
       {
@@ -219,7 +216,7 @@ export default {
     },
     defaultGoal: {
       time: 0,
-      assisted: false,
+      assisted: false
     },
     editedAssist: {
       id: '',
@@ -238,14 +235,16 @@ export default {
       return this.editedIndex === -1 ? 'New Player Shot' : 'Edit Player Shot'
     },
     player_matches_sorted () {
-      return this.player_matches.sort(function (a, b) {
-        if (a.player_label < b.player_label)
+      let pms = this.player_matches.slice()
+      return pms.sort(function (a, b) {
+        if (a.player_label < b.player_label) {
           return -1
-        if (a.player_label > b.player_label)
+        }
+        if (a.player_label > b.player_label) {
           return 1
+        }
         return 0
       })
-
     }
   },
   watch: {
@@ -258,26 +257,14 @@ export default {
     this.load(id)
   },
   methods: {
-    onClickShot(shot) {
+    onClickShot (shot) {
       this.editItem(shot)
     },
-    onClickCanvas(x, y) {
-      console.log("MOVE SHOT")
+    onClickCanvas (x, y) {
       this.editedItem.x = x
       this.editedItem.y = y
     },
     load (id) {
-      // TODO : doesn't get used at all does this?
-      API.getPlayers()
-        .then(players => {
-          this.players = players.sort(function (a, b) {
-            if (a.name < b.name)
-              return -1;
-            if (a.name > b.name)
-              return 1;
-            return 0;
-          })
-        })
       API.getShotsByMatch(id)
         .then((shots) => {
           this.shots = shots
@@ -291,40 +278,8 @@ export default {
     cancel () {
       this.onCancel()
     },
-    toggleShotScored () {
-      console.log("toggleShotScored")
-      /*
-      if (this.editedItem.scored) {
-        this.editedItem.goal = {}
-        Object.assign(this.editedItem.goal, this.defaultGoal)
-        console.log("ADDING GOAL")
-      } else {
-        this.editedItem.goal = this.defaultGoal
-        console.log("CLEAR GOAL")
-      }
-      console.log("toggleShotScored index:" + this.editedIndex)
-      */
-
-    },
-    toggleGoalAssisted (e) {
-      console.log("toggleGoalAssisted")
-      /*
-      if (this.editedGoal.assisted) {
-        console.log("ADDING ASSIST")
-        if (this.editedItem.goal.assist === null) {
-          this.editedItem.goal.assist = this.defaultAssist
-        }
-        //Object.assign(this.editedItem.goal.assist, this.defaultAssist)
-      } else {
-        console.log("CLEAR ASSIST")
-        this.editedItem.goal.assist = this.defaultAssist
-      }
-      console.log("toggleGoalAssisted index:" + this.editedIndex)
-      */
-    },
     editItem (item) {
-      console.log(item)
-      this.editedIndex =  this.shots.indexOf(item)
+      this.editedIndex = this.shots.indexOf(item)
       this.editedItem = Object.assign({}, this.defaultItem)
       this.editedGoal = Object.assign({}, this.defaultGoal)
       this.editedAssist = Object.assign({}, this.defaultAssist)
@@ -337,16 +292,9 @@ export default {
       this.dialog = true
     },
     deleteItem (item) {
-      const index = this.shots.indexOf(item)
-      console.log("deleteItem index:" + this.editedIndex)
+      // TODO: actually remove the shot ??
       const id = item.id
       API.deleteShot(id)
-      /*
-      if (confirm('Are you sure you want to delete this item?') && this.shots.splice(index, 1)) {
-        API.deleteShot(item.id)
-      }
-      */
-      //this.shots = this.shots.filter(i => i.id !== id )
     },
     close () {
       this.dialog = false
@@ -356,42 +304,32 @@ export default {
       }, 300)
     },
     initialize () {
-      alert("not imple yo!")
+      alert('Not used')
     },
     save () {
-      console.log("save index:" + this.editedIndex)
       if (this.editedItem.scored) {
         this.editedItem.goal = this.editedGoal
       }
-      if (this.editedItem.scored && this.editedGoal.assisted ) {
+      if (this.editedItem.scored && this.editedGoal.assisted) {
         this.editedItem.goal.assist = this.editedAssist
       }
 
       if (this.editedIndex > -1) {
-        console.log("UPDATE SHOT")
         let editedIndex = this.editedIndex
-        let editedItem = this.editedItem
 
         // updated existing Shot
-        /*
-        this.editedItem['player_label'] = this.player_matches.filter(
-          obj => { return obj['id'] === this.editedItem['player_match']}
-        )[0]['player_label']
-        */
         API.updateShot(this.editedItem.id, this.editedItem)
-        .then((shot) => {
-          console.log(editedIndex)
-          Object.assign(this.shots[editedIndex],  shot)//editedItem)
+          .then((shot) => {
+            Object.assign(this.shots[editedIndex], shot)
           })
-        } else {
+      } else {
         // create new Shot
-        console.log("NEW SHOT")
         const match_id = this.$route.params.id
         this.editedItem.match = match_id
         API.createShot(this.editedItem)
-        .then((shot) => {
-          this.shots.push(shot)
-        })
+          .then((shot) => {
+            this.shots.push(shot)
+          })
       }
       this.close()
     },

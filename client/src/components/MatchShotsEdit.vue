@@ -14,7 +14,7 @@ import API from '@/lib/API'
 
 export default {
   components: {
-     ShotsForm
+    ShotsForm
   },
   data () {
     return {
@@ -28,7 +28,6 @@ export default {
   },
   methods: {
     submit () {
-      alert("BACK HERE!")
       API.updatePlayerMatches(this.player_matches.id, this.player_matches)
         .then(() => {
           this.$router.push({

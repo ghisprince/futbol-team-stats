@@ -78,7 +78,7 @@ export default {
   },
   computed: {
     canEdit () {
-      return this.$store.state.canEdit
+      return this.$store.state.authUser.canEdit
     }
   },
   mounted () {
@@ -91,6 +91,11 @@ export default {
         .then((opponent) => {
           this.opponent = opponent
         })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.$router.push({name: 'login'})
+          }
+        })
       API.getMatchesByOpponent(id)
         .then((matches) => {
           this.matches = matches
@@ -101,16 +106,14 @@ export default {
         })
     },
     deleteOpponent () {
-      API.deleteOpponent(this.opponent.id)
-        .then(() => {
-          this.$router.push({
-            name: 'Opponents'
-          })
-        })
-        .catch((err) => {
-          this.alert = true
-          this.alertMessage = err.response.data.error
-        })
+      this.$store.dispatch('deleteOpponent', this.opponent.id)
+      .then(response => {
+        console.log('deleteOpponent success')
+      }, error => {
+        console.log('deleteOpponent error')
+        this.alert = true
+        this.alertMessage = error.response.data.error
+      })
     }
   }
 }

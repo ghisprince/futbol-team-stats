@@ -26,13 +26,7 @@ export default {
   },
   methods: {
     submit () {
-      this.competition.team = this.$store.state.team
-      API.createCompetition(this.competition)
-        .then(result => {
-          this.$router.push({
-            name: 'Competition',
-            params: { id: result.id }})
-        })
+      this.$store.dispatch('createCompetition', this.competition)
     }
   }
 }

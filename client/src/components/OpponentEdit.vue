@@ -29,6 +29,9 @@ export default {
             name: 'Opponent',
             params: { id: this.opponent.id }})
         })
+        .then(
+          this.$store.dispatch('fetchOpponents')
+        )
     },
     load (id) {
       API.getOpponent(id)

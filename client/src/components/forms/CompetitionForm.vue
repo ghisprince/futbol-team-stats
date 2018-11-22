@@ -3,22 +3,22 @@
     <v-container>
       <v-card>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field 
+          <v-text-field
             v-model="competition.name"
             :rules="nameRules"
             :counter="30"
             label="Name"
             required>
           </v-text-field>
-          <v-text-field 
+          <v-text-field
             v-model="competition.result"
             label="Result">
           </v-text-field>
-          <v-textarea 
+          <v-textarea
             v-model="competition.note"
             label="Note">
           </v-textarea>
-          <v-text-field 
+          <v-text-field
             v-model="competition.external_url"
             label="Competition URL">
           </v-text-field>

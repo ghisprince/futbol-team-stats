@@ -6,6 +6,17 @@
       :search="search"
       :pagination.sync="pagination"
     >
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+          </span>
+        </v-tooltip>
+      </template>
+
       <template slot="items" slot-scope="props">
 
         <td>{{ props.item.date_time | formattedDateTime }}</td>
@@ -33,6 +44,7 @@
           <span v-show="props.item.result === 'loss'" style="color:red">{{ props.item.result }}</span>
           <span v-show="props.item.result === 'tie'" style="color:grey">{{ props.item.result }}</span>
         </td>
+
         <td>{{ props.item.score }}</td>
         <td>
           <router-link :to="{
@@ -52,28 +64,28 @@ export default {
   props: ['matches', 'showOpponent', 'showCompetition'],
   data () {
     return {
-      win_color: "blue",
+      win_color: 'blue',
       pagination: {
         sortBy: 'date_time',
         descending: true
       },
       search: '',
       headersAll: [
-        {text: 'Date', value: 'date_time', width: "1%"},
-        {text: 'Competition', value: 'competition_name', width: "1%"},
-        {text: 'Opponent', value: 'opponent_name', width: "1%"},
-        {text: 'Result', value: 'result', width: "1%"},
-        {text: 'Score', value: 'score', width: "1%"},
-        {text: 'Match Details', value: 'match', width: "1%"}
+        {text: 'Date', value: 'date_time', tooltip: 'Date & time of match', width: '1%'},
+        {text: 'Competition', value: 'competition_name', tooltip: 'Name of competition', width: '1%'},
+        {text: 'Opponent', value: 'opponent_name', tooltip: 'Opponent name', width: '1%'},
+        {text: 'Result', value: 'result', width: '1%'},
+        {text: 'Score', value: 'score', width: '1%'},
+        {text: 'Match Details', value: 'match', tooltip: 'Further Match Details', width: '1%'}
       ]
     }
   },
   methods: {
   },
   filters: {
-    formattedDateTime: function(v) {
+    formattedDateTime: function (v) {
       if (!v) return ''
-      return v.slice(0,16).replace("T", " ");
+      return v.slice(0, 16).replace('T', ' ')
     }
   },
   computed: {

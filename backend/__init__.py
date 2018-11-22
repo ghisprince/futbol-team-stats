@@ -1,7 +1,7 @@
 #! ../env/bin/python
 
 from flask import Flask
-from flask_cache import Cache
+from flask_caching import Cache
 from . controllers.main import main
 from . shared import api
 from . shared import db
