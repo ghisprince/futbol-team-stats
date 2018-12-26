@@ -82,7 +82,6 @@ export default {
   props: ['player_matches', 'showMatch', 'showPlayer'],
   data () {
     return {
-      showProgress: false,
       pagination: {
         sortBy: 'match.date_time',
         descending: true
@@ -96,6 +95,9 @@ export default {
     }
   },
   computed: {
+    showProgress: function () {
+      return this.player_matches.length === 0
+    },
     headers: function () {
       let arr = []
       if (this.showPlayer) {

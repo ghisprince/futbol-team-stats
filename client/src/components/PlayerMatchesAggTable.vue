@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <v-data-table
       :headers="headers"
       :items="aggregatePMs"
@@ -76,7 +75,6 @@ export default {
   props: ['player_matches', 'showPlayer', 'showCompetition'],
   data () {
     return {
-      showProgress: false,
       pagination: {
         sortBy: 'date_time',
         descending: true
@@ -86,6 +84,9 @@ export default {
   updated () {
   },
   computed: {
+    showProgress: function () {
+      return this.player_matches.length === 0
+    },
     headers: function () {
       let arr = []
       if (this.showPlayer) {

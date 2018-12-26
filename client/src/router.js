@@ -40,6 +40,11 @@ const router = new Router({
       name: 'login',
       component: Login
     },
+    {
+      path: '/login',
+      name: 'logout',
+      component: Login
+    },
     // Competitions
     {
       path: '/competitions',
@@ -148,8 +153,16 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  if (to.name === 'logout') {
+    window.localStorage.removeItem('futUser')
+    next({name: 'login'})
+  }
+
   const authUser = JSON.parse(window.localStorage.getItem('futUser'))
-  if (!authUser || !authUser.token) {
+
+  if (to.name === 'login') {
+    next()
+  } else if (!authUser || !authUser.token) {
     next({name: 'login'})
   } else {
     next()

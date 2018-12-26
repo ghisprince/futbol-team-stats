@@ -11,6 +11,10 @@
             required>
           </v-text-field>
           <v-text-field
+            v-model="competition.level"
+            label="Level">
+          </v-text-field>
+          <v-text-field
             v-model="competition.result"
             label="Result">
           </v-text-field>

@@ -131,6 +131,7 @@
                        :onClickShot=onClickShot>
           </shots-graph>
         </v-card>
+        <v-btn @click="backToCompetition()" color="error">Back To Competition</v-btn>
       </v-container>
     </v-card>
   </div>
@@ -252,6 +253,12 @@ export default {
           this.alert = true
           this.alertMessage = err.response.data.error
         })
+    },
+    backToCompetition () {
+      this.$router.push({
+        name: 'Competition',
+        params: { id: this.match.competition }}
+      )
     }
   }
 }

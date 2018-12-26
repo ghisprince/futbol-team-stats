@@ -47,7 +47,7 @@
                   name: 'Player',
                   params: { id: props.item.id }
                 }">
-                Stats
+                <v-icon>insert_chart</v-icon>
               </router-link>
             </td>
           </template>
@@ -70,7 +70,7 @@ export default {
         {text: 'Name', value: 'label'},
         {text: 'Active', value: 'active'},
         {text: 'Apps', tooltip: 'Number of Matches participated in', value: 'num_apps'},
-        {text: 'Stats', value: 'id'}
+        {text: 'Details', value: 'id'}
       ]
     }
   },

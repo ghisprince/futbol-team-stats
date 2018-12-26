@@ -1,5 +1,3 @@
-#! ../env/bin/python
-
 from flask import Flask
 from flask_caching import Cache
 from . controllers.main import main

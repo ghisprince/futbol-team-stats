@@ -209,6 +209,7 @@ class Competition(db.Model, CRUD_MixIn):
     name = db.Column(db.String(), nullable=False)
     result = db.Column(db.String())
     note = db.Column(db.String())
+    level = db.Column(db.String())
     external_url = db.Column(db.String())
 
     # relationships

@@ -58,7 +58,7 @@ export default {
         .then(function (res) {
           if (res.status === 'success') {
             authUser.username = res.username
-            authUser.token = res.token // todo: remove this
+            authUser.token = res.token
             authUser.canEdit = res.canEdit
 
             window.localStorage.setItem('futUser', JSON.stringify(authUser))

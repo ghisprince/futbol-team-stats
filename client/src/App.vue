@@ -55,7 +55,7 @@ export default {
         {icon: 'view_list', title: 'Competition', route: 'Competitions'},
         {icon: 'view_list', title: 'Opponent', route: 'Opponents'},
         {icon: 'view_list', title: 'Players', route: 'Players'},
-        {icon: '', title: 'Logout', route: 'login'}
+        {icon: 'close', title: 'Log out', route: 'logout'}
       ]
     }
   },

@@ -5,7 +5,9 @@
       :items="matches"
       :search="search"
       :pagination.sync="pagination"
+      :loading="true"
     >
+      <v-progress-linear v-show="showProgress" slot="progress" color="blue" indeterminate></v-progress-linear>
       <template slot="headerCell" slot-scope="props">
         <v-tooltip bottom>
           <span slot="activator">
@@ -89,6 +91,9 @@ export default {
     }
   },
   computed: {
+    showProgress: function () {
+      return this.matches.length === 0
+    },
     headers: function () {
       let h = this.headersAll
       if (!this.showCompetition) {

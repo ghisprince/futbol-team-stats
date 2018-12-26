@@ -64,9 +64,6 @@ export default new Vuex.Store({
     },
     setOpponents (state, opponents) {
       state.opponents = opponents
-    },
-    createPlayer (state, player) {
-      console.log("createPlayer mutation")
     }
   },
   actions: {
@@ -76,7 +73,6 @@ export default new Vuex.Store({
       context.dispatch('init')
     },
     init (context) {
-      console.log('INIT')
       const authUser = JSON.parse(window.localStorage.getItem('futUser'))
       if (authUser === null || authUser === undefined) {
         router.push('/login')

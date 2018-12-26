@@ -40,6 +40,7 @@
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.start_date }}</td>
+          <td>{{ props.item.level }}</td>
           <td>{{ props.item.num_match }}</td>
           <td>{{ props.item.match_results }}</td>
           <td>{{ props.item.result }}</td>
@@ -74,8 +75,9 @@ export default {
       headers: [
         {text: 'Name', value: 'name', sortable: false},
         {text: 'Start', tooltip: 'Start Date', value: 'start_date'},
+        {text: 'Level', tooltip: 'Tournament level', value: 'level'},
         {text: 'Matches', tooltip: 'Number of Matches', value: 'num_match'},
-        {text: 'W-D-L', tooltip: 'Number of Wins-Draws-Losses', value: 'match_results'},
+        {text: 'W-D-L', tooltip: 'Number of Win-Draw-Loss', value: 'match_results'},
         {text: 'Result', value: 'result'},
         {text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential'},
         {text: 'Clean Sheets', value: 'clean_sheets'},
