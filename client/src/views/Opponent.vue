@@ -107,13 +107,12 @@ export default {
     },
     deleteOpponent () {
       this.$store.dispatch('deleteOpponent', this.opponent.id)
-      .then(response => {
-        console.log('deleteOpponent success')
-      }, error => {
-        console.log('deleteOpponent error')
-        this.alert = true
-        this.alertMessage = error.response.data.error
-      })
+        .then(response => {
+          console.log('deleteOpponent success')
+        }, error => {
+          this.alert = true
+          this.alertMessage = error.response.data.error
+        })
     }
   }
 }

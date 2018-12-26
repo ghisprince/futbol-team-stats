@@ -50,7 +50,6 @@ export default {
   }),
   methods: {
     submit () {
-      console.log('login submit')
       const authUser = {}
       var app = this
       const { username, password } = this
@@ -63,7 +62,7 @@ export default {
 
             window.localStorage.setItem('futUser', JSON.stringify(authUser))
             app.$store.dispatch('init')
-            app.$router.push('/')
+            app.$router.push({name: 'Home'})
           } else {
             app.showError = true
           }

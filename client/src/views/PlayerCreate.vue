@@ -7,7 +7,6 @@
 
 <script>
 import PlayerForm from '@/components/forms/PlayerForm'
-import API from '@/lib/API'
 
 export default {
   components: {

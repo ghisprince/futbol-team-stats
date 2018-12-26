@@ -7,7 +7,7 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="600px">
-        <v-btn slot="activator" color="primary" dark class="mb-2">New Shot</v-btn>
+        <v-btn slot="activator" color="primary" @click="newItem" dark class="mb-2">New Shot</v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -278,9 +278,11 @@ export default {
     cancel () {
       this.onCancel()
     },
+    newItem () {
+      this.editedItem = Object.assign({}, this.defaultItem)
+    },
     editItem (item) {
       this.editedIndex = this.shots.indexOf(item)
-      this.editedItem = Object.assign({}, this.defaultItem)
       this.editedGoal = Object.assign({}, this.defaultGoal)
       this.editedAssist = Object.assign({}, this.defaultAssist)
       Object.assign(this.editedItem, item)
@@ -288,12 +290,16 @@ export default {
       if (item.goal && item.goal.assist) {
         Object.assign(this.editedAssist, item.goal.assist)
       }
-
       this.dialog = true
     },
     deleteItem (item) {
       // TODO: actually remove the shot ??
       const id = item.id
+      const index = this.shots.indexOf(item)
+
+      if (index > -1) {
+        this.shots.splice(index, 1)
+      } 
       API.deleteShot(id)
     },
     close () {
@@ -303,9 +309,7 @@ export default {
         this.editedIndex = -1
       }, 300)
     },
-    initialize () {
-      alert('Not used')
-    },
+    initialize () {},
     save () {
       if (this.editedItem.scored) {
         this.editedItem.goal = this.editedGoal

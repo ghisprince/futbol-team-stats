@@ -11,7 +11,7 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="500px">
-        <v-btn slot="activator" color="primary" dark class="mb-2">Add Player Match</v-btn>
+        <v-btn slot="activator" color="primary" dark class="mb-2" @click="newItem">Add Player Match</v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -112,7 +112,26 @@
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
     </v-data-table>
-    <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>
+
+    <v-layout row>
+      <v-btn :to="{
+                name: 'Match',
+                params: {id: $route.params.id}
+              }"
+        color="error">
+        Back To Match
+      </v-btn>
+
+      <v-spacer></v-spacer>
+
+      <v-btn :to="{
+                name: 'MatchShotsEdit',
+                params: {id: $route.params.id}
+              }"
+              color="primary">
+        Edit Shots
+      </v-btn>
+    </v-layout>
   </v-card>
 </template>
 
@@ -166,7 +185,7 @@ export default {
       player_label: '',
       player_id: null,
       corners: 0,
-      minutes: null,
+      minutes: 0,
       starter: false,
       subbed_due_to_injury: false,
       yellow_cards: false,
@@ -195,6 +214,9 @@ export default {
     },
     cancel () {
       this.onCancel()
+    },
+    newItem () {
+      this.editedItem = Object.assign({}, this.defaultItem)
     },
     editItem (item) {
       this.editedIndex = this.player_matches.indexOf(item)
@@ -225,23 +247,13 @@ export default {
         API.updatePlayerMatch(this.editedItem.id, this.editedItem)
       } else {
         // create new PlayerMatch
-        const match_id = this.$route.params.id
-        this.editedItem.match = match_id
+        this.editedItem.match = this.$route.params.id
         API.createPlayerMatch(this.editedItem)
           .then((player_match) => {
             this.player_matches.push(player_match)
           })
       }
       this.close()
-    },
-    backToMatch () {
-      // TODO: put this into a prop
-      const match_id = this.$route.params.id
-
-      this.$router.push({
-        name: 'Match',
-        params: { id: match_id }
-      })
     }
   }
 }

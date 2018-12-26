@@ -38,7 +38,7 @@
           </div>
 
           <div v-if="competition.external_url">
-              <a v-bind:href="competition.external_url">Web site</a>
+              <a v-bind:href="competition.external_url">Competition's web site</a>
           </div>
 
         </v-card-text>
@@ -126,13 +126,13 @@ export default {
     },
     deleteCompetition () {
       this.$store.dispatch('deleteCompetition', this.competition.id)
-      .then(response => {
-        console.log('deleteCompetition success')
-      }, error => {
-        console.log('deleteCompetition error')
-        this.alert = true
-        this.alertMessage = error.response.data.error
-      })
+        .then(response => {
+          console.log('deleteCompetition success')
+        }, error => {
+          console.log('deleteCompetition error')
+          this.alert = true
+          this.alertMessage = error.response.data.error
+        })
     }
   }
 }

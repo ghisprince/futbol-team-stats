@@ -102,6 +102,7 @@ class GetAuthToken(flask_restful.Resource):
         except:
             return False
 
+
 # decorate all with end points with login_required
 class Resource(flask_restful.Resource):
     method_decorators = [auth.login_required]
@@ -435,30 +436,36 @@ class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
+
 class GetUpdateDeleteMatchStats(GetUpdateDeleteResourceBase):
     ModelClass = MatchStats
     mm_schema = matchstats_schema
     mm_schema_ex = None # todo ?
+
 
 class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
     mm_schema_ex = competition_schema_ex
 
+
 class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
     mm_schema_ex = opponent_schema_ex
+
 
 class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
 
+
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
     ModelClass = Match
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
+
 
 class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     ModelClass = Shot

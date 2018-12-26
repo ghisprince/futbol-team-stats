@@ -8,6 +8,11 @@ import store from './store'
 require('../src/assets/fonts.googleapis.roboto.css')
 Vue.config.productionTip = false
 
+Vue.filter('formatDate', function (v) {
+  if (!v) return ''
+  return v.slice(0, 16).replace('T', ' ')
+})
+
 new Vue({
   router,
   store,

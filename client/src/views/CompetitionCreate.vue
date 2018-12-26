@@ -7,7 +7,6 @@
 
 <script>
 import CompetitionForm from '@/components/forms/CompetitionForm'
-import API from '@/lib/API'
 
 export default {
   components: {

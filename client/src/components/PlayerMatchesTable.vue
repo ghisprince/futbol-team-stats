@@ -7,6 +7,17 @@
       :loading="true"
     >
       <v-progress-linear v-show="showProgress" slot="progress" color="blue" indeterminate></v-progress-linear>
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+          </span>
+        </v-tooltip>
+      </template>
+
       <template slot="items" slot-scope="props">
         <td v-if="showPlayer">
             <router-link :to="{
@@ -16,7 +27,7 @@
             {{ props.item.player_label }}
           </router-link>
         </td>
-        <td v-if="showMatch">{{ props.item.match.date_time | formattedDateTime }}</td>
+        <td v-if="showMatch">{{ props.item.match.date_time | formatDate }}</td>
         <td v-if="showMatch">
             <router-link :to="{
               name: 'Competition',
@@ -88,12 +99,6 @@ export default {
       }
     }
   },
-  filters: {
-    formattedDateTime: function (v) {
-      if (!v) return ''
-      return v.slice(0, 16).replace('T', ' ')
-    }
-  },
   computed: {
     showProgress: function () {
       return this.player_matches.length === 0
@@ -113,15 +118,15 @@ export default {
         arr.push({ text: 'Opponent', value: 'match.opponent_name' })
       }
       arr.push.apply(arr, [
-        { text: 'Starter', value: 'starter' },
-        { text: 'Minutes', value: 'minutes' },
+        { text: 'Starter', tooltip: 'In starting lineup', value: 'starter' },
+        { text: 'Min', tooltip: 'Minutes played', value: 'minutes' },
         { text: 'Goals', value: 'num_goals' },
         { text: 'Assists', value: 'num_assists' },
-        { text: 'Shots', value: 'num_shots' },
+        { text: 'Shots', tooltip: 'Attempts on goal', value: 'num_shots' },
         { text: 'Corners', value: 'corners' },
-        { text: 'Yellow Card', value: 'yellow_cards' },
-        { text: 'Red Card', value: 'red_cards' },
-        { text: 'Subbed due to injury', value: 'subbed_due_to_injury' }
+        { text: 'YC', tooltip: 'Yellow Cards', value: 'yellow_cards' },
+        { text: 'RC', tooltip: 'Red Cards', value: 'red_cards' },
+        { text: 'Injury', tooltip: 'Subsituted due to injury', value: 'subbed_due_to_injury' }
       ])
       if (this.showMatch) {
         arr.push({ text: 'Match Details', value: 'match.id' })

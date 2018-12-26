@@ -13,42 +13,42 @@
       </v-alert>
 
       <v-card-title>
-      <v-spacer></v-spacer>
-      <div v-if="canEdit">
-        <v-btn
-          :to="{
-            name: 'MatchEdit',
-            params: {
-                id: match.id
-            }
-          }"
-          color="primary">
-          Edit
-        </v-btn>
-        <v-btn @click="deleteMatch()" color="error">Delete</v-btn>
+        <v-spacer></v-spacer>
+        <div v-if="canEdit">
+          <v-btn
+            :to="{
+              name: 'MatchEdit',
+              params: {
+                  id: match.id
+              }
+            }"
+            color="primary">
+            Edit
+          </v-btn>
+          <v-btn @click="deleteMatch()" color="error">Delete</v-btn>
 
-        <v-btn v-if="match.match_stats"
-          :to="{
-            name: 'MatchStatsEdit',
-            params: {
-                id: match.match_stats
-            }
-          }"
-          color="primary">Edit Extra Stats</v-btn>
-        <v-btn v-else @click="createMatchStats()">Add Extra Stats</v-btn>
-      </div>
+          <v-btn v-if="match.match_stats"
+            :to="{
+              name: 'MatchStatsEdit',
+              params: {
+                  id: match.match_stats
+              }
+            }"
+            color="primary">Edit Extra Stats</v-btn>
+          <v-btn v-else @click="createMatchStats()">Add Extra Stats</v-btn>
+        </div>
       </v-card-title>
 
       <v-card-text>
-        <h3>
-          Date : {{ match.date_time }} <br/>
+        <h4>
+          Date : {{ match.date_time | formatDate }} <br/>
           Competition : {{ match.competition_name }} <br/>
           Opponent : {{ match.opponent_name }} <br/>
           Duration : {{ match.duration }} mins <br/>
           <div v-if="match.note">
             Note: {{ match.note }}
           </div>
-        </h3>
+        </h4>
       </v-card-text>
 
         <v-card-text>
@@ -229,25 +229,21 @@ export default {
     },
     onClickShot (shot) {
       // todo: vuetify hover https://vuetifyjs.com/en/components/hover
-      alert('shot details\nplayer: ' + shot.player_label
-      )
+      alert('shot details\nplayer: ' + shot.player_label)
     },
     createMatchStats () {
       const { id } = this.$route.params
       this.match_stats = { match: id }
       API.createMatchStats(this.match_stats)
-        // match_stats are fetched from match
         .then(this.load(id))
     },
     deleteMatch () {
       API.deleteMatch(this.match.id)
         .then(() => {
-          //this.$store.actions('fetchOpponents')
-          //this.$store.actions('fetchCompetitions')
           this.$router.push({
             name: 'Competition',
             params: { id: this.match.competition }}
-            )
+          )
         })
         .catch((err) => {
           this.alert = true

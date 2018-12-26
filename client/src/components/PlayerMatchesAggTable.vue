@@ -97,15 +97,15 @@ export default {
       }
       arr.push.apply(arr, [
         { text: 'Apps', tooltip: 'Appearances', value: 'apps' },
-        { text: 'Starter', tooltip: 'Part of starting 11', value: 'starter' },
-        { text: 'Minutes', tooltip: 'Minutes played', value: 'minutes' },
+        { text: 'Starter', tooltip: 'In starting lineup', value: 'starter' },
+        { text: 'Min', tooltip: 'Minutes played', value: 'minutes' },
         { text: 'Goals', tooltip: 'Goals Scored', value: 'num_goals' },
         { text: 'Assists', tooltip: 'Goals Assisted', value: 'num_assists' },
         { text: 'Shots', tooltip: 'Attempts on goal', value: 'num_shots' },
         { text: 'Corners', tooltip: 'Corners taken', value: 'corners' },
-        { text: 'Yellow Card', value: 'yellow_cards' },
-        { text: 'Red Card', value: 'red_cards' },
-        { text: 'Injury substitution', tooltip: 'Number Of Times Subsituted due to injury', value: 'subbed_due_to_injury' }
+        { text: 'YC', tooltip: 'Yellow Cards', value: 'yellow_cards' },
+        { text: 'RC', tooltip: 'Red Cards', value: 'red_cards' },
+        { text: 'Injury', tooltip: 'Number Of Times Subsituted due to injury', value: 'subbed_due_to_injury' }
       ])
 
       return arr

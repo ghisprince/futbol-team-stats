@@ -21,7 +21,7 @@
 
       <template slot="items" slot-scope="props">
 
-        <td>{{ props.item.date_time | formattedDateTime }}</td>
+        <td>{{ props.item.date_time | formatDate  }}</td>
 
         <td v-if="showOpponent">
             <router-link :to="{
@@ -42,9 +42,9 @@
         </td>
 
         <td>
-          <span v-show="props.item.result === 'win'" style="color:lime">{{ props.item.result }}</span>
-          <span v-show="props.item.result === 'loss'" style="color:red">{{ props.item.result }}</span>
-          <span v-show="props.item.result === 'tie'" style="color:grey">{{ props.item.result }}</span>
+          <span v-show="props.item.result === 'win'" style="color:limegreen">{{ props.item.result }}</span>
+          <span v-show="props.item.result === 'loss'" style="color:#ff4000">{{ props.item.result }}</span>
+          <span v-show="props.item.result === 'tie'" style="color:darkgrey">{{ props.item.result }}</span>
         </td>
 
         <td>{{ props.item.score }}</td>
@@ -83,12 +83,6 @@ export default {
     }
   },
   methods: {
-  },
-  filters: {
-    formattedDateTime: function (v) {
-      if (!v) return ''
-      return v.slice(0, 16).replace('T', ' ')
-    }
   },
   computed: {
     showProgress: function () {

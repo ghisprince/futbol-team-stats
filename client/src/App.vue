@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app id="inspire" :dark="dark">
     <v-navigation-drawer
       persistent
       :mini-variant="miniVariant"
@@ -7,7 +7,7 @@
       fixed
       app>
       <v-list>
-        <v-subheader class="mt-3 grey--text text--darken-1">View stats by...</v-subheader>
+        <v-subheader class="mt-3 grey--text text--darken-1">Statistic by...</v-subheader>
 
         <v-list-tile
           value="true"
@@ -21,9 +21,41 @@
           <v-list-tile-content>
             <router-link :to="{ name: item.route }">{{item.title}}</router-link>
           </v-list-tile-content>
-
         </v-list-tile>
+
+        <v-divider></v-divider>
+
+        <v-subheader class="mt-3 grey--text text--darken-1">Other pages</v-subheader>
+
+        <v-list-tile value="true">
+          <v-list-tile-action>
+            <v-icon>help_outline</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <router-link :to="{ name: 'Home' }">Help</router-link>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile value="true">
+          <v-list-tile-action>
+            <v-icon>close</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <router-link :to="{ name: 'logout' }">Logout</router-link>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-divider></v-divider>
+        <v-list-tile>
+          <v-list-tile-content>
+            <v-btn small @click="dark = !dark">Toggle dark mode</v-btn>
+          </v-list-tile-content>
+        </v-list-tile>
+
       </v-list>
+
     </v-navigation-drawer>
     <v-toolbar app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
@@ -32,11 +64,13 @@
     </v-toolbar>
     <v-content>
       <router-view/> <!-- this all the content -->
-      <!-- state is {{ state }} -->
     </v-content>
-    <v-footer :fixed="fixed" app>
-      <span>&copy; 2018</span>
+    <!--
+    <v-footer :fixed="fixed" app dark>
+      <v-spacer></v-spacer>
+      <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
+    -->
   </v-app>
 </template>
 
@@ -47,14 +81,18 @@ export default {
   data () {
     return {
       drawer: false,
+      dark: true,
       fixed: true,
       miniVariant: false,
       right: true,
-      title: 'Pats B04 Futbol stats',
+      title: 'Futbol Stats',
       items: [
         {icon: 'view_list', title: 'Competition', route: 'Competitions'},
         {icon: 'view_list', title: 'Opponent', route: 'Opponents'},
-        {icon: 'view_list', title: 'Players', route: 'Players'},
+        {icon: 'view_list', title: 'Players', route: 'Players'}
+      ],
+      items2: [
+        {icon: 'help_outline', title: 'Help', route: 'Home'},
         {icon: 'close', title: 'Log out', route: 'logout'}
       ]
     }

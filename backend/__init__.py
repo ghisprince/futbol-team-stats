@@ -1,21 +1,9 @@
 from flask import Flask
 from flask_caching import Cache
-from . controllers.main import main
+from . main import main
 from . shared import api
 from . shared import db
 from . shared import ma
-from . shared import login_manager
-
-class CustomFlask(Flask):
-    jinja_options = Flask.jinja_options.copy()
-    jinja_options.update(dict(
-        block_start_string='{%',
-        block_end_string='%}',
-        variable_start_string='((',  # instead of jinja2 default of {{
-        variable_end_string='))',  # instead of }}
-        comment_start_string='{#',
-        comment_end_string='#}',
-    ))
 
 
 def create_app(object_name):
@@ -29,7 +17,7 @@ def create_app(object_name):
     """
 
     # app = Flask(__name__)
-    app = CustomFlask(__name__)
+    app = Flask(__name__)
 
     app.config.from_object(object_name)
 
@@ -44,10 +32,7 @@ def create_app(object_name):
     ma.init_app(app)
 
     # register flask_restful api
-    api.init_app(app)
-
-    # register LoginManager
-    login_manager.init_app(app)
+    api.init_app(main)
 
     # register our blueprints
     app.register_blueprint(main)

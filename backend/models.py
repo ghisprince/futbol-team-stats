@@ -54,7 +54,7 @@ class RolesUsers(db.Model):
     role_id = db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 
 
-class Role(db.Model):  # , RoleMixin):
+class Role(db.Model):
     __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -103,6 +103,7 @@ class User(db.Model, CRUD_MixIn, UserMixin):
         return self.id
 
     def generate_auth_token(self, expiration=6000):
+        # 6000 seconds = 100 minutes
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({'id': self.id})
 

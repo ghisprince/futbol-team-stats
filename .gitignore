@@ -86,12 +86,16 @@ env/
 # Rope project settings
 .ropeproject
 
-# ides
+# ide settings
 .idea/
 .vscode/
 
 # database
 *.db
+
+# zip files
+*.zip
+*.tar.gz
 
 # backup folders
 bu_*/

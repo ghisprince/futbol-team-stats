@@ -2,29 +2,29 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 
-import Competitions from '@/components/Competitions.vue'
-import Competition from '@/components/Competition.vue'
-import CompetitionCreate from '@/components/CompetitionCreate.vue'
-import CompetitionEdit from '@/components/CompetitionEdit.vue'
+import Competitions from '@/views/Competitions.vue'
+import Competition from '@/views/Competition.vue'
+import CompetitionCreate from '@/views/CompetitionCreate.vue'
+import CompetitionEdit from '@/views/CompetitionEdit.vue'
 
-import Opponents from '@/components/Opponents.vue'
-import Opponent from '@/components/Opponent.vue'
-import OpponentCreate from '@/components/OpponentCreate.vue'
-import OpponentEdit from '@/components/OpponentEdit.vue'
+import Opponents from '@/views/Opponents.vue'
+import Opponent from '@/views/Opponent.vue'
+import OpponentCreate from '@/views/OpponentCreate.vue'
+import OpponentEdit from '@/views/OpponentEdit.vue'
 
-import Match from '@/components/Match.vue'
-import MatchEdit from '@/components/MatchEdit.vue'
-import MatchCreate from '@/components/MatchCreate.vue'
-import MatchStatsEdit from '@/components/MatchStatsEdit.vue'
-import PlayerMatchEdit from '@/components/PlayerMatchEdit.vue'
-import MatchShotsEdit from '@/components/MatchShotsEdit.vue'
+import Match from '@/views/Match.vue'
+import MatchEdit from '@/views/MatchEdit.vue'
+import MatchCreate from '@/views/MatchCreate.vue'
+import MatchStatsEdit from '@/views/MatchStatsEdit.vue'
+import PlayerMatchEdit from '@/views/PlayerMatchEdit.vue'
+import MatchShotsEdit from '@/views/MatchShotsEdit.vue'
 
-import Players from '@/components/Players.vue'
-import Player from '@/components/Player.vue'
-import PlayerCreate from '@/components/PlayerCreate.vue'
-import PlayerEdit from '@/components/PlayerEdit.vue'
+import Players from '@/views/Players.vue'
+import Player from '@/views/Player.vue'
+import PlayerCreate from '@/views/PlayerCreate.vue'
+import PlayerEdit from '@/views/PlayerEdit.vue'
 
-import Login from '@/components/forms/Login.vue'
+import Login from '@/views/Login.vue'
 
 Vue.use(Router)
 
@@ -32,7 +32,7 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Home',
       component: Home
     },
     {
