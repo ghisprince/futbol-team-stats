@@ -1,6 +1,7 @@
 <template>
   <v-app id="inspire" :dark="dark">
     <v-navigation-drawer
+      v-show="show_drawer"
       persistent
       :mini-variant="miniVariant"
       v-model="drawer"
@@ -104,7 +105,10 @@ export default {
     /*
     state () {
       return this.$store.state
-    } */
+    }, */
+    show_drawer: function () {
+      return this.$route.name !== 'login' && this.$route.name !== 'logout'
+    }
   },
   methods: {
     log_user_out () {

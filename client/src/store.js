@@ -84,6 +84,9 @@ export default new Vuex.Store({
       }
       window.localStorage.setItem('user', JSON.stringify(user))
       context.commit('updateCurrentUser', user)
+      context.commit('setPlayers', [])
+      context.commit('setCompetitions', [])
+      context.commit('setOpponents', [])
     },
     init (context) {
       const user = JSON.parse(window.localStorage.getItem('user'))
