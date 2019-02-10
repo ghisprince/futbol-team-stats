@@ -7,7 +7,9 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="600px">
-        <v-btn slot="activator" color="primary" @click="newItem" dark class="mb-2">New Shot</v-btn>
+        <v-btn slot="activator" color="primary" @click="newItem" dark class="mb-2">
+          New Shot
+        </v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -299,7 +301,7 @@ export default {
 
       if (index > -1) {
         this.shots.splice(index, 1)
-      } 
+      }
       API.deleteShot(id)
     },
     close () {

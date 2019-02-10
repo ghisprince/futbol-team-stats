@@ -1,18 +1,9 @@
-from flask_login import UserMixin, AnonymousUserMixin
-from .shared import login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from itsdangerous import BadSignature, SignatureExpired, \
-    TimedJSONWebSignatureSerializer as Serializer
 import datetime
 
 from .settings import Config
 from .shared import db
-
-
-@login_manager.user_loader
-def load_user(userid):
-    return User.query.get(userid)
 
 
 class CRUD_MixIn():
@@ -38,6 +29,21 @@ def get_or_create(session, model, **kwargs):
         session.commit()
         return instance
 
+'''
+class RevokedTokenModel(db.Model):
+    __tablename__ = 'revoked_tokens'
+    id = db.Column(db.Integer, primary_key = True)
+    jti = db.Column(db.String(120))
+    
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    @classmethod
+    def is_jti_blacklisted(cls, jti):
+        query = cls.query.filter_by(jti = jti).first()
+        return bool(query)
+'''
 
 # many to many relationship between User and Team
 class TeamsUsers(db.Model):
@@ -65,7 +71,7 @@ class Role(db.Model):
         self.description = description
 
 
-class User(db.Model, CRUD_MixIn, UserMixin):
+class User(db.Model, CRUD_MixIn):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(), nullable=False)
     password = db.Column(db.String(), nullable=False)
@@ -89,12 +95,13 @@ class User(db.Model, CRUD_MixIn, UserMixin):
     def check_password(self, value):
         return check_password_hash(self.password, value)
 
-    @property
-    def is_authenticated(self):
-        if isinstance(self, AnonymousUserMixin):
-            return False
-        else:
-            return True
+    @classmethod
+    def get_by_id(cls, id):
+        return cls.query.filter_by(id = id).first()
+
+    @classmethod
+    def get_by_username(cls, username):
+        return cls.query.filter_by(username = username).first()
 
     def is_active(self):
         return True

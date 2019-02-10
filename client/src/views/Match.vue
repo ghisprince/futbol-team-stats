@@ -14,7 +14,7 @@
 
       <v-card-title>
         <v-spacer></v-spacer>
-        <div v-if="canEdit">
+        <div v-if="is_editor">
           <v-btn
             :to="{
               name: 'MatchEdit',
@@ -94,7 +94,7 @@
 
             <v-spacer></v-spacer>
 
-            <v-btn v-if="canEdit"
+            <v-btn v-if="is_editor"
                    :to="{
                      name: 'PlayerMatchEdit',
                      params: {id: match.id}
@@ -106,7 +106,8 @@
           <v-card-text>
             <player-matches-table :player_matches="player_matches"
                                   :match="match"
-                                  :showPlayer="true">
+                                  :showPlayer="true"
+                                  :showProgress="showProgress">
             </player-matches-table>
           </v-card-text>
         </v-card>
@@ -117,7 +118,7 @@
           <v-card-title>
             <h2>Shots</h2>
           <v-spacer></v-spacer>
-            <v-btn v-if="canEdit"
+            <v-btn v-if="is_editor"
                    :to="{
                      name: 'MatchShotsEdit',
                      params: {id: match.id}
@@ -161,12 +162,13 @@ export default {
         { text: 'Team', value: 'team_stat', sortable: false, align: 'right' },
         { text: '', value: 'stat', sortable: false, align: 'center' },
         { text: 'Opponent', value: 'opponent_stat', sortable: false, align: 'left' }
-      ]
+      ],
+      showProgress: true
     }
   },
   computed: {
-    canEdit () {
-      return this.$store.state.authUser.canEdit
+    is_editor () {
+      return this.$store.state.user.is_editor
     },
     matchTableRows: function () {
       let rows = [{
@@ -220,7 +222,8 @@ export default {
         })
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
-          this.player_matches = player_matches
+          this.player_matches = player_matches,
+          this.showProgress = false
         })
       API.getShotsByMatch(id)
         .then((shots) => {

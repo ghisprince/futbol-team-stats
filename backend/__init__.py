@@ -1,10 +1,9 @@
 from flask import Flask
-from flask_caching import Cache
 from . main import main
 from . shared import api
 from . shared import db
 from . shared import ma
-
+from . shared import jwt
 
 def create_app(object_name):
     """
@@ -18,20 +17,12 @@ def create_app(object_name):
 
     # app = Flask(__name__)
     app = Flask(__name__)
-
     app.config.from_object(object_name)
 
-    # initialize the cache
-    cache = Cache()
-    cache.init_app(app)
-
-    # register SQLAlchemy
+    # register extensions
     db.init_app(app)
-
-    # register Marshmallow
+    jwt.init_app(app)
     ma.init_app(app)
-
-    # register flask_restful api
     api.init_app(main)
 
     # register our blueprints

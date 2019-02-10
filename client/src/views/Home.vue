@@ -8,6 +8,7 @@
 
           <h3>What's New with version 2</h3>
           <ul>
+            <li>Log into site once and stay logged in.</li>
             <li>Competitions table now includes level (aka flight), goal differential, # clean sheets.</li>
             <li>Opponent's table now shows # matches, goal differential.</li>
             <li>Player's table now includes player's stats aggregated by competition

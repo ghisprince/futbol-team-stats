@@ -4,6 +4,13 @@ db_file = tempfile.NamedTemporaryFile()
 
 class Config(object):
     SECRET_KEY = 'REPLACE ME'
+    JWT_SECRET_KEY = 'REPLACE ME'
+
+    #JWT_BLACKLIST_ENABLED = True
+    #JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    PROPAGATE_EXCEPTIONS = True
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSONIFY_PRETTYPRINT_REGULAR = True
 
 

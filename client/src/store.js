@@ -8,10 +8,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     team: {id: 1},
-    authUser:
+    user:
       { username: '',
-        token: '',
-        canEdit: false
+        access_token: '',
+        refresh_token: '',
+        is_editor: false,
+        is_admin: false
       },
     players: [],
     competitions: [],
@@ -54,7 +56,7 @@ export default new Vuex.Store({
   },
   mutations: {
     updateCurrentUser (state, user) {
-      state.authUser = user
+      state.user = user
     },
     setPlayers (state, players) {
       state.players = players
@@ -68,30 +70,36 @@ export default new Vuex.Store({
   },
   actions: {
     updateCurrentUser (context) {
-      const user = JSON.parse(window.localStorage.getItem('futUser'))
+      const user = JSON.parse(window.localStorage.getItem('user'))
       context.commit('updateCurrentUser', user)
       context.dispatch('init')
     },
+    clearCurrentUser (context) {
+      const user = {
+        username: '',
+        access_token: '',
+        refresh_token: '',
+        is_editor: false,
+        is_admin: false
+      }
+      window.localStorage.setItem('user', JSON.stringify(user))
+      context.commit('updateCurrentUser', user)
+    },
     init (context) {
-      const authUser = JSON.parse(window.localStorage.getItem('futUser'))
-      if (authUser === null || authUser === undefined) {
+      const user = JSON.parse(window.localStorage.getItem('user'))
+      if (user === null || user === undefined) {
         router.push('/login')
       } else {
         context.dispatch('fetchPlayers')
         context.dispatch('fetchCompetitions')
         context.dispatch('fetchOpponents')
-        context.commit('updateCurrentUser', authUser)
+        context.commit('updateCurrentUser', user)
       }
     },
     fetchPlayers ({commit}) {
       API.getPlayers().then(players => {
         commit('setPlayers', players)
       })
-        .catch((err) => {
-          if (err.response.status === 401) {
-            router.push({name: 'login'})
-          }
-        })
     },
     fetchCompetitions ({commit}) {
       API.getCompetitions().then(competitions => {
@@ -140,7 +148,6 @@ export default new Vuex.Store({
     },
     deleteCompetition ({commit, state, dispatch}, id) {
       return new Promise((resolve, reject) => {
-        console.log(id)
         API.deleteCompetition(id)
           .then((resp) => {
             dispatch('fetchCompetitions')
@@ -155,7 +162,6 @@ export default new Vuex.Store({
     },
     deleteOpponent ({commit, state, dispatch}, id) {
       return new Promise((resolve, reject) => {
-        console.log(id)
         API.deleteOpponent(id)
           .then((resp) => {
             dispatch('fetchOpponents')

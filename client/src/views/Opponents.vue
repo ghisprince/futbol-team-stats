@@ -3,7 +3,7 @@
     <v-container>
       <v-card>
         <v-layout align-start justify-end fill-height>
-          <v-btn v-if="canEdit"
+          <v-btn v-if="is_editor"
                  color="success"
                  :to="{name: 'OpponentCreate'}">
             New Opponent
@@ -75,8 +75,8 @@ export default {
     }
   },
   computed: {
-    canEdit () {
-      return this.$store.state.authUser.canEdit
+    is_editor () {
+      return this.$store.state.user.is_editor
     },
     opponents () {
       return this.$store.getters.opponentsSorted

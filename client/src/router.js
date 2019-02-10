@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
+import store from '@/store'
 
 import Competitions from '@/views/Competitions.vue'
 import Competition from '@/views/Competition.vue'
@@ -153,20 +154,16 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.name === 'logout') {
-    window.localStorage.removeItem('futUser')
-    next({name: 'login'})
+  if (from.name) {
+    //  catch leaving PlayerGamesEdit and trigger refresh
+    if (from.name === 'MatchShotsEdit') {
+      store.dispatch('fetchOpponents')
+      store.dispatch('fetchCompetitions')
+      store.dispatch('fetchPlayers')
+    }
   }
-
-  const authUser = JSON.parse(window.localStorage.getItem('futUser'))
-
-  if (to.name === 'login') {
-    next()
-  } else if (!authUser || !authUser.token) {
-    next({name: 'login'})
-  } else {
-    next()
-  }
+  next()
 })
+
 
 export default router

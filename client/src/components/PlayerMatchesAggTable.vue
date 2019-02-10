@@ -6,7 +6,11 @@
       :pagination.sync="showPlayer ? undefined : pagination"
       :loading="true"
     >
-      <v-progress-linear v-show="showProgress" slot="progress" color="blue" indeterminate></v-progress-linear>
+      <v-progress-linear v-show="showProgress"
+                         slot="progress"
+                         color="blue"
+                         indeterminate>
+      </v-progress-linear>
       <template slot="headerCell" slot-scope="props">
         <v-tooltip bottom>
           <span slot="activator">
@@ -72,7 +76,7 @@
 import UTILS from '@/lib/UTILS'
 
 export default {
-  props: ['player_matches', 'showPlayer', 'showCompetition'],
+  props: ['player_matches', 'showPlayer', 'showCompetition', 'showProgress'],
   data () {
     return {
       pagination: {
@@ -84,9 +88,6 @@ export default {
   updated () {
   },
   computed: {
-    showProgress: function () {
-      return this.player_matches.length === 0
-    },
     headers: function () {
       let arr = []
       if (this.showPlayer) {
@@ -97,7 +98,7 @@ export default {
       }
       arr.push.apply(arr, [
         { text: 'Apps', tooltip: 'Appearances', value: 'apps' },
-        { text: 'Starter', tooltip: 'In starting lineup', value: 'starter' },
+        { text: 'Starter', tooltip: 'In starting 11', value: 'starter' },
         { text: 'Min', tooltip: 'Minutes played', value: 'minutes' },
         { text: 'Goals', tooltip: 'Goals Scored', value: 'num_goals' },
         { text: 'Assists', tooltip: 'Goals Assisted', value: 'num_assists' },

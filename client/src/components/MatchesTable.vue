@@ -7,7 +7,11 @@
       :pagination.sync="pagination"
       :loading="true"
     >
-      <v-progress-linear v-show="showProgress" slot="progress" color="blue" indeterminate></v-progress-linear>
+      <v-progress-linear v-show="showProgress"
+                         slot="progress"
+                         color="blue"
+                         indeterminate>
+      </v-progress-linear>
       <template slot="headerCell" slot-scope="props">
         <v-tooltip bottom>
           <span slot="activator">
@@ -63,7 +67,7 @@
 
 <script>
 export default {
-  props: ['matches', 'showOpponent', 'showCompetition'],
+  props: ['matches', 'showOpponent', 'showCompetition', 'showProgress'],
   data () {
     return {
       win_color: 'blue',
@@ -85,9 +89,6 @@ export default {
   methods: {
   },
   computed: {
-    showProgress: function () {
-      return this.matches.length === 0
-    },
     headers: function () {
       let h = this.headersAll
       if (!this.showCompetition) {

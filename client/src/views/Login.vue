@@ -50,22 +50,13 @@ export default {
   }),
   methods: {
     submit () {
-      const authUser = {}
+      const user = {}
       var app = this
       const { username, password } = this
       API.logIn(username, password)
         .then(function (res) {
-          if (res.status === 'success') {
-            authUser.username = res.username
-            authUser.token = res.token
-            authUser.canEdit = res.canEdit
-
-            window.localStorage.setItem('futUser', JSON.stringify(authUser))
-            app.$store.dispatch('init')
-            app.$router.push({name: 'Home'})
-          } else {
-            app.showError = true
-          }
+          app.$store.dispatch('init')
+          app.$router.push({name: 'Home'})
         })
         .catch((err) => {
           app.showError = true

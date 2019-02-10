@@ -18,6 +18,7 @@ export default {
         name: '',
         result: '',
         note: '',
+        level: '',
         external_url: ''
       }
 

@@ -4,7 +4,7 @@ module.exports = {
       '/api': {
         target: 'http://localhost:5000',
         pathRewrite: {
-          '^/api': '/api'
+          '^/api': '/futbol/api'
         },
         xfwd: true
       }
@@ -13,6 +13,6 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   baseUrl: process.env.NODE_ENV === 'production'
-    ? 'futbol'
+    ? '/futbol'
     : '/'
 }

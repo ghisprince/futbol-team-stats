@@ -43,7 +43,9 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <router-link :to="{ name: 'logout' }">Logout</router-link>
+              <router-link :to="{ name: 'logout' }">
+              <span v-on:click="log_user_out">Logout</span>
+              </router-link>
           </v-list-tile-content>
         </v-list-tile>
 
@@ -75,6 +77,7 @@
 </template>
 
 <script>
+import API from '@/lib/API'
 
 export default {
   name: 'App',
@@ -98,8 +101,15 @@ export default {
     }
   },
   computed: {
+    /*
     state () {
       return this.$store.state
+    } */
+  },
+  methods: {
+    log_user_out () {
+      API.logout()
+      this.$store.dispatch('clearCurrentUser')
     }
   },
   created () {

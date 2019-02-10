@@ -1,25 +1,25 @@
 # soccer-player-stats
-Web-app to capture and report a team and player's stats.
+Web-app to store and report a soccer team and player's stats.
 
 
-### Statistics
+### Statistics stored
  * by team
    * players
    * matches
    * opponent
    * competitions (tournaments & seasons)
  * by player
-   * starts
+   * start
    * minutes played
-   * shots
+   * shots (with location)
    * goals
    * assists
    * yellow and red cards
    * corners
-   * injury
-
+   * substituted due to injury
 
 ## Deploying app
+Backend rest api written in python.  Uses flask, sqlalchemy, marshmallow, flask-restful.
 
 ### Python
 Install requirements
@@ -29,13 +29,14 @@ source env/bin/activate
 pip3 install -r backend/requirements.txt
 ```
 
-### run flask local server
+### run flask server
 ```
 python manage.py server
 ```
 
+Frontend/client SPA.  Uses:  in vuejs, vuetify, Vue CLI 3.
+
 ### Javascript
-Using webpack to compile js & vue files
 
 ```
 cd client
@@ -44,25 +45,11 @@ npm run serve
 npm build serve
 ```
 
-### Tests
-To run backend tests
+## Additional stuff
+
+### tests
+Running backend tests
+
 ```
 py.test -s test
 ```
-
-### Toy data
-Data is included to play/dev with. To load it
-
-```
-python scripts\load_data.py
-```
-
-
-## Stack
- * client side: VueJS, webpack
- * server side: python, flask, sqlalchemy, marshmallow, flask-restful
-
-### Code foundation
- * vue-cli3
- * [JackStouffer/Flask-Foundation](https://github.com/JackStouffer/Flask-Foundation)
- * [Leo-G/Flask-Scaffold](https://github.com/Leo-G/Flask-Scaffold)

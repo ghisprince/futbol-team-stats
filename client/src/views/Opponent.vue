@@ -13,7 +13,7 @@
           <h2>{{ opponent.name }}</h2>
 
           <v-spacer></v-spacer>
-          <div v-if="canEdit">
+          <div v-if="is_editor">
             <v-btn
               :to="{
                 name: 'OpponentEdit',
@@ -36,7 +36,10 @@
           <div v-if="opponent.external_url">
               <a v-bind:href="opponent.external_url">Web site</a>
           </div>
-        <matches-table :matches="matches" :showCompetition="true"></matches-table>
+        <matches-table :matches="matches"
+                       :showCompetition="true" 
+                       :showProgress="showProgress">
+        </matches-table>
         </v-card-text>
 
       </v-card>
@@ -48,7 +51,10 @@
         </v-card-title>
 
         <v-card-text>
-          <player-matches-agg-table :player_matches="player_matches" :showPlayer="true"></player-matches-agg-table>
+          <player-matches-agg-table :player_matches="player_matches" 
+                                    :showPlayer="true"
+                                    :showProgress="showProgress">
+          </player-matches-agg-table>
         </v-card-text>
       </v-card>
     </v-container>
@@ -73,12 +79,13 @@ export default {
         name: null
       },
       matches: [],
-      player_matches: []
+      player_matches: [],
+      showProgress: true
     }
   },
   computed: {
-    canEdit () {
-      return this.$store.state.authUser.canEdit
+    is_editor () {
+      return this.$store.state.user.is_editor
     }
   },
   mounted () {
@@ -99,6 +106,7 @@ export default {
       API.getMatchesByOpponent(id)
         .then((matches) => {
           this.matches = matches
+          this.showProgress = false
         })
       API.getPlayerMatchesByOpponent(id)
         .then((player_matches) => {

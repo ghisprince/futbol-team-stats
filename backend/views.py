@@ -1,31 +1,27 @@
-import flask_restful
-import flask_login
+from flask_restful import Resource
 
-from flask import jsonify, make_response, request, g
-from flask import session as flask_session
+from flask import request
 from sqlalchemy.exc import SQLAlchemyError
 from webargs.flaskparser import use_kwargs
 
+from flask_jwt_extended import (create_access_token,
+                                jwt_required,
+                                get_jwt_identity,
+                                get_raw_jwt,
+                                jwt_refresh_token_required,
+                                create_refresh_token)
+
+
 from . models import *
 from . schemas import *
-#from flask_login import login_required
-from flask_httpauth import HTTPTokenAuth
 
 import marshmallow
 from marshmallow import ValidationError
 import webargs
 from pprint import pprint
-import json
 
-auth = HTTPTokenAuth(scheme='Token')
 
-"""
-This module servers views of the model as REST api
-
-This module should be refactored to be DRY-er.
-
-"""
-
+# initialize instance of each Schema class
 user_schema = UserSchema()
 
 team_schema = TeamSchema()
@@ -76,40 +72,77 @@ requested resource has been created successfully, the server MUST
 return a 201 Created status code"""
 
 
-@auth.verify_token
-def verify_token(token):
-    try:
-        token = request.headers['Authorization'].split("Bearer ")[1]
-        return User.verify_auth_token(token) is not None
-    except:
-        return False
+"""
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return RevokedTokenModel.is_jti_blacklisted(jti)
+"""
 
-class GetAuthToken(flask_restful.Resource):
-    def post(self):
-        req = request.get_json(force=True)
-        username = req.get("username")
-        password = req.get("password") 
-        if not (username and password):
-            return False
+def generate_tokens(username):
+    access_token = create_access_token(identity=username, fresh=True)
+    refresh_token = create_refresh_token(identity=username)
 
+    return {'access_token': access_token,
+            'refresh_token': refresh_token }
+
+class UserLogin(Resource):
+    @use_kwargs({'username': webargs.fields.Str(required=True),
+                 'password': webargs.fields.Str(required=True) })
+    def post(self, username, password):
+        user = User.get_by_username(username)
         try:
-            user = User.query.filter_by(username=username).first()
+
+            if not user:
+                raise
+
             if user.check_password(password):
-                return jsonify({'status': "success",
-                                'token': user.generate_auth_token().decode('ascii'),
-                                'canEdit': user.is_editor,
-                                'username': user.username})
+                resp = generate_tokens(user.username)
+                resp['is_editor'] = user.is_editor
+                resp['is_admin'] = False #user.is_admin
+                resp['username'] = user.username
+                resp['message'] = f'User {user.username} was logged in'
+
+                return resp, 200
+            else:
+                raise
         except:
-            return False
+            return {'message': 'Login failed'}, 401
 
 
-# decorate all with end points with login_required
-class Resource(flask_restful.Resource):
-    method_decorators = [auth.login_required]
-    #pass
+class UserLogout(Resource):
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token.add()
+            return {'message': 'Access token has been revoked'}, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+
+class UserLogoutR(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token.add()
+            return {'message': 'Access token has been revoked'}, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+
+class RefreshToken(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return {'access_token': new_token}, 200
 
 
 class CreateListResourceBase(Resource):
+    @jwt_refresh_token_required
     @use_kwargs({'name': webargs.fields.Str(required=False),
                  'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
@@ -139,6 +172,7 @@ class CreateListResourceBase(Resource):
             return self.mm_schema_ex.dump(query.all(), many=True).data
         return self.mm_schema.dump(query.all(), many=True).data
 
+    @jwt_refresh_token_required
     def post(self):
         request_dict = request.get_json(force=True)
         try:
@@ -153,15 +187,11 @@ class CreateListResourceBase(Resource):
             return results, 201
 
         except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 403
-            return resp
+            return {"error": err.messages}, 400
 
         except SQLAlchemyError as e:
             db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 403
-            return resp
+            return {"error": str(e)}, 400
 
 
 # basic collection of roles
@@ -188,6 +218,7 @@ class CreateListMatch(CreateListResourceBase):
     mm_schema = match_schema
     mm_schema_ex = match_schema_ex
 
+    @jwt_refresh_token_required
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False) })
     def get(self, opponent_id, competition_id):
@@ -216,6 +247,7 @@ class CreateListShot(CreateListResourceBase):
     mm_schema = shot_schema
     mm_schema_ex = shot_schema_ex
 
+    @jwt_refresh_token_required
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False),
@@ -244,14 +276,16 @@ class CreateListShot(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
+    @jwt_refresh_token_required
     def post(self):
         shot_dict, _ = super().post()
         request_dict = request.get_json(force=True)
 
-        query = self.ModelClass.query.get(shot_dict['id'])
+        shot = self.ModelClass.query.get(shot_dict['id'])
 
         goal_dict = request_dict.pop('goal', None)
         if goal_dict:
+            shot.on_target = True
             goal_dict['shot'] = shot_dict['id']
             goal_schema.validate(goal_dict)
             goal = goal_schema.load(goal_dict).data
@@ -264,17 +298,17 @@ class CreateListShot(CreateListResourceBase):
                 assist_schema.validate(assist_dict)
                 assist = assist_schema.load(assist_dict).data
 
-            query.goal = goal
+            shot.goal = goal
 
         # todo: add goal/assist?
         db.session.commit()
-        results = self.mm_schema.dump(query).data
-        return results, 201
+        return self.mm_schema.dump(shot).data, 200
 
 class CreateListGoal(CreateListResourceBase):
     ModelClass = Goal
     mm_schema = goal_schema
 
+    @jwt_refresh_token_required
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
                  'playermatch_id': webargs.fields.Int(required=False), })
@@ -299,6 +333,8 @@ class CreateListAssist(CreateListResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
 
+
+    @jwt_refresh_token_required
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
                  'playermatch_id': webargs.fields.Int(required=False)})
@@ -325,6 +361,7 @@ class GetUpdateDeleteResourceBase(Resource):
         - delete(id)
       """
 
+    @jwt_refresh_token_required
     @use_kwargs({'expand': webargs.fields.Bool(required=False)})
     def get(self, id, expand=False):
         query = self.ModelClass.query.get_or_404(id)
@@ -332,6 +369,7 @@ class GetUpdateDeleteResourceBase(Resource):
             return self.mm_schema_ex.dump(query).data
         return self.mm_schema.dump(query).data
 
+    @jwt_refresh_token_required
     def patch(self, id):
         modelInst = self.ModelClass.query.get_or_404(id)
         request_dict = request.get_json(force=True)
@@ -343,70 +381,26 @@ class GetUpdateDeleteResourceBase(Resource):
             return self.get(id)
 
         except ValidationError as err:
-            resp = jsonify({"error": err.messages})
-            resp.status_code = 401
-            return resp
+            return {"error": err.messages}, 400
 
         except SQLAlchemyError as e:
             db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 401
-            return resp
+            return {"error": str(e)}, 400
 
+    @jwt_refresh_token_required
     def delete(self, id):
         modelInst = self.ModelClass.query.get_or_404(id)
         for att in ['matches', 'playermatches', ]:
             if getattr(modelInst, att, None):
-                resp = jsonify(
-                    {"error": "Delete failed, object has associated " + att})
-                resp.status_code = 401
-                return resp
+                return {"error": "Delete failed, object has associated " + att}, 403
 
         try:
             modelInst.delete(modelInst)
-            resp = make_response()
-            resp.status_code = 204
-            return resp
+            return {}, 204
 
         except SQLAlchemyError as e:
             db.session.rollback()
-            resp = jsonify({"error": str(e)})
-            resp.status_code = 401
-            return resp
-
-
-class GetCurrentUserID(Resource):  # not GetUpdateDeleteResourceBase
-    mm_schema = user_schema
-
-    def get(self, ):
-        query = User.query.get_or_404(flask_login.current_user.get_id())
-        return self.mm_schema.dump(query).data
-
-
-class GetCurrentTeamID(Resource):  # not GetUpdateDeleteResourceBase
-    mm_schema = team_schema
-
-    def get(self, ):
-        team_id = flask_session.get('current_team', None)
-        if team_id is None:
-            # if no current_team, then get first from current_user
-            current_user = User.query.get_or_404(flask_login.current_user.get_id())
-            try:
-                team_id = current_user.teams[0].id
-            except:
-                raise ValueError("Need an active team")
-
-        return json.dumps(team_id)
-
-    def post(self):
-        request_dict = request.get_json(force=True)
-
-        if not request_dict in [i.id for i in User.query.get_or_404(flask_login.current_user.get_id()).teams]:
-            raise ValueError("User not associated with this team")
-
-        team = Team.query.get_or_404(request_dict)
-        flask_session['current_team'] = team.id
-        return json.dumps(team.id)
+            return {"error": str(e)}, 400
 
 
 class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
@@ -414,10 +408,9 @@ class GetUpdateDeleteTeam(GetUpdateDeleteResourceBase):
     mm_schema = team_schema
     mm_schema = team_schema_ex
 
+    @jwt_refresh_token_required
     def delete(self, id):
-        resp = jsonify({"error": "Deleting of team not allowed!"})
-        resp.status_code = 403
-        return resp
+        return {"error": "Deleting of team not allowed!"}, 403
 
 
 class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
@@ -425,10 +418,9 @@ class GetUpdateDeletePlayer(GetUpdateDeleteResourceBase):
     mm_schema = player_schema
     mm_schema = player_schema_ex
 
+    @jwt_refresh_token_required
     def delete(self, id):
-        resp = jsonify({"error": "Deleting of player not allowed!"})
-        resp.status_code = 403
-        return resp
+        return {"error": "Deleting of player not allowed!"}, 403
 
 
 class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
@@ -472,31 +464,31 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
     mm_schema = shot_schema
     mm_schema_ex = shot_schema_ex
 
+    @jwt_refresh_token_required
     def patch(self, id):
         request_dict = request.get_json(force=True)
-        modelInst = self.ModelClass.query.get_or_404(id)
+        shot = self.ModelClass.query.get_or_404(id)
         goal_dict = request_dict.pop('goal', {})
         if goal_dict:
             assist_dict = goal_dict.pop('assist', {})
 
         if request_dict['scored'] == True and goal_dict:
+            shot.on_target = True
             goal_dict['shot'] = id
             goal_schema.validate(goal_dict, partial=True)
 
-            if modelInst.goal is None:
-                # add new Goal
+            if shot.goal is None:
+                # no goal yet, so create new
                 goal = goal_schema.load(goal_dict, partial=True).data
-
             else:
                 # update existing Goal
-                # TODO : isthis first get_or_404 needed?
-                goal = Goal.query.get_or_404(goal_dict['id'])
+                goal = Goal.query.get_or_404(goal_dict['id']) # this overwritten on next line?
                 goal = goal_schema.load(goal_dict, partial=True).data
 
             if (goal_dict['assisted'] == True) and assist_dict:
-                assist_dict['goal'] = modelInst.goal.id
+                assist_dict['goal'] = shot.goal.id
 
-                if modelInst.goal.assist is None:
+                if shot.goal.assist is None:
                     # add new Assist
                     # todo : this seemswrong
                     assist_dict.pop('id')
@@ -505,13 +497,13 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
                     # update existing Assist
                     assist_schema.validate(assist_dict, partial=True)
                     assist = assist_schema.load(assist_dict).data
-            elif modelInst.goal and modelInst.goal.assist:
-                assist = modelInst.goal.assist
+            elif shot.goal and shot.goal.assist:
+                assist = shot.goal.assist
                 db.session.delete(assist)
 
         else:
-            if modelInst.goal:
-                goal = modelInst.goal
+            if shot.goal:
+                goal = shot.goal
                 db.session.delete(goal)
 
         db.session.commit()

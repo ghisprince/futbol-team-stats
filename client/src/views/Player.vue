@@ -12,7 +12,7 @@
       <h1>{{ player.label }}</h1>
       <v-spacer></v-spacer>
 
-      <div v-if="canEdit">
+      <div v-if="is_editor">
         <v-btn
           :to="{
             name: 'PlayerEdit',
@@ -29,7 +29,12 @@
       <v-card>
       <v-card-text>
         <h3>Aggregated by Competition</h3>
-        <player-matches-agg-table :player_matches="player_matches" :showPlayer="false" :showCompetition="true"></player-matches-agg-table>
+        <player-matches-agg-table :player_matches="player_matches"
+                                  :showPlayer="false"
+                                  :showCompetition="true"
+                                  :showProgress="showProgress"
+                                  >
+        </player-matches-agg-table>
       </v-card-text>
       </v-card>
     </v-container>
@@ -37,7 +42,11 @@
       <v-card>
         <v-card-text>
         <h3>Individual Matches</h3>
-        <player-matches-table :player_matches="player_matches" :showPlayer="false" :showMatch="true"></player-matches-table>
+        <player-matches-table :player_matches="player_matches"
+                              :showPlayer="false"
+                              :showMatch="true"
+                              :showProgress="showProgress">
+        </player-matches-table>
       </v-card-text>
       </v-card>
     </v-container>
@@ -61,12 +70,13 @@ export default {
         id: -1,
         label: null
       },
-      player_matches: []
+      player_matches: [],
+      showProgress: true
     }
   },
   computed: {
-    canEdit () {
-      return this.$store.state.authUser.canEdit
+    is_editor () {
+      return this.$store.state.user.is_editor
     }
   },
   mounted () {
@@ -87,6 +97,7 @@ export default {
       API.getPlayerMatchesByPlayerEx(id)
         .then((player_matches) => {
           this.player_matches = player_matches
+          this.showProgress = false
         })
     },
     deletePlayer () {
