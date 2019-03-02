@@ -478,8 +478,12 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
             goal_schema.validate(goal_dict, partial=True)
 
             if shot.goal is None:
-                # no goal yet, so create new
+                # new Goal
                 goal = goal_schema.load(goal_dict, partial=True).data
+                db.session.add(goal)
+                db.session.commit()
+                shot.goal = goal
+
             else:
                 # update existing Goal
                 goal = Goal.query.get_or_404(goal_dict['id']) # this overwritten on next line?
@@ -489,14 +493,15 @@ class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):
                 assist_dict['goal'] = shot.goal.id
 
                 if shot.goal.assist is None:
-                    # add new Assist
-                    # todo : this seemswrong
+                    # add new Assist (this seems wrong)
                     assist_dict.pop('id')
                     assist = assist_schema.load(assist_dict, partial=True).data
                 else:
                     # update existing Assist
                     assist_schema.validate(assist_dict, partial=True)
                     assist = assist_schema.load(assist_dict).data
+                db.session.add(assist)
+
             elif shot.goal and shot.goal.assist:
                 assist = shot.goal.assist
                 db.session.delete(assist)
