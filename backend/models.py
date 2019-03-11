@@ -354,6 +354,7 @@ class Match(db.Model, CRUD_MixIn):
         return "{}-{}".format(self.num_goals,
                               self.num_goals_against)
 
+
     @hybrid_property
     def label(self):
         return "match 2 of tourney X (2017/11/5), - or something"
@@ -750,14 +751,19 @@ class Goal(db.Model, CRUD_MixIn):
         else:
             time = "?'"
 
+        assist = ""
         if self.assist:
             assist = " ({})".format(self.assist.player_match.player.name)
-        else:
-            assist = ""
+
+        # reuse assist to carry PK/OG tags
+        if self.shot.pk:
+            assist = " PK"
 
         if self.own_goal:
-            player = "OG"
-        elif self.shot.by_opponent:
+            assist = " OG"
+
+        # if team goal, put player's name, else blank
+        if self.shot.by_opponent:
             player = ""
         else:
             player = self.shot.player_match.player.name

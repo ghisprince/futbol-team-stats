@@ -12,6 +12,7 @@
                          color="blue"
                          indeterminate>
       </v-progress-linear>
+
       <template slot="headerCell" slot-scope="props">
         <v-tooltip bottom>
           <span slot="activator">
@@ -52,6 +53,7 @@
         </td>
 
         <td>{{ props.item.score }}</td>
+        <td>{{ props.item.num_shots }}-{{props.item.num_shots_against}}</td>
         <td>
           <router-link :to="{
               name: 'Match',
@@ -81,7 +83,8 @@ export default {
         {text: 'Competition', value: 'competition_name', tooltip: 'Name of competition', width: '1%'},
         {text: 'Opponent', value: 'opponent_name', tooltip: 'Opponent name', width: '1%'},
         {text: 'Result', value: 'result', width: '1%'},
-        {text: 'Score', value: 'score', width: '1%'},
+        {text: 'Score', value: 'score', tooltip: 'Goals for-Goals against', width: '1%'},
+        {text: 'Shots', value: 'num_shots', tooltip: 'Shots for-Shots against', width: '1%'},
         {text: 'Match Details', value: 'match', tooltip: 'Further Match Details', width: '1%'}
       ]
     }
