@@ -153,8 +153,10 @@ export default {
       alertMessage: '',
       match: {
         id: -1,
-        match_stats: -1,
         date_time: ''
+      },
+      match_stats: {
+        id: -1
       },
       player_matches: [],
       shots: [],
@@ -214,11 +216,7 @@ export default {
       API.getMatch(id)
         .then((match) => {
           this.match = match
-        })
-        .catch((err) => {
-          if (err.response.status === 401) {
-            this.$router.push({name: 'login'})
-          }
+          this.match_stats = match.match_stats
         })
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
@@ -236,8 +234,8 @@ export default {
     },
     createMatchStats () {
       const { id } = this.$route.params
-      this.match_stats = { match: id }
-      API.createMatchStats(this.match_stats)
+      let payload = { match: id }
+      API.createMatchStats(payload)
         .then(this.load(id))
     },
     deleteMatch () {
