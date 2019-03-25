@@ -28,18 +28,24 @@
 
         <v-card-text>
 
-          Match Results (W-D-L): {{ opponent.match_results }} <br/>
+          <strong>Match Results (W-D-L) : </strong> {{ opponent.match_results }} <br/>
 
           <div v-if="opponent.note">
-            Note: {{ opponent.note }}
+            <strong>Note : </strong> {{ opponent.note }}
           </div>
+
           <div v-if="opponent.external_url">
-              <a v-bind:href="opponent.external_url">Web site</a>
+              <strong> Web site : </strong>
+              <a v-bind:href="opponent.external_url" target="_blank">
+                external link
+              </a>
           </div>
-        <matches-table :matches="matches"
-                       :showCompetition="true" 
-                       :showProgress="showProgress">
-        </matches-table>
+
+
+          <matches-table :matches="matches"
+                         :showCompetition="true"
+                         :showProgress="showProgress">
+          </matches-table>
         </v-card-text>
 
       </v-card>
@@ -51,7 +57,7 @@
         </v-card-title>
 
         <v-card-text>
-          <player-matches-agg-table :player_matches="player_matches" 
+          <player-matches-agg-table :player_matches="player_matches"
                                     :showPlayer="true"
                                     :showProgress="showProgress">
           </player-matches-agg-table>

@@ -7,7 +7,10 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="600px">
-        <v-btn slot="activator" color="primary" @click="newItem" dark class="mb-2">
+        <v-btn slot="activator"
+               color="primary"
+               @click="newItem"
+               dark class="mb-2">
           New Shot
         </v-btn>
         <v-card>
@@ -205,6 +208,7 @@ export default {
       scored: false
     },
     defaultItem: {
+      id: -1,
       player_match: '',
       player_label: '',
       by_opponent: false,
@@ -282,6 +286,8 @@ export default {
     },
     newItem () {
       this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedGoal = Object.assign({}, this.defaultGoal)
+      this.editedAssist = Object.assign({}, this.defaultAssist)
     },
     editItem (item) {
       this.editedIndex = this.shots.indexOf(item)

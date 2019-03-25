@@ -185,7 +185,7 @@ export default {
       player_label: '',
       player_id: null,
       corners: 0,
-      minutes: 0,
+      minutes: 80,
       starter: false,
       subbed_due_to_injury: false,
       yellow_cards: false,

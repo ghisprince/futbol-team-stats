@@ -6,8 +6,7 @@
           v-model="alert"
           dismissible
           color="warning"
-          icon="priority_high"
-        >
+          icon="priority_high">
           {{ alertMessage }}
         </v-alert>
         <v-card-title>
@@ -23,26 +22,29 @@
                 }
               }"
               color="primary">Edit</v-btn>
-            <v-btn @click="deleteCompetition()" color="error">Delete</v-btn>
+            <v-btn @click="deleteCompetition()" color="error">
+              Delete
+            </v-btn>
           </div>
         </v-card-title>
         <v-card-text>
-          Match Results (W-D-L): {{ competition.match_results }} <br/>
+          <strong> Match Results (W-D-L) : </strong>
+          {{ competition.match_results }}
 
           <div v-if="competition.result">
-            Results : {{ competition.result }}
+            <strong> Result : </strong> {{ competition.result }}
           </div>
 
           <div v-if="competition.note">
-            Note: {{ competition.note }}
+            <strong> Note : </strong> {{ competition.note }}
           </div>
 
           <div v-if="competition.external_url">
-              <a v-bind:href="competition.external_url">
-                Competition's web site
+              <strong> Web site : </strong>
+              <a v-bind:href="competition.external_url" target="_blank">
+                external link
               </a>
           </div>
-
         </v-card-text>
       </v-card>
     </v-container>
@@ -58,8 +60,8 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <matches-table :matches="matches" 
-                           :showOpponent="true" 
+            <matches-table :matches="matches"
+                           :showOpponent="true"
                            :showProgress="showProgress">
             </matches-table>
           </v-card-text>

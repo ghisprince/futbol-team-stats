@@ -81,7 +81,8 @@ export default {
     return {
       pagination: {
         sortBy: 'date_time',
-        descending: true
+        descending: true,
+        rowsPerPage: -1
       }
     }
   },

@@ -13,6 +13,7 @@
       </v-alert>
 
       <v-card-title>
+        <h2>Match Details</h2>
         <v-spacer></v-spacer>
         <div v-if="is_editor">
           <v-btn
@@ -25,6 +26,7 @@
             color="primary">
             Edit
           </v-btn>
+
           <v-btn @click="deleteMatch()" color="error">Delete</v-btn>
 
           <v-btn v-if="match.match_stats"
@@ -40,15 +42,13 @@
       </v-card-title>
 
       <v-card-text>
-        <h4>
-          Date : {{ match.date_time | formatDate }} <br/>
-          Competition : {{ match.competition_name }} <br/>
-          Opponent : {{ match.opponent_name }} <br/>
-          Duration : {{ match.duration }} mins <br/>
+          <strong> Date : </strong> {{ match.date_time | formatDate }} <br/>
+          <strong> Competition : </strong> {{ match.competition_name }} <br/>
+          <strong> Opponent : </strong> {{ match.opponent_name }} <br/>
+          <strong> Duration : </strong> {{ match.duration }} mins <br/>
           <div v-if="match.note">
-            Note: {{ match.note }}
+            <strong> Note : </strong> {{ match.note }}
           </div>
-        </h4>
       </v-card-text>
 
         <v-card-text>
