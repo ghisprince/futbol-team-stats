@@ -4,7 +4,7 @@
       <v-card>
         <v-card-text>
           <h2>Futbol team stats</h2>
-          <img src="@/assets/crest.png" alt="Crest.js" align="right">
+          <img src="@/assets/Crest.png" alt="crest.js" align="right">
 
           <h3>What's New with version 2</h3>
           <ul>

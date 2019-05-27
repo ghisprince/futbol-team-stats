@@ -1,5 +1,4 @@
 aniso8601==4.0.1
-certifi==2018.10.15
 Click==7.0
 Flask==1.0.2
 Flask-JWT-Extended==3.17.0

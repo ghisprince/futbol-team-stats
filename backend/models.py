@@ -320,7 +320,6 @@ class Match(db.Model, CRUD_MixIn):
                                   back_populates="match",
                                   cascade="all, delete-orphan")
 
-
     @hybrid_property
     def opponent_name(self):
         return self.opponent.name
@@ -353,7 +352,6 @@ class Match(db.Model, CRUD_MixIn):
     def score(self):
         return "{}-{}".format(self.num_goals,
                               self.num_goals_against)
-
 
     @hybrid_property
     def label(self):

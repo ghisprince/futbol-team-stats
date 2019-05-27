@@ -329,10 +329,10 @@ class CreateListGoal(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
+
 class CreateListAssist(CreateListResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
-
 
     @jwt_refresh_token_required
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
@@ -451,12 +451,6 @@ class GetUpdateDeletePlayerMatch(GetUpdateDeleteResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
-
-
-class GetUpdateDeleteMatch(GetUpdateDeleteResourceBase):
-    ModelClass = Match
-    mm_schema = match_schema
-    mm_schema_ex = match_schema_ex
 
 
 class GetUpdateDeleteShot(GetUpdateDeleteResourceBase):

@@ -49,7 +49,7 @@
           </router-link>
         </td>
         <td><v-icon v-show="props.item.starter">done</v-icon></td>
-        <td><span v-show="props.item.minutes">{{ props.item.minutes }}</span></td>
+        <td>{{ props.item.minutes }}</td>
         <td><span v-show="props.item.num_goals > 0">{{ props.item.num_goals }}</span></td>
         <td><span v-show="props.item.num_assists > 0">{{ props.item.num_assists }}</span></td>
         <td><span v-show="props.item.num_shots > 0">{{ props.item.num_shots }}</span></td>

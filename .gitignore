@@ -65,6 +65,7 @@ target/
 
 # IPython Notebook
 .ipynb_checkpoints
+futbolnb/
 
 # pyenv
 .python-version

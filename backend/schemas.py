@@ -48,7 +48,6 @@ class PlayerSchemaEx(PlayerSchema):
 
 
 class CompetitionSchema(ModelSchema):
-
     start_date = fields.String(dump_only=True)
     num_match_won = fields.Integer(dump_only=True)
     num_match_tied = fields.Integer(dump_only=True)
@@ -72,7 +71,6 @@ class CompetitionSchemaEx(CompetitionSchema):
 
 
 class OpponentSchema(ModelSchema):
-
     num_match_won = fields.Integer(dump_only=True)
     num_match_tied = fields.Integer(dump_only=True)
     num_match_lost = fields.Integer(dump_only=True)
@@ -120,6 +118,7 @@ class ShotSchemaEx(ShotSchema):
     # todo: if don't do "all player shots, then no need for this for graphing"
     pass
 
+
 class AssistSchema(ModelSchema):
     class Meta:
         strict = True
@@ -129,7 +128,8 @@ class AssistSchema(ModelSchema):
 
 class AssistSchemaEx(AssistSchema):
     player_label = fields.String(dump_only=True)
-    goal = fields.Nested('GoalSchemaEx', dump_only=True,
+    goal = fields.Nested('GoalSchemaEx',
+                         dump_only=True,
                          exclude=["assist", "player_match"])
 
 

@@ -74,12 +74,14 @@ export default {
         { id: 0, x: 10, y: 20, width: 430, height: 330 },
         { id: 1, x: 100, y: 20, width: 245, height: 100 },
         { id: 2, x: 170, y: 20, width: 115, height: 30 },
+        { id: 3, x: 200, y: 18, width: 55, height: 4 },
         // bottom half
-        { id: 3, x: 10, y: 350, width: 430, height: 330 },
-        { id: 4, x: 100, y: 580, width: 245, height: 100 },
-        { id: 5, x: 170, y: 650, width: 115, height: 30 },
+        { id: 4, x: 10, y: 350, width: 430, height: 330 },
+        { id: 5, x: 100, y: 580, width: 245, height: 100 },
+        { id: 6, x: 170, y: 650, width: 115, height: 30 },
+        { id: 7, x: 200, y: 678, width: 55, height: 4 },
         // hidden
-        { id: 6, x: 460, y: 20, width: 70, height: 660 }
+        { id: 8, x: 460, y: 20, width: 70, height: 660 }
       ],
       fieldLabels: [
         { id: 10, x: 225, y: 250, label: "Team's attempts"},
