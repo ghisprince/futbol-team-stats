@@ -684,6 +684,7 @@ class Shot(db.Model, CRUD_MixIn):
     on_target = db.Column(db.Boolean(), default=False, nullable=False)
     pk = db.Column(db.Boolean(), default=False)
     by_opponent = db.Column(db.Boolean(), default=False)
+    blocked = db.Column(db.Boolean(), nullable=True)
 
     # relationships
     player_match_id = db.Column(db.Integer, db.ForeignKey('player_match.id'),
@@ -707,15 +708,15 @@ class Shot(db.Model, CRUD_MixIn):
     def player_label(self):
         return self.player_match.player_label
 
-
     def __init__(self, player_match, x=None, y=None, on_target=None,
-                 pk=None, by_opponent=None):
+                 pk=None, by_opponent=None, blocked=None):
         self.player_match = player_match
         self.x = x
         self.y = y
         self.on_target = on_target
         self.pk = pk
         self.by_opponent = by_opponent
+        self.blocked = blocked
 
     def __repr__(self):
         return "Shot (id={}, player={}, x={}, y={}, on_target={})".format(

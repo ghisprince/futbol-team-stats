@@ -149,7 +149,8 @@ class CreateListResourceBase(Resource):
                  'competition_id': webargs.fields.Int(required=False),
                  'opponent_id': webargs.fields.Int(required=False),
                  'expand': webargs.fields.Bool(required=False)})
-    def get(self, name, player_id, match_id, competition_id, opponent_id, expand=False):
+    def get(self, name=None, player_id=None, match_id=None,
+            competition_id=None, opponent_id=None, expand=False):
         query = self.ModelClass.query
         if name:
             query = query.filter_by(name=name)
@@ -221,7 +222,7 @@ class CreateListMatch(CreateListResourceBase):
     @jwt_refresh_token_required
     @use_kwargs({'opponent_id': webargs.fields.Int(required=False),
                  'competition_id': webargs.fields.Int(required=False) })
-    def get(self, opponent_id, competition_id):
+    def get(self, opponent_id=None, competition_id=None):
         query = self.ModelClass.query
 
         if opponent_id:
@@ -253,7 +254,8 @@ class CreateListShot(CreateListResourceBase):
                  'competition_id': webargs.fields.Int(required=False),
                  'by_opponent': webargs.fields.Bool(required=False),
                  'expand': webargs.fields.Bool(required=False)})
-    def get(self, player_id, match_id, competition_id, by_opponent, expand):
+    def get(self, player_id=None, match_id=None, competition_id=None,
+            by_opponent=None, expand=None):
         query = self.ModelClass.query
 
         if player_id:
@@ -268,7 +270,7 @@ class CreateListShot(CreateListResourceBase):
             query = query.join(PlayerMatch).join(Match).join(Competition).filter(
                 Competition.id == competition_id)
 
-        if not isinstance(by_opponent, marshmallow.utils._Missing):
+        if not by_opponent is None:
             query = query.filter(Shot.by_opponent == by_opponent)
 
         if expand:
@@ -312,7 +314,7 @@ class CreateListGoal(CreateListResourceBase):
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
                  'playermatch_id': webargs.fields.Int(required=False), })
-    def get(self, player_id, match_id, playermatch_id):
+    def get(self, player_id=None, match_id=None, playermatch_id=None):
         query = self.ModelClass.query
 
         if player_id:
@@ -338,7 +340,7 @@ class CreateListAssist(CreateListResourceBase):
     @use_kwargs({'player_id': webargs.fields.Int(required=False),
                  'match_id': webargs.fields.Int(required=False),
                  'playermatch_id': webargs.fields.Int(required=False)})
-    def get(self, player_id, match_id, playermatch_id):
+    def get(self, player_id=None, match_id=None, playermatch_id=None):
         query = self.ModelClass.query
 
         if player_id:
