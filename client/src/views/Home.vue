@@ -4,7 +4,7 @@
       <v-card>
         <v-card-text>
           <h2>Futbol team stats</h2>
-          <img src="@/assets/Crest.png" alt="crest.js" align="right">
+          <img src="@/assets/crest.png" alt="crest.js" align="right">
 
           <h3>What's New with version 2</h3>
           <ul>
@@ -24,8 +24,6 @@
           <h3>Request</h3>
           <ul>
             <li>Any problems/feedback/ideas pls feel free to shoot me email.</li>
-            <li>If anybody else is willing to collect game data (with pen and paper) for
-              games/tourneys in which my son does not participate please let me know.</li>
           </ul>
         </v-card-text>
       </v-card>

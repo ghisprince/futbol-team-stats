@@ -50,7 +50,6 @@ export default {
   }),
   methods: {
     submit () {
-      const user = {}
       var app = this
       const { username, password } = this
       API.logIn(username, password)

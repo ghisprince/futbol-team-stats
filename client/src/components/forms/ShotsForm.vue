@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <v-container>
+
     <v-toolbar>
       <h2>Shots</h2>
       <v-divider class="mx-2" inset vertical></v-divider>
@@ -44,6 +45,12 @@
                 <v-flex>
                   <v-checkbox v-model="editedItem.on_target"
                               label="On Target">
+                  </v-checkbox>
+                </v-flex>
+
+                <v-flex>
+                  <v-checkbox v-model="editedItem.blocked"
+                              label="Blocked">
                   </v-checkbox>
                 </v-flex>
 
@@ -126,6 +133,7 @@
         <td>{{ props.item.player_label }}</td>
         <td><v-icon v-show="props.item.by_opponent">done</v-icon></td>
         <td><v-icon v-show="props.item.on_target">done</v-icon></td>
+        <td><v-icon v-show="props.item.blocked">done</v-icon></td>
         <td><v-icon v-show="props.item.pk">done</v-icon></td>
         <td><v-icon v-show="props.item.scored">done</v-icon></td>
 
@@ -155,7 +163,7 @@
       :showHiddenArea="true"
     ></shots-graph>
     <v-btn @click="backToMatch()" color="error">Back To Match</v-btn>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -184,6 +192,10 @@ export default {
         value: 'on_target'
       },
       {
+        text: 'Blocked',
+        value: 'blocked'
+      },
+      {
         text: 'Penalty Kick',
         value: 'pk'
       },
@@ -204,6 +216,7 @@ export default {
       player_label: '',
       by_opponent: false,
       on_target: false,
+      blocked: false,
       pk: false,
       scored: false
     },
@@ -213,6 +226,7 @@ export default {
       player_label: '',
       by_opponent: false,
       on_target: false,
+      blocked: false,
       pk: false,
       scored: false
     },

@@ -41,7 +41,6 @@
               </a>
           </div>
 
-
           <matches-table :matches="matches"
                          :showCompetition="true"
                          :showProgress="showProgress">

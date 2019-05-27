@@ -220,7 +220,7 @@ export default {
         })
       API.getPlayerMatchesByMatch(id)
         .then((player_matches) => {
-          this.player_matches = player_matches,
+          this.player_matches = player_matches
           this.showProgress = false
         })
       API.getShotsByMatch(id)
