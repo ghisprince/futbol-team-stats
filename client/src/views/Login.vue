@@ -55,7 +55,7 @@ export default {
       API.logIn(username, password)
         .then(function (res) {
           app.$store.dispatch('init')
-          app.$router.push({name: 'Home'})
+          app.$router.push({ name: 'Home' })
         })
         .catch((err) => {
           app.showError = true

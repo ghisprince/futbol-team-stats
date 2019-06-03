@@ -84,8 +84,8 @@ export default {
         { id: 8, x: 460, y: 20, width: 70, height: 660 }
       ],
       fieldLabels: [
-        { id: 10, x: 225, y: 250, label: "Team's attempts"},
-        { id: 11, x: 225, y: 450, label: "Opponent's attempts"}
+        { id: 10, x: 225, y: 250, label: "Team's attempts" },
+        { id: 11, x: 225, y: 450, label: "Opponent's attempts" }
       ]
     }
   },

@@ -75,15 +75,15 @@ export default {
       },
       search: '',
       headers: [
-        {text: 'Name', value: 'name', sortable: false},
-        {text: 'Start', tooltip: 'Start Date', value: 'start_date'},
-        {text: 'Level', tooltip: 'Tournament level', value: 'level'},
-        {text: 'Matches', tooltip: 'Number of Matches', value: 'num_match'},
-        {text: 'W-D-L', tooltip: 'Number of Win-Draw-Loss', value: 'match_results'},
-        {text: 'Result', value: 'result'},
-        {text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential'},
-        {text: 'Clean Sheets', value: 'clean_sheets'},
-        {text: 'Details', value: 'id'}
+        { text: 'Name', value: 'name', sortable: false },
+        { text: 'Start', tooltip: 'Start Date', value: 'start_date' },
+        { text: 'Level', tooltip: 'Tournament level', value: 'level' },
+        { text: 'Matches', tooltip: 'Number of Matches', value: 'num_match' },
+        { text: 'W-D-L', tooltip: 'Number of Win-Draw-Loss', value: 'match_results' },
+        { text: 'Result', value: 'result' },
+        { text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential' },
+        { text: 'Clean Sheets', value: 'clean_sheets' },
+        { text: 'Details', value: 'id' }
       ]
     }
   },

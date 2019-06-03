@@ -28,13 +28,15 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Match',
-            params: { id: this.match.id }})
+            params: { id: this.match.id }
+          })
         })
     },
     cancel () {
       this.$router.push({
         name: 'Match',
-        params: { id: this.match.id }})
+        params: { id: this.match.id }
+      })
     },
     load (id) {
       API.getMatch(id)

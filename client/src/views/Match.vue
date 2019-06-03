@@ -243,8 +243,8 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Competition',
-            params: { id: this.match.competition }}
-          )
+            params: { id: this.match.competition }
+          })
         })
         .catch((err) => {
           this.alert = true
@@ -254,8 +254,8 @@ export default {
     backToCompetition () {
       this.$router.push({
         name: 'Competition',
-        params: { id: this.match.competition }}
-      )
+        params: { id: this.match.competition }
+      })
     }
   }
 }

@@ -27,7 +27,8 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Player',
-            params: { id: this.player.id }})
+            params: { id: this.player.id }
+          })
         })
         .then(
           this.$store.dispatch('fetchPlayers')

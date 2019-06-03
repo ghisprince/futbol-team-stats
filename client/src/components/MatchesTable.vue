@@ -79,13 +79,13 @@ export default {
       },
       search: '',
       headersAll: [
-        {text: 'Date', value: 'date_time', tooltip: 'Date & time of match', width: '1%'},
-        {text: 'Competition', value: 'competition_name', tooltip: 'Name of competition', width: '1%'},
-        {text: 'Opponent', value: 'opponent_name', tooltip: 'Opponent name', width: '1%'},
-        {text: 'Result', value: 'result', width: '1%'},
-        {text: 'Score', value: 'score', tooltip: 'Goals for-Goals against', width: '1%'},
-        {text: 'Shots', value: 'num_shots', tooltip: 'Shots for-Shots against', width: '1%'},
-        {text: 'Match Details', value: 'match', tooltip: 'Further Match Details', width: '1%'}
+        { text: 'Date', value: 'date_time', tooltip: 'Date & time of match', width: '1%' },
+        { text: 'Competition', value: 'competition_name', tooltip: 'Name of competition', width: '1%' },
+        { text: 'Opponent', value: 'opponent_name', tooltip: 'Opponent name', width: '1%' },
+        { text: 'Result', value: 'result', width: '1%' },
+        { text: 'Score', value: 'score', tooltip: 'Goals for-Goals against', width: '1%' },
+        { text: 'Shots', value: 'num_shots', tooltip: 'Shots for-Shots against', width: '1%' },
+        { text: 'Match Details', value: 'match', tooltip: 'Further Match Details', width: '1%' }
       ]
     }
   },

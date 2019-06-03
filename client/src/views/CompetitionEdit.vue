@@ -27,7 +27,8 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Competition',
-            params: { id: this.competition.id }})
+            params: { id: this.competition.id }
+          })
         })
         .then(
           this.$store.dispatch('fetchCompetitions')

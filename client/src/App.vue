@@ -91,13 +91,13 @@ export default {
       right: true,
       title: 'Futbol Stats',
       items: [
-        {icon: 'view_list', title: 'Competition', route: 'Competitions'},
-        {icon: 'view_list', title: 'Opponent', route: 'Opponents'},
-        {icon: 'view_list', title: 'Players', route: 'Players'}
+        { icon: 'view_list', title: 'Competition', route: 'Competitions' },
+        { icon: 'view_list', title: 'Opponent', route: 'Opponents' },
+        { icon: 'view_list', title: 'Players', route: 'Players' }
       ],
       items2: [
-        {icon: 'help_outline', title: 'Help', route: 'Home'},
-        {icon: 'close', title: 'Log out', route: 'logout'}
+        { icon: 'help_outline', title: 'Help', route: 'Home' },
+        { icon: 'close', title: 'Log out', route: 'logout' }
       ]
     }
   },

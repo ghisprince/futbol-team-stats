@@ -32,13 +32,15 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Match',
-            params: { id: this.player_matches[0].match }})
+            params: { id: this.player_matches[0].match }
+          })
         })
     },
     cancel () {
       this.$router.push({
         name: 'Match',
-        params: { id: this.player_matches[0].id }})
+        params: { id: this.player_matches[0].id }
+      })
     },
     load (id) {
       API.getPlayerMatchesByMatch(id)

@@ -66,11 +66,11 @@ export default {
     return {
       search: '',
       headers: [
-        {text: 'Name', value: 'name'},
-        {text: 'Matches', tooltip: 'Number of Matches', value: 'num_match'},
-        {text: 'W-D-L', tooltip: 'Number of Win-Draw-Loss', value: 'match_results'},
-        {text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential'},
-        {text: 'Details', value: 'id'}
+        { text: 'Name', value: 'name' },
+        { text: 'Matches', tooltip: 'Number of Matches', value: 'num_match' },
+        { text: 'W-D-L', tooltip: 'Number of Win-Draw-Loss', value: 'match_results' },
+        { text: 'Goal Diff', tooltip: 'Goal Differential (Goals scored-Goals allowed)', value: 'goal_differential' },
+        { text: 'Details', value: 'id' }
       ]
     }
   },

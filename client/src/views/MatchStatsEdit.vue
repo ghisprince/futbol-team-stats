@@ -31,13 +31,15 @@ export default {
         .then(() => {
           this.$router.push({
             name: 'Match',
-            params: { id: this.match_stats.match }})
+            params: { id: this.match_stats.match }
+          })
         })
     },
     cancel () {
       this.$router.push({
         name: 'Match',
-        params: { id: this.match_stats.id }})
+        params: { id: this.match_stats.id }
+      })
     },
     load (id) {
       API.getMatchStats(id)

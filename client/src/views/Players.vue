@@ -67,10 +67,10 @@ export default {
       pagination: {},
       search: '',
       headers: [
-        {text: 'Name', value: 'label'},
-        {text: 'Active', value: 'active'},
-        {text: 'Apps', tooltip: 'Number of Matches participated in', value: 'num_apps'},
-        {text: 'Details', value: 'id'}
+        { text: 'Name', value: 'label' },
+        { text: 'Active', value: 'active' },
+        { text: 'Apps', tooltip: 'Number of Matches participated in', value: 'num_apps' },
+        { text: 'Details', value: 'id' }
       ]
     }
   },

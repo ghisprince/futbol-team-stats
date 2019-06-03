@@ -7,7 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    team: {id: 1},
+    team: { id: 1 },
     user:
       { username: '',
         access_token: '',
@@ -99,33 +99,34 @@ export default new Vuex.Store({
         context.commit('updateCurrentUser', user)
       }
     },
-    fetchPlayers ({commit}) {
+    fetchPlayers ({ commit }) {
       API.getPlayers().then(players => {
         commit('setPlayers', players)
       })
     },
-    fetchCompetitions ({commit}) {
+    fetchCompetitions ({ commit }) {
       API.getCompetitions().then(competitions => {
         commit('setCompetitions', competitions)
       })
     },
-    fetchOpponents ({commit}) {
+    fetchOpponents ({ commit }) {
       API.getOpponents().then(opponents => {
         commit('setOpponents', opponents)
       })
     },
-    createPlayer ({commit, state, dispatch}, player) {
+    createPlayer ({ commit, state, dispatch }, player) {
       // add team onto payload
       player.team = state.team
       API.createPlayer(player)
         .then(player => {
           router.push({
             name: 'Player',
-            params: { id: player.id }})
+            params: { id: player.id }
+          })
           dispatch('fetchPlayers')
         })
     },
-    createOpponent ({commit, state, dispatch}, opponent) {
+    createOpponent ({ commit, state, dispatch }, opponent) {
       // add team onto payload
       opponent.team = state.team
 
@@ -133,11 +134,12 @@ export default new Vuex.Store({
         .then(result => {
           router.push({
             name: 'Opponent',
-            params: { id: result.id }})
+            params: { id: result.id }
+          })
           dispatch('fetchOpponents')
         })
     },
-    createCompetition ({commit, state, dispatch}, competition) {
+    createCompetition ({ commit, state, dispatch }, competition) {
       // add team onto payload
       competition.team = state.team
 
@@ -146,10 +148,11 @@ export default new Vuex.Store({
           dispatch('fetchCompetitions')
           router.push({
             name: 'Competition',
-            params: { id: result.id }})
+            params: { id: result.id }
+          })
         })
     },
-    deleteCompetition ({commit, state, dispatch}, id) {
+    deleteCompetition ({ commit, state, dispatch }, id) {
       return new Promise((resolve, reject) => {
         API.deleteCompetition(id)
           .then((resp) => {
@@ -163,7 +166,7 @@ export default new Vuex.Store({
           })
       })
     },
-    deleteOpponent ({commit, state, dispatch}, id) {
+    deleteOpponent ({ commit, state, dispatch }, id) {
       return new Promise((resolve, reject) => {
         API.deleteOpponent(id)
           .then((resp) => {

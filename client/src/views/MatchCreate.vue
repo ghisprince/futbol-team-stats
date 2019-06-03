@@ -43,7 +43,8 @@ export default {
         .then(result => {
           this.$router.push({
             name: 'Match',
-            params: { id: result.id }})
+            params: { id: result.id }
+          })
         })
     },
     cancel () {
