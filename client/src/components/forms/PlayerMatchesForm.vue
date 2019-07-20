@@ -11,7 +11,9 @@
 
       <!-- THIS IS POPUP DIALOG -->
       <v-dialog v-model="dialog" max-width="500px">
-        <v-btn slot="activator" color="primary" dark class="mb-2" @click="newItem">Add Player Match</v-btn>
+        <v-btn slot="activator" color="primary" dark class="mb-2" @click="newItem">
+          Add Player Match
+        </v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -24,7 +26,7 @@
                   <v-select
                     v-model="editedItem.player"
                     :items="players"
-                    item-text="name"
+                    item-text="label"
                     item-value="id"
                     :rules="[v => !!v || 'Player is required']"
                     label="Player"
@@ -33,7 +35,8 @@
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.starter" label="Starter"></v-checkbox>
+                  <v-checkbox v-model="editedItem.starter" label="Starter">
+                  </v-checkbox>
                 </v-flex>
 
                 <v-flex>
@@ -53,15 +56,21 @@
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.subbed_due_to_injury" label="Subbed due to injury"></v-checkbox>
+                  <v-checkbox v-model="editedItem.subbed_due_to_injury" 
+                              label="Subbed due to injury">
+                  </v-checkbox>
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.yellow_cards" label="Yellow Card"></v-checkbox>
+                  <v-checkbox v-model="editedItem.yellow_cards" 
+                              label="Yellow Card">
+                  </v-checkbox>
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.red_cards" label="Red Card"></v-checkbox>
+                  <v-checkbox v-model="editedItem.red_cards"
+                              label="Red Card">
+                  </v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
