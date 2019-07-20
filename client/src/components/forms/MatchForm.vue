@@ -22,6 +22,11 @@
               mask="##"
             ></v-text-field>
 
+            <v-text-field
+              v-model="match.external_url"
+              label="Match URL">
+            </v-text-field>
+
             <v-textarea
               v-model="match.note"
               label="Note"

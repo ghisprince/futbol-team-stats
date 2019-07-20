@@ -292,6 +292,7 @@ class Match(db.Model, CRUD_MixIn):
     at_home = db.Column(db.Boolean())
     duration = db.Column(db.Integer())  # match duration in minutes
     note = db.Column(db.String())
+    external_url = db.Column(db.String())
 
     # relationships
     player_matches = db.relationship("PlayerMatch", back_populates="match",
@@ -490,7 +491,7 @@ class Match(db.Model, CRUD_MixIn):
             return
 
     def __init__(self, date_time, team, opponent, competition=None,
-                 at_home=True, duration=None, note=None):
+                 at_home=True, duration=None, note=None, external_url=None):
         self.date_time = date_time #datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S", )
         self.team = team
         self.opponent = opponent
@@ -498,6 +499,7 @@ class Match(db.Model, CRUD_MixIn):
         self.at_home = at_home
         self.duration = duration
         self.note = note
+        self.external_url = external_url
 
     def __repr__(self):
         return "Match (id={}, team={}, opponent={}, date_time={})".format(
@@ -647,10 +649,12 @@ class PlayerMatch(db.Model, CRUD_MixIn):
     @hybrid_property
     def num_goals(self):
         return len([i for i in self.shots if (i.scored and not i.by_opponent)])
+        #(i.scored and (not i.by_opponent or (i.by_opponent and i.goal.own_goal)))])
 
     @hybrid_property
     def num_goals_against(self):
         return len([i for i in self.shots if (i.scored and i.by_opponent)])
+        #(i.scored and (i.by_opponent ^ (i.by_opponent and i.goal.own_goal)))])
 
     @hybrid_property
     def num_saves(self):

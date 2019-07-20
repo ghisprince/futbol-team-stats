@@ -31,7 +31,8 @@ export default {
         date_time: today(),
         at_home: null,
         duration: 80,
-        note: null
+        note: '',
+        external_url: ''
       }
     }
   },

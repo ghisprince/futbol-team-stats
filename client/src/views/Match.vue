@@ -49,6 +49,13 @@
           <div v-if="match.note">
             <strong> Note : </strong> {{ match.note }}
           </div>
+          <div v-if="match.external_url">
+              <strong>Web site : </strong>
+              <a v-bind:href="match.external_url" target="_blank">
+                external link
+              </a>
+          </div>
+
       </v-card-text>
 
         <v-card-text>

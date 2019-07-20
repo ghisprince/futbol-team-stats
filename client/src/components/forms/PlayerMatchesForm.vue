@@ -56,13 +56,13 @@
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.subbed_due_to_injury" 
+                  <v-checkbox v-model="editedItem.subbed_due_to_injury"
                               label="Subbed due to injury">
                   </v-checkbox>
                 </v-flex>
 
                 <v-flex>
-                  <v-checkbox v-model="editedItem.yellow_cards" 
+                  <v-checkbox v-model="editedItem.yellow_cards"
                               label="Yellow Card">
                   </v-checkbox>
                 </v-flex>
