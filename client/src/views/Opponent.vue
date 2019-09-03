@@ -35,9 +35,9 @@
           </div>
 
           <div v-if="opponent.external_url">
-              <strong> Web site : </strong>
+              <strong>Web site : </strong>
               <a v-bind:href="opponent.external_url" target="_blank">
-                external link
+                {{ opponent.external_url | getHostName }}
               </a>
           </div>
 

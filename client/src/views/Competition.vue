@@ -40,9 +40,9 @@
           </div>
 
           <div v-if="competition.external_url">
-              <strong> Web site : </strong>
+              <strong>Web site : </strong>
               <a v-bind:href="competition.external_url" target="_blank">
-                external link
+                {{ competition.external_url | getHostName}}
               </a>
           </div>
         </v-card-text>

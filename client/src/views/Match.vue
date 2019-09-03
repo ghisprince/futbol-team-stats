@@ -50,9 +50,9 @@
             <strong> Note : </strong> {{ match.note }}
           </div>
           <div v-if="match.external_url">
-              <strong>Web site : </strong>
+              <strong>Match web site : </strong>
               <a v-bind:href="match.external_url" target="_blank">
-                external link
+                {{ match.external_url | getHostName}}
               </a>
           </div>
 
