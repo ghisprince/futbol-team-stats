@@ -1,7 +1,8 @@
 <template>
   <v-container>
     <v-flex offset-xs1>
-      <v-card>
+      <v-card v-on:keyup.enter="submit"
+      >
         <v-alert type="error" :value="showError">
           Login failed
         </v-alert>
@@ -11,7 +12,6 @@
           <v-avatar size=80><img src="@/assets/crest.png"></v-avatar>
         </v-card-title>
         <v-form v-model="valid" lazy-validation>
-
           <v-text-field v-model="username"
                         name="Username"
                         label="Username"
@@ -48,6 +48,7 @@ export default {
     valid: true,
     showError: false
   }),
+
   methods: {
     submit () {
       var app = this
