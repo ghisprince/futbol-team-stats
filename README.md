@@ -22,11 +22,22 @@ Web-app to store and report a soccer team and player's stats.
 Backend rest api written in python.  Uses flask, sqlalchemy, marshmallow, flask-restful.
 
 ### Python
-Install requirements
+Create env using conda
+```
+conda create -n futbol python=3.6
+conda activate futbol
+```
+
+Create env using virtualenv
 ```
 virtualenv env --python=python3.6
 source env/bin/activate
-pip3 install -r backend/requirements.txt
+
+```
+
+Install requirements
+```
+pip3 install -r requirements.txt
 ```
 
 ### run flask server
