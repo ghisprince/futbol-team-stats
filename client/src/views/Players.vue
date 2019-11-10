@@ -33,7 +33,7 @@
                 {{ props.header.text }}
               </span>
               <span>
-                {{ props.header.tooltip ? props.header.tooltip : props.header.text  }}
+                {{ props.header.tooltip ? props.header.tooltip : props.header.text }}
               </span>
             </v-tooltip>
           </template>
@@ -46,7 +46,7 @@
               <router-link :to="{
                   name: 'Player',
                   params: { id: props.item.id }
-                }">
+                  }">
                 <v-icon>insert_chart</v-icon>
               </router-link>
             </td>

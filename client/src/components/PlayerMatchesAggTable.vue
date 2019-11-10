@@ -107,7 +107,9 @@ export default {
         { text: 'Corners', tooltip: 'Corners taken', value: 'corners' },
         { text: 'YC', tooltip: 'Yellow Cards', value: 'yellow_cards' },
         { text: 'RC', tooltip: 'Red Cards', value: 'red_cards' },
-        { text: 'Injury', tooltip: 'Number Of Times Subsituted due to injury', value: 'subbed_due_to_injury' }
+        { text: 'Injury', 
+          tooltip: 'Number Of Times Subsituted due to injury',
+          value: 'subbed_due_to_injury' }
       ])
 
       return arr

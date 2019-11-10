@@ -41,7 +41,7 @@ export default {
     nameRules: [
       v => (v && v.trim().length !== 0) || 'Name is required yo',
       v => !!v || 'Name is required',
-      v => (v && v.length <= 30) || 'Name must be less than 40 characters'
+      v => (v && v.length <= 50) || 'Name must be less than 50 characters'
     ]
   }),
   methods: {

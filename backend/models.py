@@ -274,7 +274,8 @@ class Competition(db.Model, CRUD_MixIn):
         """ team's clean sheets aka no goals allowed """
         return len([1 for i in self.matches if (i.num_goals_against == 0)])
 
-    def __init__(self, name, team, level=None, result=None, external_url=None, note=None):
+    def __init__(self, name, team, level=None, result=None, external_url=None,
+                 note=None):
         self.name = name
         self.team = team
         self.level = level

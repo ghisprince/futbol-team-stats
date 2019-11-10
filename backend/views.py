@@ -86,6 +86,7 @@ def generate_tokens(username):
     return {'access_token': access_token,
             'refresh_token': refresh_token }
 
+
 class UserLogin(Resource):
     @use_kwargs({'username': webargs.fields.Str(required=True),
                  'password': webargs.fields.Str(required=True) })
@@ -201,18 +202,22 @@ class CreateListTeam(CreateListResourceBase):
     mm_schema = team_schema
     mm_schema_ex = team_schema_ex
 
+
 class CreateListPlayer(CreateListResourceBase):
     ModelClass = Player
     mm_schema = player_schema
+
 
 class CreateListCompetition(CreateListResourceBase):
     ModelClass = Competition
     mm_schema = competition_schema
     mm_schema_ex = competition_schema_ex
 
+
 class CreateListOpponent(CreateListResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
+
 
 class CreateListMatch(CreateListResourceBase):
     ModelClass = Match
@@ -234,14 +239,17 @@ class CreateListMatch(CreateListResourceBase):
 
         return self.mm_schema.dump(query.all(), many=True).data
 
+
 class CreateListPlayerMatch(CreateListResourceBase):
     ModelClass = PlayerMatch
     mm_schema = playermatch_schema
     mm_schema_ex = playermatch_schema_ex
 
+
 class CreateListMatchStats(CreateListResourceBase):
     ModelClass = MatchStats
     mm_schema = matchstats_schema
+
 
 class CreateListShot(CreateListResourceBase):
     ModelClass = Shot
@@ -305,6 +313,7 @@ class CreateListShot(CreateListResourceBase):
         # todo: add goal/assist?
         db.session.commit()
         return self.mm_schema.dump(shot).data, 200
+
 
 class CreateListGoal(CreateListResourceBase):
     ModelClass = Goal
@@ -517,7 +526,9 @@ class GetUpdateDeleteGoal(GetUpdateDeleteResourceBase):
     mm_schema = goal_schema
     mm_schema_ex = goal_schema_ex
 
+
 class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     ModelClass = Assist
     mm_schema = assist_schema
     mm_schema_ex = assist_schema_ex
+
