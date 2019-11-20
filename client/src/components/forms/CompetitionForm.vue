@@ -10,18 +10,31 @@
             label="Name"
             required>
           </v-text-field>
+
+          <v-select
+            v-model="competition.season"
+            :items="seasons"
+            item-text="name"
+            item-value="id"
+            label="Season (optional)"
+          >
+          </v-select>
+
           <v-text-field
             v-model="competition.level"
             label="Level">
           </v-text-field>
+
           <v-text-field
             v-model="competition.result"
             label="Result">
           </v-text-field>
+
           <v-textarea
             v-model="competition.note"
             label="Note">
           </v-textarea>
+
           <v-text-field
             v-model="competition.external_url"
             label="Competition URL">
@@ -47,6 +60,13 @@ export default {
       v => (v && v.length <= 50) || 'Name must be less than 50 characters'
     ]
   }),
+  computed: {
+    seasons () {
+      let seasons = this.$store.getters.seasonsSorted
+      seasons.push({id: null, name: "None"})
+      return seasons
+    }
+  },
   methods: {
     submit () {
       if (this.valid) {

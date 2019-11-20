@@ -28,6 +28,19 @@
     <v-container>
       <v-card>
       <v-card-text>
+        <h3>Aggregated by Season</h3>
+        <player-seasons-agg-table :agg_player_matches="player_season_data"
+                                  :showPlayer="false"
+                                  :showSeason="true"
+                                  :showProgress="showProgress2"
+                                  >
+        </player-seasons-agg-table>
+      </v-card-text>
+      </v-card>
+    </v-container>
+    <v-container>
+      <v-card>
+      <v-card-text>
         <h3>Aggregated by Competition</h3>
         <player-matches-agg-table :player_matches="player_matches"
                                   :showPlayer="false"
@@ -57,10 +70,11 @@
 import API from '@/lib/API'
 import PlayerMatchesTable from '@/components/PlayerMatchesTable'
 import PlayerMatchesAggTable from '@/components/PlayerMatchesAggTable'
+import PlayerSeasonsAggTable from '@/components/PlayerSeasonsAggTable'
 
 export default {
   components: {
-    PlayerMatchesTable, PlayerMatchesAggTable
+    PlayerMatchesTable, PlayerMatchesAggTable, PlayerSeasonsAggTable
   },
   data () {
     return {
@@ -71,7 +85,9 @@ export default {
         label: null
       },
       player_matches: [],
-      showProgress: true
+      player_season_data: [],
+      showProgress: true,
+      showProgress2: true
     }
   },
   computed: {
@@ -98,6 +114,11 @@ export default {
         .then((player_matches) => {
           this.player_matches = player_matches
           this.showProgress = false
+        })
+      API.getPlayerSeasonData(id)
+        .then((player_season_data) => {
+          this.player_season_data = player_season_data
+          this.showProgress2 = false
         })
     },
     deletePlayer () {

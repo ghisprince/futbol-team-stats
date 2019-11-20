@@ -8,6 +8,11 @@ import Competition from '@/views/Competition.vue'
 import CompetitionCreate from '@/views/CompetitionCreate.vue'
 import CompetitionEdit from '@/views/CompetitionEdit.vue'
 
+import Seasons from '@/views/Seasons.vue'
+import Season from '@/views/Season.vue'
+import SeasonCreate from '@/views/SeasonCreate.vue'
+import SeasonEdit from '@/views/SeasonEdit.vue'
+
 import Opponents from '@/views/Opponents.vue'
 import Opponent from '@/views/Opponent.vue'
 import OpponentCreate from '@/views/OpponentCreate.vue'
@@ -67,6 +72,28 @@ const router = new Router({
       name: 'CompetitionEdit',
       component: CompetitionEdit
     },
+    // Seasons
+    {
+      path: '/seasons',
+      name: 'Seasons',
+      component: Seasons
+    },
+    {
+      path: '/seasons/:id',
+      name: 'Season',
+      component: Season
+    },
+    {
+      path: '/seasons/create',
+      name: 'SeasonCreate',
+      component: SeasonCreate
+    },
+    {
+      path: '/seasons/:id/edit',
+      name: 'SeasonEdit',
+      component: SeasonEdit
+    },
+
     // Opponents
     {
       path: '/opponents',

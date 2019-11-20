@@ -48,6 +48,8 @@ class PlayerSchemaEx(PlayerSchema):
 
 
 class CompetitionSchema(ModelSchema):
+
+    # hybrid properties
     start_date = fields.String(dump_only=True)
     num_match_won = fields.Integer(dump_only=True)
     num_match_tied = fields.Integer(dump_only=True)
@@ -56,6 +58,7 @@ class CompetitionSchema(ModelSchema):
     match_results = fields.String(dump_only=True)
     goal_differential = fields.Integer(dump_only=True)
     clean_sheets = fields.Integer(dump_only=True)
+    season_name = fields.String(dump_only=True)
 
     class Meta:
         strict = True
@@ -68,6 +71,22 @@ class CompetitionSchemaEx(CompetitionSchema):
     matches = fields.Nested('MatchSchemaEx', many=True,
                             dump_only=True,
                             exclude=("player_matches",))
+
+
+class SeasonSchema(ModelSchema):
+    # TODO: move stuff into Ex
+    start_date = fields.String(dump_only=True)
+    num_matches = fields.Integer(dump_only=True)
+    match_results = fields.String(dump_only=True)
+
+    class Meta:
+        strict = True
+        model = Season
+        sqla_session = db.session
+
+
+class SeasonSchemaEx(SeasonSchema):
+    team_table_data = fields.String(dump_only=True)
 
 
 class OpponentSchema(ModelSchema):

@@ -5,10 +5,13 @@ const loginURL = 'login'
 const competitionsURL = 'competitions'
 const matchesURL = 'matches'
 const opponentsURL = 'opponents'
+const seasonsURL = 'seasons'
 const playerMatchesURL = 'playermatches'
 const matchStatsURL = 'matchstats'
 const playersURL = 'players'
 const shotsURL = 'shots'
+const playerseasondataURL = "playerseasondata" 
+const teamseasondataURL =  "teamseasondata"
 
 const getHeader = function () {
   const user = JSON.parse(window.localStorage.getItem('user'))
@@ -140,6 +143,36 @@ export default {
     return HTTP.delete(`${opponentsURL}/${id}`)
       .then(response => response.data)
   },
+  // Seasons
+  getSeasons () {
+    return HTTP.get(seasonsURL)
+      .then(response => response.data)
+  },
+  getSeason (id) {
+    return HTTP.get(`${seasonsURL}/${id}`)
+      .then(response => response.data)
+  },
+  createSeason (season) {
+    return HTTP.post(seasonsURL, season)
+      .then(response => response.data)
+  },
+  updateSeason (id, season) {
+    return HTTP.patch(`${seasonsURL}/${id}`, season)
+      .then(response => response.data)
+  },
+  deleteSeason (id) {
+    return HTTP.delete(`${seasonsURL}/${id}`)
+      .then(response => response.data)
+  },
+  getPlayerSeasonData (id) {
+    return HTTP.get(`${playerseasondataURL}/${id}`)
+      .then(response => response.data)
+  },
+  getTeamSeasonData (id) {
+    return HTTP.get(`${teamseasondataURL}/${id}`)
+      .then(response => response.data)
+  },
+
   // playerMatches
   createPlayerMatch (player_match) {
     return HTTP.post(playerMatchesURL, player_match)

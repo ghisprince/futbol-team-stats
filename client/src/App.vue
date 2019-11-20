@@ -8,7 +8,7 @@
       fixed
       app>
       <v-list>
-        <v-subheader class="mt-3 grey--text text--darken-1">Statistic by...</v-subheader>
+        <v-subheader class="mt-3 grey--text text--darken-1">Statistics by ...</v-subheader>
 
         <v-list-tile
           value="true"
@@ -91,6 +91,7 @@ export default {
       right: true,
       title: 'Futbol Stats',
       items: [
+        { icon: 'view_list', title: 'Season', route: 'Seasons' },
         { icon: 'view_list', title: 'Competition', route: 'Competitions' },
         { icon: 'view_list', title: 'Opponent', route: 'Opponents' },
         { icon: 'view_list', title: 'Players', route: 'Players' }

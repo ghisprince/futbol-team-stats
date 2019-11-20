@@ -31,6 +31,10 @@
           <strong> Match Results (W-D-L) : </strong>
           {{ competition.match_results }}
 
+          <div v-if="competition.season">
+            <strong> Season : </strong> {{ competition.season_name }}
+          </div>
+
           <div v-if="competition.result">
             <strong> Result : </strong> {{ competition.result }}
           </div>

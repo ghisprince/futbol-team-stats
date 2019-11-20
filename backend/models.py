@@ -223,11 +223,23 @@ class Competition(db.Model, CRUD_MixIn):
     # relationships
     matches = db.relationship("Match", back_populates="competition")
 
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'),
-                        nullable=False, index=True)
+    team_id = db.Column(db.Integer,
+                        db.ForeignKey('team.id'),
+                        nullable=False,
+                        index=True)
+
     team = db.relationship("Team",
                            uselist=False,
                            back_populates="competitions")
+
+    season_id = db.Column(db.Integer,
+                          db.ForeignKey('season.id'),
+                          nullable=False,
+                          index=True)
+
+    season = db.relationship("Season",
+                             uselist=False,
+                             back_populates="competitions")
 
     @hybrid_property
     def start_date(self):
@@ -273,6 +285,13 @@ class Competition(db.Model, CRUD_MixIn):
     def clean_sheets(self):
         """ team's clean sheets aka no goals allowed """
         return len([1 for i in self.matches if (i.num_goals_against == 0)])
+
+    @hybrid_property
+    def season_name(self):
+        """ name of the season """
+        if self.season:
+            return self.season.name
+        return ""
 
     def __init__(self, name, team, level=None, result=None, external_url=None,
                  note=None):
@@ -505,6 +524,145 @@ class Match(db.Model, CRUD_MixIn):
     def __repr__(self):
         return "Match (id={}, team={}, opponent={}, date_time={})".format(
             self.id, self.team, self.opponent, self.date_time)
+
+
+from functools import reduce
+import operator
+
+class Season(db.Model, CRUD_MixIn):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String())
+    note = db.Column(db.String())
+
+    competitions = db.relationship("Competition", back_populates="season")
+
+    @hybrid_property
+    def start_date(self):
+        """  """
+
+        try:
+            return min(i.start_date for i in self.competitions)
+        except ValueError:
+            return None
+
+    @hybrid_property
+    def num_matches(self):
+        """ """
+        return sum(i.num_match for i in self.competitions)
+
+    def num_match_won(self):
+        """ number of matches won """
+        return sum(i.num_match_won for i in self.competitions)
+
+    def num_match_tied(self):
+        """ number of matches tied """
+        return sum(i.num_match_tied for i in self.competitions)
+
+    def num_match_lost(self):
+        """ number of matches lost """
+        return sum(i.num_match_lost for i in self.competitions)
+
+    @hybrid_property
+    def match_results(self):
+        """ return competition result in W-D-L format """
+        return "{}-{}-{}".format(self.num_match_won(),
+                                 self.num_match_tied(),
+                                 self.num_match_lost())
+
+
+    def team_aggregated_data(self):
+        """ """
+        from itertools import chain
+        matches = db.session.query(Match).join(Competition).join(Season).filter(Season.id == self.id).all()
+
+        if not matches: return None
+        result = []
+        players = {i.player.id : i.player.name for i in (chain.from_iterable([i.player_matches for i in matches]))}
+        player_matches = reduce(operator.concat, (i.player_matches for i in matches))
+
+        data = []
+        for player in players:
+            player_matches_sub = [i for i in player_matches if (i.player.id == player)] 
+            tot_minutes = sum(i.minutes for i in player_matches_sub)
+            num_minutes = sum(i.minutes for i in player_matches_sub)
+            # reduce to flatten list of lists
+            shots = reduce(operator.concat, (i.shots for i in player_matches_sub))
+            assists = reduce(operator.concat, (i.assists for i in player_matches_sub))
+
+            num_shots = len([i for i in shots if (i.by_opponent == False)])
+            num_assists = len(assists)
+            num_goals = len(list(i for i in shots if (i.goal and i.by_opponent == False)))
+
+            num_apps = len(player_matches_sub)
+            avr_minutes = round(tot_minutes/num_apps, 1)
+
+            num_yellow_cards = sum([i.yellow_cards for i in player_matches_sub])
+            num_red_cards = sum([i.red_cards for i in player_matches_sub])
+            num_injury = sum([i.subbed_due_to_injury for i in player_matches_sub])
+            num_starter = sum([i.starter for i in player_matches_sub])
+
+            data.append({"player_id": player,
+                         "player_label": players[player],
+                         "apps": num_apps,
+                         "starter": num_starter,
+                         "matches": self.num_matches,
+                         "minutes": tot_minutes,
+                         "minutes_avr": avr_minutes,
+                         "shots": num_shots,
+                         "assists": num_assists,
+                         "goals": num_goals,
+                         "red_cards": num_red_cards,
+                         "yellow_cards": num_yellow_cards,
+                         "subbed_due_to_injury": num_injury,
+                         })
+        return data
+
+    def player_aggregated_data(self, id):
+        """ """
+        player_matches = [i for i in db.session.query(PlayerMatch).filter_by(player_id=id).all()
+                                if (i.match.competition.season_id == self.id)]
+
+        if not player_matches: return None
+
+        num_apps = len(player_matches)
+        tot_minutes = sum([i.minutes for i in player_matches])
+        avr_minutes = round(tot_minutes/num_apps, 1)
+
+        # reduce to flatten list of lists
+        shots = reduce(operator.concat, (i.shots for i in player_matches))
+        assists = reduce(operator.concat, (i.assists for i in player_matches))
+
+        num_shots = len([i for i in shots if (i.by_opponent == False)])
+        num_assists = len(assists)
+        num_goals = len(list(i for i in shots if (i.goal and i.by_opponent == False)))
+
+        num_yellow_cards = sum([i.yellow_cards for i in player_matches])
+        num_red_cards = sum([i.red_cards for i in player_matches])
+        num_injury = sum([i.subbed_due_to_injury for i in player_matches])
+        num_starter = sum([i.starter for i in player_matches])
+
+        return {"season_id": self.id,
+                "season_name": self.name,
+                "apps": num_apps,
+                "starter": num_starter,
+                "matches": self.num_matches,
+                "minutes": tot_minutes,
+                "minutes_avr": avr_minutes,
+                "shots": num_shots,
+                "assists": num_assists,
+                "goals": num_goals,
+                "red_cards": num_red_cards,
+                "yellow_cards": num_yellow_cards,
+                "subbed_due_to_injury": num_injury,
+                }
+
+
+    def __init__(self, name, note=None,):
+        self.name = name
+        self.note = note
+
+    def __repr__(self):
+        return "Season (id={}, name={})".format(self.id, self.name)
 
 
 class MatchStats(db.Model, CRUD_MixIn):
@@ -809,4 +967,4 @@ class Assist(db.Model, CRUD_MixIn):
         return "Assist (id={}, player={}, Goal.player={})".format(
             self.id,
             self.player_match.player.name,
-            self.goal.shot.player_match.player.name)
+            self.goal.shot.player_match.player.name)    

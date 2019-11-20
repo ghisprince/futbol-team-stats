@@ -36,6 +36,9 @@ match_schema_ex = MatchSchemaEx()
 competition_schema = CompetitionSchema()
 competition_schema_ex = CompetitionSchemaEx()
 
+season_schema = SeasonSchema()
+season_schema_ex = SeasonSchemaEx()
+
 opponent_schema = OpponentSchema()
 opponent_schema_ex = OpponentSchemaEx()
 
@@ -213,6 +216,11 @@ class CreateListCompetition(CreateListResourceBase):
     mm_schema = competition_schema
     mm_schema_ex = competition_schema_ex
 
+
+class CreateListSeason(CreateListResourceBase):
+    ModelClass = Season
+    mm_schema = season_schema
+    mm_schema_ex = season_schema_ex
 
 class CreateListOpponent(CreateListResourceBase):
     ModelClass = Opponent
@@ -452,6 +460,12 @@ class GetUpdateDeleteCompetition(GetUpdateDeleteResourceBase):
     mm_schema_ex = competition_schema_ex
 
 
+class GetUpdateDeleteSeason(GetUpdateDeleteResourceBase):
+    ModelClass = Season
+    mm_schema = season_schema
+    mm_schema_ex = season_schema_ex
+
+
 class GetUpdateDeleteOpponent(GetUpdateDeleteResourceBase):
     ModelClass = Opponent
     mm_schema = opponent_schema
@@ -532,3 +546,24 @@ class GetUpdateDeleteAssist(GetUpdateDeleteResourceBase):
     mm_schema = assist_schema
     mm_schema_ex = assist_schema_ex
 
+
+class GetPlayerSeasonData(Resource):
+    @jwt_refresh_token_required
+    @use_kwargs({'id': webargs.fields.Int(required=False)})
+    def get(self, id=None):
+
+        player = Player.query.get_or_404(id)
+        data = []
+        for season in Season.query.all():
+            season_data = season.player_aggregated_data(id)
+            if season_data:
+                data.append(season_data)
+        return data
+
+
+class GetSeasonSeasonData(Resource):
+    @jwt_refresh_token_required
+    @use_kwargs({'id': webargs.fields.Int(required=False)})
+    def get(self, id=None):
+        season = Season.query.get_or_404(id)
+        return season.team_aggregated_data()

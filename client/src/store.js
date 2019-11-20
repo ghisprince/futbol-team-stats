@@ -17,6 +17,7 @@ export default new Vuex.Store({
       },
     players: [],
     competitions: [],
+    seasons: [],
     opponents: []
   },
   getters: {
@@ -38,6 +39,17 @@ export default new Vuex.Store({
         }
         if (a.start_date > b.start_date) {
           return -1
+        }
+        return 0
+      })
+    },
+    seasonsSorted (state, getters) {
+      return state.seasons.sort(function (a, b) {
+        if (a.name < b.name) {
+          return -1
+        }
+        if (a.name > b.name) {
+          return 1
         }
         return 0
       })
@@ -64,6 +76,9 @@ export default new Vuex.Store({
     setCompetitions (state, competitions) {
       state.competitions = competitions
     },
+    setSeasons (state, seasons) {
+      state.seasons = seasons
+    },
     setOpponents (state, opponents) {
       state.opponents = opponents
     }
@@ -86,6 +101,7 @@ export default new Vuex.Store({
       context.commit('updateCurrentUser', user)
       context.commit('setPlayers', [])
       context.commit('setCompetitions', [])
+      context.commit('setSeasons', [])
       context.commit('setOpponents', [])
     },
     init (context) {
@@ -95,6 +111,7 @@ export default new Vuex.Store({
       } else {
         context.dispatch('fetchPlayers')
         context.dispatch('fetchCompetitions')
+        context.dispatch('fetchSeasons')
         context.dispatch('fetchOpponents')
         context.commit('updateCurrentUser', user)
       }
@@ -107,6 +124,11 @@ export default new Vuex.Store({
     fetchCompetitions ({ commit }) {
       API.getCompetitions().then(competitions => {
         commit('setCompetitions', competitions)
+      })
+    },
+    fetchSeasons ({ commit }) {
+      API.getSeasons().then(seasons => {
+        commit('setSeasons', seasons)
       })
     },
     fetchOpponents ({ commit }) {
@@ -152,6 +174,19 @@ export default new Vuex.Store({
           })
         })
     },
+    createSeason ({ commit, state, dispatch }, season) {
+      // add team onto payload
+      season.team = state.team
+
+      API.createSeason(season)
+        .then(result => {
+          dispatch('fetchSeasons')
+          router.push({
+            name: 'Season',
+            params: { id: result.id }
+          })
+        })
+    },
     deleteCompetition ({ commit, state, dispatch }, id) {
       return new Promise((resolve, reject) => {
         API.deleteCompetition(id)
@@ -159,6 +194,20 @@ export default new Vuex.Store({
             dispatch('fetchCompetitions')
             router.push({
               name: 'Competitions'
+            })
+            resolve(resp)
+          }, error => {
+            reject(error)
+          })
+      })
+    },
+    deleteSeason ({ commit, state, dispatch }, id) {
+      return new Promise((resolve, reject) => {
+        API.deleteSeason(id)
+          .then((resp) => {
+            dispatch('fetchSeasons')
+            router.push({
+              name: 'Seasons'
             })
             resolve(resp)
           }, error => {

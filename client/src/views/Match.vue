@@ -43,8 +43,25 @@
 
       <v-card-text>
           <strong> Date : </strong> {{ match.date_time | formatDate }} <br/>
-          <strong> Competition : </strong> {{ match.competition_name }} <br/>
-          <strong> Opponent : </strong> {{ match.opponent_name }} <br/>
+
+          <strong> Competition : </strong>
+            <router-link :to="{
+              name: 'Competition',
+              params: { id: this.match.competition }
+            }">
+            {{ match.competition_name }}
+            </router-link>
+          <br/>
+
+          <strong> Opponent : </strong>
+            <router-link :to="{
+              name: 'Opponent',
+              params: { id: this.match.opponent }
+            }">
+            {{ match.opponent_name }}
+            </router-link>
+          <br/>
+
           <strong> Duration : </strong> {{ match.duration }} mins <br/>
           <div v-if="match.note">
             <strong> Note : </strong> {{ match.note }}
@@ -160,7 +177,9 @@ export default {
       alertMessage: '',
       match: {
         id: -1,
-        date_time: ''
+        date_time: '',
+        opponent: -1,
+        competition: -1
       },
       match_stats: {
         id: -1

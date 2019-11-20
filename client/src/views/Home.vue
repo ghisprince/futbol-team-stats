@@ -6,7 +6,13 @@
           <h2>Futbol team stats</h2>
           <img src="@/assets/crest.png" alt="crest.js" align="right">
 
-          <h3>What's New with version 2</h3>
+          <h3>Dec 2019 update</h3>
+          <ul>
+            <li>Stats aggregated by Season (eg: 2018-2019, 2019-2020,...).</li>
+            <li>More compact tables.</li>
+          </ul>
+
+          <h3>Sept 2018 update</h3>
           <ul>
             <li>Log into site once and stay logged in.</li>
             <li>Competitions table now includes level (aka flight), goal differential, # clean sheets.</li>
