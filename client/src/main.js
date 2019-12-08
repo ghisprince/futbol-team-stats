@@ -5,8 +5,8 @@ import './plugins/vuetify'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-require('../src/assets/fonts.googleapis.roboto.css')
 import '../src/assets/style.css'
+require('../src/assets/fonts.googleapis.roboto.css')
 
 Vue.config.productionTip = false
 

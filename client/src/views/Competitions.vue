@@ -42,9 +42,8 @@ export default {
     return {
       showProgress: false,
       search: ''
-      }
     }
-  ,
+  },
   computed: {
     is_editor () {
       return this.$store.state.user.is_editor

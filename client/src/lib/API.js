@@ -10,8 +10,8 @@ const playerMatchesURL = 'playermatches'
 const matchStatsURL = 'matchstats'
 const playersURL = 'players'
 const shotsURL = 'shots'
-const playerseasondataURL = "playerseasondata" 
-const teamseasondataURL =  "teamseasondata"
+const playerseasondataURL = 'playerseasondata'
+const teamseasondataURL = 'teamseasondata'
 
 const getHeader = function () {
   const user = JSON.parse(window.localStorage.getItem('user'))

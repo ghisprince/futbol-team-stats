@@ -96,7 +96,7 @@ export default {
       arr.push.apply(arr, [
         { text: 'Apps', tooltip: 'Appearances', value: 'apps' },
         { text: 'Min', tooltip: 'Minutes played', value: 'minutes' },
-        //{ text: 'Min per App', tooltip: 'Minutes played per appearance', value: 'minutes_avr' },
+        // { text: 'Min per App', tooltip: 'Minutes played per appearance', value: 'minutes_avr' },
         { text: 'Goals', tooltip: 'Goals Scored', value: 'goals' },
         { text: 'Assists', tooltip: 'Goals Assisted', value: 'assists' },
         { text: 'Shots', tooltip: 'Attempts on goal', value: 'shots' },

@@ -63,7 +63,7 @@ export default {
   computed: {
     seasons () {
       let seasons = this.$store.getters.seasonsSorted
-      seasons.push({id: null, name: "None"})
+      seasons.push({ id: null, name: 'None' })
       return seasons
     }
   },
