@@ -9,6 +9,7 @@
           <h3>Dec 2019 update</h3>
           <ul>
             <li>Stats aggregated by Season (eg: 2018-2019, 2019-2020,...).</li>
+            <li>Add shots graph to player and competition pages.</li>
             <li>More compact tables.</li>
           </ul>
 

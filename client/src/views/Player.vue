@@ -63,7 +63,20 @@
       </v-card-text>
       </v-card>
     </v-container>
+
+    <v-container>
+      <v-card>
+        <v-card-title>
+          <h2>Shots</h2>
+        </v-card-title>
+
+        <shots-graph :shots="shots"
+                     :onClickShot=onClickShot>
+        </shots-graph>
+      </v-card>
+    </v-container>
   </v-card>
+
 </template>
 
 <script>
@@ -71,10 +84,11 @@ import API from '@/lib/API'
 import PlayerMatchesTable from '@/components/PlayerMatchesTable'
 import PlayerMatchesAggTable from '@/components/PlayerMatchesAggTable'
 import PlayerSeasonsAggTable from '@/components/PlayerSeasonsAggTable'
+import ShotsGraph from '@/components/ShotsGraph'
 
 export default {
   components: {
-    PlayerMatchesTable, PlayerMatchesAggTable, PlayerSeasonsAggTable
+    PlayerMatchesTable, PlayerMatchesAggTable, PlayerSeasonsAggTable, ShotsGraph
   },
   data () {
     return {
@@ -85,6 +99,7 @@ export default {
         label: null
       },
       player_matches: [],
+      shots: [],
       player_season_data: [],
       showProgress: true,
       showProgress2: true
@@ -120,6 +135,10 @@ export default {
           this.player_season_data = player_season_data
           this.showProgress2 = false
         })
+      API.getShotsByPlayer(id)
+        .then((shots) => {
+          this.shots = shots
+        })
     },
     deletePlayer () {
       API.deletePlayer(this.player.id)
@@ -132,6 +151,10 @@ export default {
           this.alert = true
           this.alertMessage = err.response.data.error
         })
+    },
+    onClickShot (shot) {
+      // todo: vuetify hover https://vuetifyjs.com/en/components/hover
+      alert('shot details\nplayer: ' + shot.player_label)
     }
   }
 }

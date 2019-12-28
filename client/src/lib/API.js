@@ -233,6 +233,14 @@ export default {
     return HTTP.get(`${shotsURL}?match_id=${id}`)
       .then(response => response.data)
   },
+  getShotsByCompetition (id) {
+    return HTTP.get(`${shotsURL}?competition_id=${id}`)
+      .then(response => response.data)
+  },
+  getShotsByPlayer (id) {
+    return HTTP.get(`${shotsURL}?player_id=${id}`)
+      .then(response => response.data)
+  },
   // todo: is this even used?
   getShotsByMatchEx (id) {
     return HTTP.get(`${shotsURL}?match_id=${id}&expand=true`)

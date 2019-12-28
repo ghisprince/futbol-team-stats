@@ -85,6 +85,19 @@
         </v-card-text>
       </v-card>
     </v-container>
+
+    <v-container>
+      <v-card>
+        <v-card-title>
+          <h2>Shots</h2>
+        </v-card-title>
+
+        <shots-graph :shots="shots"
+                     :onClickShot=onClickShot>
+        </shots-graph>
+      </v-card>
+    </v-container>
+
   </v-card>
 </template>
 
@@ -92,10 +105,11 @@
 import API from '@/lib/API'
 import MatchesTable from '@/components/MatchesTable'
 import PlayerMatchesAggTable from '@/components/PlayerMatchesAggTable'
+import ShotsGraph from '@/components/ShotsGraph'
 
 export default {
   components: {
-    MatchesTable, PlayerMatchesAggTable
+    MatchesTable, PlayerMatchesAggTable, ShotsGraph
   },
   data () {
     return {
@@ -107,6 +121,7 @@ export default {
       },
       matches: [],
       player_matches: [],
+      shots: [],
       showProgress: true,
       showProgress2: true
     }
@@ -141,6 +156,14 @@ export default {
           this.player_matches = player_matches
           this.showProgress2 = false
         })
+      API.getShotsByCompetition(id)
+        .then((shots) => {
+          this.shots = shots
+        })
+    },
+    onClickShot (shot) {
+      // todo: vuetify hover https://vuetifyjs.com/en/components/hover
+      alert('shot details\nplayer: ' + shot.player_label)
     },
     deleteCompetition () {
       this.$store.dispatch('deleteCompetition', this.competition.id)
